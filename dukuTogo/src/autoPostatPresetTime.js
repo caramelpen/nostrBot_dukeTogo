@@ -233,7 +233,7 @@ const composePost = (postChar) => {
  * メイン
  ***************/
 const main = async () => {
-    cron.schedule ("* * * * *", () => {  // 分単位
+    cron.schedule ("* * * * *", async () => {  // 分単位
         let connectedSw = 0;
         try {
             // 秘密鍵
