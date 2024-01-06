@@ -32,7 +32,7 @@ const autoPostatPresetTime = async (relay)=>{
     const lng = 139.6917;
 
     try{
-        cron.schedule("* * * * *", () => {  // 分単位
+        //cron.schedule("* * * * *", () => {  // 分単位
             // 現在日時
             const nowDate = currDateTime();
             const nowDateTime = formattedDateTime(new Date(nowDate));
@@ -46,8 +46,8 @@ const autoPostatPresetTime = async (relay)=>{
             subSunriseSunset(relay
                             ,sunriseSunsetPath
                             ,nowDateTime, lat, lng);
-        }
-        );
+        // }
+        // );
     } catch(err) {
         console.error(err);
     }
@@ -233,43 +233,51 @@ const composePost = (postChar) => {
  ***************/
 const main = async () => {
 
-    // 秘密鍵
-    require("dotenv").config();
-    // console.log(require("dotenv").config());
-    const nsec = process.env.dukuTogo_BOT_PRIVATE_KEY;
-    if (nsec === undefined) {
-        console.error("nsec is not found");
-        return;
-    }
-    const dr = nip19.decode(nsec);
-    if (dr.type !== "nsec") {
-        console.error("NOSTR PRIVATE KEY is not nsec");
-        return;
-    }
-    BOT_PRIVATE_KEY_HEX = dr.data;
-    pubkey = getPublicKey(BOT_PRIVATE_KEY_HEX); // 秘密鍵から公開鍵の取得
+    cron.schedule("* * * * *", () => {  // 分単位
+        let connectedSw = 0;
 
-    // リレー
-    const relay = relayInit(relayUrl);
-    relay.on("error", () => {
-        console.error("autoPostatPresetTime:failed to connect");
-        relay.close();
-        return;
+        // 秘密鍵
+        require("dotenv").config();
+        // console.log(require("dotenv").config());
+        const nsec = process.env.dukuTogo_BOT_PRIVATE_KEY;
+        if (nsec === undefined) {
+            console.error("nsec is not found");
+            return;
+        }
+        const dr = nip19.decode(nsec);
+        if (dr.type !== "nsec") {
+            console.error("NOSTR PRIVATE KEY is not nsec");
+            return;
+        }
+        BOT_PRIVATE_KEY_HEX = dr.data;
+        pubkey = getPublicKey(BOT_PRIVATE_KEY_HEX); // 秘密鍵から公開鍵の取得
+
+        // リレー
+        const relay = relayInit(relayUrl);
+        relay.on("error", () => {
+            console.error("autoPostatPresetTime:failed to connect");
+            relay.close();
+            return;
+        });
+
+        await relay.connect();
+        // console.log("autoPostatPresetTime:connected to relay");
+        connectedSw = 1;
+        try {
+            /*
+                jsonに設定された指定の時刻に対応する語句をポスト
+            */
+            autoPostatPresetTime(relay);
+
+        } catch(err) {
+            console.error(err);
+
+        } finally {
+            if(connectedSw === 1) {
+                relay.close();
+            }
+        }
     });
-
-    await relay.connect();
-    console.log("autoPostatPresetTime:connected to relay");
-
-    try {
-        /*
-            jsonに設定された指定の時刻に対応する語句をポスト
-        */
-        autoPostatPresetTime(relay);
-
-    } catch(err) {
-        console.error(err);
-
-    }
 }
 
 
