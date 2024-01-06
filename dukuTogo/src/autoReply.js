@@ -28,7 +28,7 @@ const autoReply = async (relay) => {
         return;
     }
 
-
+    
     // フィードを購読
     const sub = relay.sub(
                 [{ kinds: [1] }]
@@ -49,7 +49,7 @@ const autoReply = async (relay) => {
 
                     // 反応語句はjsonの何番目にいるか取得
                     const orgPostIdx = target.orgPost.findIndex(element => ev.content.includes(element));
-                    if(orgPostIdx == -1) {
+                    if(orgPostIdx === -1) {
                         return;
                     }
                     // 反応語句はポストの何文字目にいるか取得
