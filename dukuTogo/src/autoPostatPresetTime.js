@@ -232,10 +232,8 @@ const composePost = (postChar) => {
 /****************
  * メイン
  ***************/
-//const main = async () => {
-const main = () => {
-
-    cron.schedule async ("* * * * *", () => {  // 分単位
+const main = async () => {
+    cron.schedule ("* * * * *", () => {  // 分単位
         let connectedSw = 0;
         try {
             // 秘密鍵
