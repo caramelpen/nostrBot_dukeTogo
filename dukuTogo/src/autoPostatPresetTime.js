@@ -72,7 +72,7 @@ const subPresetPost = (presetDatePath, nowDateTime) => {
         //console.log(nowDateTime12);    
         const presetDateJson = jsonOpen(presetDatePath);
         if(presetDateJson === null){
-            console.err("subPresetPost:json file is not get");
+            console.error("subPresetPost:json file is not get");
             return false;
         }        
 
@@ -109,7 +109,7 @@ const subPresetPost = (presetDatePath, nowDateTime) => {
         }
         return false;
     } catch(err) {
-        console.err("subPresetPost:" + err);
+        console.error("subPresetPost:" + err);
         return false;
     }
   }
@@ -132,7 +132,7 @@ const subSunriseSunset = (sunriseSunsetPath, nowDateTime, lat, lng) => {
         const sunriseSunsetJson = jsonOpen(sunriseSunsetPath);
         //console.log(Array.isArray(sunriseSunsetJson));
         if(sunriseSunsetJson === null){
-            console.err("subSunriseSunset:json file is not get");
+            console.error("subSunriseSunset:json file is not get");
             return false;
         }
         // jsonファイルから日の出と日の入りの日時を設定
@@ -222,7 +222,7 @@ const subSunriseSunset = (sunriseSunsetPath, nowDateTime, lat, lng) => {
             return false;
         }
     } catch (err) {
-        console.err("subSunriseSunset:" + err);
+        console.error("subSunriseSunset:" + err);
         return false;
     }
 }
