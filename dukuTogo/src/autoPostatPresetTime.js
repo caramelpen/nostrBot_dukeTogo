@@ -145,39 +145,39 @@ const subSunriseSunset = (relay
             isPostSunset = true;
         }
     }
+    // 海外サーバ設置の際の対応として、日本時間にできるようにjsonで対応
     const offset = sunriseSunsetJson.jpnTimezoneOffset1 * sunriseSunsetJson.jpnTimezoneOffset2 * 60 * 1000;
     //console.log("offset:" + offset);
     if(isPostSunrise == true || isPostSunset == true) {
         // 明日の日の出日の入りの時刻を取得
         const times = sunCalc.getTimes(nextDay, lat, lng);
-        // 日の出と日の入りでjsonから得るプロパティが異なるため
-        let sunriseorSunset = "";
+        // 日の出と日の入りでjsonから得るプロパティが異なるため、処理を分ける（三項演算子で書いてもいいけど、isPostSunrise の真偽判断が全部に入るのはしっくりこないので避けた）
         let nextSunriseorSunsetwk;
-        let nextSunriseorSunset;
+        let sunriseorSunset = "";
         let sunRiseorSunsetPostLength = 0;
         let sunRiseorSunsetPost = "";
         let sunRiseorSunsetConst = "";
         
         if(isPostSunrise == true) {
-            // 明日の日の出時間を時刻
-            nextSunriseorSunsetwk = new Date(times.sunrise.getTime() + offset); //日本時間にする
-            nextSunriseorSunset = formattedDateTime(nextSunriseorSunsetwk);
+            // 明日の日の出時間を取得
+            nextSunriseorSunsetwk = new Date(times.sunrise.getTime() + offset);
             sunriseorSunset = "sunRise";
             sunRiseorSunsetPostLength = sunriseSunsetJson.sunRisePost.length;
             sunRiseorSunsetPost = "sunRisePost";
             sunRiseorSunsetConst = "sunRiseConst";
         } else {
             if(isPostSunset == true) {
-                // 明日の日の入り時間を時刻
+                // 明日の日の入り時間を取得
                 nextSunriseorSunsetwk = new Date(times.sunset.getTime() + offset);
-                nextSunriseorSunset = formattedDateTime(nextSunriseorSunsetwk);
                 sunriseorSunset = "sunSet";
                 sunRiseorSunsetPostLength = sunriseSunsetJson.sunSetPost.length;
                 sunRiseorSunsetPost = "sunSetPost";
                 sunRiseorSunsetConst = "sunSetConst";
             }
         }
-        nextSunriseorSunset = nextSunriseorSunset.substring(0, 12); // 秒をカット
+
+        let nextSunriseorSunset = formattedDateTime(nextSunriseorSunsetwk);
+        nextSunriseorSunset = nextSunriseorSunset.substring(0, 12); // 秒部分をカット
 
         // 設定されている投稿語句の設定数の範囲でランダム数を取得する
         const postIdx = random(0, sunRiseorSunsetPostLength - 1);
