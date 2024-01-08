@@ -8,7 +8,7 @@ const cron = require("node-cron");
 const { relayInit, getPublicKey, finishEvent, nip19 } = require("nostr-tools");
 
 const sunCalc = require("suncalc");
-const { currUnixtimeOrg, currDateTime, currUnixtime, random, jsonOpen, writeJsonFile, formattedDateTime } = require("../../common/utils.js");
+const { currDateTime, currUnixtime, random, jsonOpen, writeJsonFile, formattedDateTime } = require("../../common/utils.js");
 const { publishToRelay } = require("../../common/publishToRelay.js");
 
 //const relayUrl = "wss://relay-jp.nostr.wirednet.jp";
