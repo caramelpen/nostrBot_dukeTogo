@@ -8,7 +8,7 @@ const cron = require("node-cron");
 const { relayInit, getPublicKey, finishEvent, nip19 } = require("nostr-tools");
 
 const sunCalc = require("suncalc");
-const { currDateTime, currUnixtime, random, jsonOpen, writeJsonFile, formattedDateTime } = require("../../common/utils.js");
+const { currUnixtimeOrg, currDateTime, currUnixtime, random, jsonOpen, writeJsonFile, formattedDateTime } = require("../../common/utils.js");
 const { publishToRelay } = require("../../common/publishToRelay.js");
 
 //const relayUrl = "wss://relay-jp.nostr.wirednet.jp";
@@ -251,7 +251,7 @@ const composePost = (postChar) => {
         ,kind: 1
         ,content: postChar
         ,tags: []
-        ,created_at: currUnixtime()
+        ,created_at: currUnixtimeOrg()
     };
 
     // イベントID(ハッシュ値)計算・署名

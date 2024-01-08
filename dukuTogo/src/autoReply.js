@@ -5,7 +5,7 @@
  */
 require("websocket-polyfill");
 const { relayInit, getPublicKey, finishEvent, nip19 } = require("nostr-tools");
-const { currDateTime, currUnixtime, jsonOpen, isSafeToReply, random, probabilityDetermination } = require("../../common/utils.js");
+const { currDateTime, currUnixtime, currUnixtimeOrg, jsonOpen, isSafeToReply, random, probabilityDetermination } = require("../../common/utils.js");
 const { publishToRelay } = require("../../common/publishToRelay.js");
 
 const relayUrl = "wss://relay-jp.nostr.wirednet.jp";
@@ -93,7 +93,7 @@ const composeReply = (replyPostChar, targetEvent) => {
             ["p",targetEvent.pubkey,""]
             ,["e",targetEvent.id,""] 
         ]
-        ,created_at: currUnixtime()
+        ,created_at: currUnixtimeOrg()
     };
 
     // イベントID(ハッシュ値)計算・署名
