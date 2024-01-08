@@ -183,7 +183,7 @@ const subSunriseSunset = (sunriseSunsetPath, nowDateTime, lat, lng) => {
             // console.log("nextDay:" + nextDay);
             // console.log("nowDateTime:" +nowDateTime);
             // console.log("nowDateTime12:" + nowDateTime12);
-            // console.log("currUnixtimeOrg:" + currUnixtimeOrg());
+            // console.log("currUnixtime:" + currUnixtime());
             // console.log("----");
             //return false;
         }

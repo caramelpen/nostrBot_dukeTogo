@@ -140,8 +140,9 @@ const isSafeToReply = ({ pubkey, created_at }) => {
   // 公開鍵ごとに、最後にリプライを返した時刻(unixtime)を保持するMap
   const lastReplyTimePerPubkey = new Map();
 
-  // const now = currUnixtime();
-  const now = currUnixtimeOrg();
+  //const now = currUnixtimeOrg();
+  const now = currUnixtime();
+  
 
   if (created_at < now - COOL_TIME_DUR_SEC) {
     return false;
@@ -216,8 +217,8 @@ const probabilityDetermination = (probability) => {
  * module.exports
  */
 module.exports = {
-  currUnixtimeOrg
-  ,currDateTime
+  //currUnixtimeOrg
+  currDateTime
   ,currUnixtime
   // ,getCliArg
   ,asyncJsonOpen, jsonOpen
