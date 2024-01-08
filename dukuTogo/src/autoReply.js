@@ -5,7 +5,7 @@
  */
 require("websocket-polyfill");
 const { relayInit, getPublicKey, finishEvent, nip19 } = require("nostr-tools");
-const { currUnixtime, jsonOpen, isSafeToReply, random, probabilityDetermination } = require("../../common/utils.js");
+const { currDateTime, currUnixtime, jsonOpen, isSafeToReply, random, probabilityDetermination } = require("../../common/utils.js");
 const { publishToRelay } = require("../../common/publishToRelay.js");
 
 const relayUrl = "wss://relay-jp.nostr.wirednet.jp";
@@ -23,12 +23,13 @@ const autoReply = async (relay) => {
     // 反応語句の格納されたjsonを取得
     const autoReplyJson = jsonOpen(autoReplyPath);
     //console.log(Array.isArray(autoReplyJson));
-    if(autoReplyJson == null){
+    if(autoReplyJson === null){
         console.log("json file is not get");
         return;
     }
 
-    
+    //console.log(currDateTime());
+
     // フィードを購読
     const sub = relay.sub(
                 [{ kinds: [1] }]

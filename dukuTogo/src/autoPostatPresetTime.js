@@ -124,6 +124,7 @@ const subPresetPost = (presetDatePath, nowDateTime) => {
 //                         , sunriseSunsetPath
 //                         , nowDateTime, lat, lng) => {
 const subSunriseSunset = (sunriseSunsetPath, nowDateTime, lat, lng) => {
+    let ret = 0;
     try {
         let isPostSunrise = false;
         let isPostSunset = false;
@@ -160,6 +161,11 @@ const subSunriseSunset = (sunriseSunsetPath, nowDateTime, lat, lng) => {
         }
         // 海外サーバ設置の際の対応として、日本時間にできるようにjsonで対応
         const offset = sunriseSunsetJson.jpnTimezoneOffset1 * sunriseSunsetJson.jpnTimezoneOffset2 * 60 * 1000;
+
+// const times1 = sunCalc.getTimes(nextDay, lat, lng);
+// console.log(new Date(times1.sunrise.getTime() ));
+// console.log(new Date(times1.sunrise.getTime() + offset));
+
         //console.log("offset:" + offset);
         if(isPostSunrise == true || isPostSunset == true) {
             // 明日の日の出日の入りの時刻を取得
@@ -203,7 +209,8 @@ const subSunriseSunset = (sunriseSunsetPath, nowDateTime, lat, lng) => {
             // json ファイルへ次の日の出か日の入り時刻を書き込む
             writeJsonFile(sunriseSunsetPath, sunriseorSunset, nextSunriseorSunset);
             console.log("write json(" + sunriseorSunset + "):" + nextSunriseorSunset);
-            return true;
+            //return true;
+            ret = 1;
         } else {
             // console.log("----");
             // const times = sunCalc.getTimes(nextDay, lat, lng);
@@ -219,11 +226,18 @@ const subSunriseSunset = (sunriseSunsetPath, nowDateTime, lat, lng) => {
             // console.log("nowDateTime12:" + nowDateTime12);
             // console.log("currUnixtimeOrg:" + currUnixtimeOrg());
             // console.log("----");
-            return false;
+            //return false;
         }
     } catch (err) {
         console.error("subSunriseSunset:" + err);
         return false;
+    } finally {
+        if(ret === 1) {
+            return true;
+        } else {
+            return false;
+        }
+
     }
 }
 
@@ -261,6 +275,23 @@ const main = async () => {
         // jsonの場所を割り出すために
         const jsonPath = require("path");
 
+        // 秘密鍵
+        require("dotenv").config();
+        // console.log(require("dotenv").config());
+        const nsec = process.env.dukuTogo_BOT_PRIVATE_KEY;
+        if (nsec === undefined) {
+            console.error("nsec is not found");
+            return;
+        }
+        const dr = nip19.decode(nsec);
+        if (dr.type !== "nsec") {
+            console.error("NOSTR PRIVATE KEY is not nsec");
+            return;
+        }
+        BOT_PRIVATE_KEY_HEX = dr.data;
+        pubkey = getPublicKey(BOT_PRIVATE_KEY_HEX); // 秘密鍵から公開鍵の取得
+
+
         for (let i = 1; i <= 2; i++) {
             let postSubject = false;
             let connectedSw = 0;
@@ -290,22 +321,6 @@ const main = async () => {
                 }
 
                 if(postSubject == true) {
-
-                    // 秘密鍵
-                    require("dotenv").config();
-                    // console.log(require("dotenv").config());
-                    const nsec = process.env.dukuTogo_BOT_PRIVATE_KEY;
-                    if (nsec === undefined) {
-                        console.error("nsec is not found");
-                        return;
-                    }
-                    const dr = nip19.decode(nsec);
-                    if (dr.type !== "nsec") {
-                        console.error("NOSTR PRIVATE KEY is not nsec");
-                        return;
-                    }
-                    BOT_PRIVATE_KEY_HEX = dr.data;
-                    pubkey = getPublicKey(BOT_PRIVATE_KEY_HEX); // 秘密鍵から公開鍵の取得
 
                     // リレー
                     const relayUrl = "wss://relay-jp.nostr.wirednet.jp";
