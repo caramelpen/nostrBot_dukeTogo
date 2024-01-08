@@ -8,53 +8,12 @@ const cron = require("node-cron");
 const { relayInit, getPublicKey, finishEvent, nip19 } = require("nostr-tools");
 
 const sunCalc = require("suncalc");
-const { currUnixtimeOrg, currDateTime, currUnixtime, random, jsonOpen, writeJsonFile, formattedDateTime } = require("../../common/utils.js");
+const { currDateTime, currUnixtime, random, jsonOpen, writeJsonFile, formattedDateTime } = require("../../common/utils.js");
 const { publishToRelay } = require("../../common/publishToRelay.js");
-
-//const relayUrl = "wss://relay-jp.nostr.wirednet.jp";
 
 let BOT_PRIVATE_KEY_HEX;
 let pubkey;
 let postEv;
-
-// const autoPostatPresetTime = (relay)=>{
-
-//     // jsonの場所を割り出すために
-//     const jsonPath = require("path");
-
-//     // 日の出日の入りjsonファイルの場所の設定
-//     const sunriseSunsetPath = jsonPath.join(__dirname, "../config/sunriseSunset.json");
-
-//     // 定刻ポストjsonファイルの場所の設定
-//     const presetDatePath =  jsonPath.join(__dirname, "../config/presetDate.json");
-
-//     // // 東京の座標を指定
-//     const lat = 35.6895;
-//     const lng = 139.6917;
-
-//     try{
-//         //cron.schedule("* * * * *", () => {  // 分単位
-//             // 現在日時
-//             const nowDate = currDateTime();
-//             const nowDateTime = formattedDateTime(new Date(nowDate));
-
-//             // 定刻ポスト
-//             subPresetPost(relay
-//                         ,presetDatePath
-//                         ,nowDateTime);
-
-//             // 日の出日の入ポスト
-//             subSunriseSunset(relay
-//                             ,sunriseSunsetPath
-//                             ,nowDateTime, lat, lng);
-//         // }
-//         // );
-//     } catch(err) {
-//         console.error(err);
-//     }
-
-
-// }
 
 
 // 定刻ポスト
@@ -251,7 +210,7 @@ const composePost = (postChar) => {
         ,kind: 1
         ,content: postChar
         ,tags: []
-        ,created_at: currUnixtimeOrg()
+        ,created_at: currUnixtime()
     };
 
     // イベントID(ハッシュ値)計算・署名

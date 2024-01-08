@@ -1,8 +1,9 @@
 // 現在のunixtime(秒単位)を取得
-const currUnixtimeOrg = () => Math.floor(new Date().getTime() / 1000);
+//const currUnixtimeOrg = () => Math.floor(new Date().getTime() / 1000);
 
 // 現在の日本時間を取得
-const currDateTime = () => new Date(new Date().toLocaleString("ja-JP", { timeZone: "Asia/Tokyo" }));
+//const currDateTime = () => new Date(new Date().toLocaleString("ja-JP", { timeZone: "Asia/Tokyo" }));
+const currDateTime = () => new Date();
 
 // 現在の日本時間のUnixtime(秒単位)を取得
 const currUnixtime = () => Math.floor(currDateTime().getTime() / 1000);

@@ -5,13 +5,14 @@
  */
 require("websocket-polyfill");
 const { relayInit, getPublicKey, finishEvent, nip19 } = require("nostr-tools");
-const { currDateTime, currUnixtime, currUnixtimeOrg, jsonOpen, isSafeToReply, random, probabilityDetermination } = require("../../common/utils.js");
+const { currUnixtime, jsonOpen, isSafeToReply, random, probabilityDetermination } = require("../../common/utils.js");
 const { publishToRelay } = require("../../common/publishToRelay.js");
 
 const relayUrl = "wss://relay-jp.nostr.wirednet.jp";
 
 let BOT_PRIVATE_KEY_HEX;
 let pubkey;
+let adminPubkey = "";
 
 const autoReply = async (relay) => {
     // jsonの場所を割り出すために
@@ -27,8 +28,6 @@ const autoReply = async (relay) => {
         console.log("json file is not get");
         return;
     }
-
-    //console.log(currDateTime());
 
     // フィードを購読
     const sub = relay.sub(
@@ -46,7 +45,7 @@ const autoReply = async (relay) => {
                 } else {
 
                     // target.probability は1～100で設定されている
-                    // 反応語句の前方に「ゴルゴ」が含まれるかあるいは確率判定でOKならリプライする
+                    // リプライする相手の公開鍵が管理者のものであるか、反応語句の前方に「ゴルゴ」が含まれるか、あるいは確率判定でOKならリプライする
 
                     // 反応語句はjsonの何番目にいるか取得
                     const orgPostIdx = target.orgPost.findIndex(element => ev.content.includes(element));
@@ -57,7 +56,7 @@ const autoReply = async (relay) => {
                     const chridx = ev.content.indexOf(target.orgPost[orgPostIdx]);
                     // 反応語句の前方を収める
                     const substr = ev.content.substring(0, chridx);
-                    if(substr.includes("ゴルゴ") || probabilityDetermination(target.probability)) {
+                    if(ev.pubkey === adminPubkey || substr.includes("ゴルゴ") || probabilityDetermination(target.probability)) {
                         // リプライしても安全なら、リプライイベントを組み立てて送信する
                         if (isSafeToReply(ev)) {
                             // jsonに設定されている対応する反応語句の数を利用してランダムで反応語句を決める
@@ -93,7 +92,7 @@ const composeReply = (replyPostChar, targetEvent) => {
             ["p",targetEvent.pubkey,""]
             ,["e",targetEvent.id,""] 
         ]
-        ,created_at: currUnixtimeOrg()
+        ,created_at: currUnixtime()
     };
 
     // イベントID(ハッシュ値)計算・署名
@@ -119,6 +118,8 @@ const main = async () => {
     BOT_PRIVATE_KEY_HEX = dr.data;
     pubkey = getPublicKey(BOT_PRIVATE_KEY_HEX); // 秘密鍵から公開鍵の取得
   
+    adminPubkey = process.env.admin_HEX_PUBKEY;
+
     // リレー
     const relay = relayInit(relayUrl);
     relay.on("error", () => {
