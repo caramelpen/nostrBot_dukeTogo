@@ -13,7 +13,7 @@
     "日没だ...",
     "日没だ...もういい加減、諦めたらどうだ..."
   ],
-  "jpnTimezoneOffset1": 9,
+  "jpnTimezoneOffset1": 0,
   "jpnTimezoneOffset2": 60,
   "detail": "海外サーバの場合、jpnTimezoneOffset1 に 9 jpnTimezoneOffset2 に 60 と設定すると日本時間になります（日本サーバの際はどちらかを 0 にすれば無効になります）"
 }
