@@ -44,19 +44,34 @@ const autoReply = async (relay) => {
                     return;
                 } else {
 
-                    // target.probability は1～100で設定されている
                     // リプライする相手の公開鍵が管理者のものであるか、反応語句の前方に「ゴルゴ」が含まれるか、あるいは確率判定でOKならリプライする
-
-                    // 反応語句はjsonの何番目にいるか取得
-                    const orgPostIdx = target.orgPost.findIndex(element => ev.content.includes(element));
-                    if(orgPostIdx === -1) {
-                        return;
+                    let canPostit = false;
+                    // リプライする相手の公開鍵が管理者のもの
+                    if(ev.pubkey === adminPubkey) {
+                        canPostit = true;
+                    } else {
+                        // 反応語句はjsonの何番目にいるか取得
+                        const orgPostIdx = target.orgPost.findIndex(element => ev.content.includes(element));
+                        if(orgPostIdx === -1) {
+                            return;
+                        }
+                        // 反応語句はポストの何文字目にいるか取得
+                        const chridx = ev.content.indexOf(target.orgPost[orgPostIdx]);
+                        // 反応語句の前方を収める
+                        const substr = ev.content.substring(0, chridx);
+                        // 反応語句の前方に「ゴルゴ」が含まれる
+                        if(substr.includes("ゴルゴ")) {
+                            canPostit = true;
+                        } else {
+                            // 確率判定でOK
+                            // target.probability は1～100で設定されている
+                            if(probabilityDetermination(target.probability)) {
+                                canPostit = true;
+                            }
+                        }
                     }
-                    // 反応語句はポストの何文字目にいるか取得
-                    const chridx = ev.content.indexOf(target.orgPost[orgPostIdx]);
-                    // 反応語句の前方を収める
-                    const substr = ev.content.substring(0, chridx);
-                    if(ev.pubkey === adminPubkey || substr.includes("ゴルゴ") || probabilityDetermination(target.probability)) {
+
+                    if(canPostit == true) {
                         // リプライしても安全なら、リプライイベントを組み立てて送信する
                         if (isSafeToReply(ev)) {
                             // jsonに設定されている対応する反応語句の数を利用してランダムで反応語句を決める

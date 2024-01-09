@@ -17,10 +17,7 @@ let postEv;
 
 
 // 定刻ポスト
-//const subPresetPost = (relay
-                    // ,presetDatePath
-                    // ,nowDateTime) => {
-const subPresetPost = (presetDatePath, nowDateTime) => {    
+const subPresetPost = (presetDatePath, nowDateTime) => {
     try {
         const nowDateTime12 = nowDateTime.substring(0 ,12);     // 秒をカット   YYYYMMDDHHMM
         const nowDateTimeYMD = nowDateTime12.substring(0 ,8);   // 年月日部分
@@ -56,11 +53,7 @@ const subPresetPost = (presetDatePath, nowDateTime) => {
             if (target) {
                 // ポスト語句は複数設定されており、設定数の範囲でランダムに取得
                 const postIdx = random(0,target.postChar.length - 1);
-                //const postEv = composePost(target.postChar[postIdx]);
                 postEv = composePost(target.postChar[postIdx]);
-                // ポスト
-                //publishToRelay(relay, postEv);
-                //break;
                 return true;
             } else {
                 //console.log(targetDateTime);
@@ -79,11 +72,7 @@ const subPresetPost = (presetDatePath, nowDateTime) => {
 
 
 // 日の出日の入ポスト
-// const subSunriseSunset = (relay
-//                         , sunriseSunsetPath
-//                         , nowDateTime, lat, lng) => {
 const subSunriseSunset = (sunriseSunsetPath, nowDateTime, lat, lng) => {
-    let ret = 0;
     try {
         let isPostSunrise = false;
         let isPostSunset = false;
@@ -120,11 +109,6 @@ const subSunriseSunset = (sunriseSunsetPath, nowDateTime, lat, lng) => {
         }
         // 海外サーバ設置の際の対応として、日本時間にできるようにjsonで対応
         const offset = sunriseSunsetJson.jpnTimezoneOffset1 * sunriseSunsetJson.jpnTimezoneOffset2 * 60 * 1000;
-
-// const times1 = sunCalc.getTimes(nextDay, lat, lng);
-// console.log(new Date(times1.sunrise.getTime() ));
-// console.log(new Date(times1.sunrise.getTime() + offset));
-
         //console.log("offset:" + offset);
         if(isPostSunrise == true || isPostSunset == true) {
             // 明日の日の出日の入りの時刻を取得
@@ -159,17 +143,13 @@ const subSunriseSunset = (sunriseSunsetPath, nowDateTime, lat, lng) => {
 
             // 設定されている投稿語句の設定数の範囲でランダム数を取得する
             const postIdx = random(0, sunRiseorSunsetPostLength - 1);
-            //const postEv = composePost(sunriseSunsetJson[sunRiseorSunsetConst] + sunriseSunsetJson[sunRiseorSunsetPost][postIdx]);
             postEv = composePost(sunriseSunsetJson[sunRiseorSunsetConst] + sunriseSunsetJson[sunRiseorSunsetPost][postIdx]);
-
-            //publishToRelay(relay, postEv);
 
             //console.log(sunriseorSunset);
             // json ファイルへ次の日の出か日の入り時刻を書き込む
             writeJsonFile(sunriseSunsetPath, sunriseorSunset, nextSunriseorSunset);
             console.log("write json(" + sunriseorSunset + "):" + nextSunriseorSunset);
-            //return true;
-            ret = 1;
+            return true;
         } else {
             // console.log("----");
             // const times = sunCalc.getTimes(nextDay, lat, lng);
@@ -190,13 +170,6 @@ const subSunriseSunset = (sunriseSunsetPath, nowDateTime, lat, lng) => {
     } catch (err) {
         console.error("subSunriseSunset:" + err);
         return false;
-    } finally {
-        if(ret === 1) {
-            return true;
-        } else {
-            return false;
-        }
-
     }
 }
 
