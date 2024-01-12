@@ -72,7 +72,7 @@ const subPresetPost = (presetDatePath, nowDateTime) => {
 
 
 // 日の出日の入ポスト
-const subSunriseSunset = (sunriseSunsetPath, nowDateTime, lat, lng) => {
+const subSunriseSunset = (sunriseSunsetPath, nowDateTime) => {
     try {
         let isPostSunrise = false;
         let isPostSunset = false;
@@ -84,7 +84,12 @@ const subSunriseSunset = (sunriseSunsetPath, nowDateTime, lat, lng) => {
             console.error("subSunriseSunset:json file is not get");
             return false;
         }
-        // jsonファイルから日の出と日の入りの日時を設定
+
+        // jsonファイルから日の出と日の入りを得る座標を取得
+        const lat = sunriseSunsetJson.lat;
+        const lng = sunriseSunsetJson.lng;
+
+        // jsonファイルから日の出と日の入りの日時を取得
         const sunrise = sunriseSunsetJson.sunRise;
         const sunset = sunriseSunsetJson.sunSet;
 
@@ -150,22 +155,6 @@ const subSunriseSunset = (sunriseSunsetPath, nowDateTime, lat, lng) => {
             writeJsonFile(sunriseSunsetPath, sunriseorSunset, nextSunriseorSunset);
             console.log("write json(" + sunriseorSunset + "):" + nextSunriseorSunset);
             return true;
-        } else {
-            // console.log("----");
-            // const times = sunCalc.getTimes(nextDay, lat, lng);
-            // console.log("sunrise  :" + times.sunrise);
-            // console.log("sunset   :" + times.sunset);
-            // const sunriseJapanTime = formattedDateTime(new Date(times.sunrise.getTime() + offset));
-            // const sunsetJapanTime = formattedDateTime(new Date(times.sunset.getTime() + offset));
-            // console.log("sunriseJp:" + sunriseJapanTime);
-            // console.log("sunsetJp :" + sunsetJapanTime);
-            // console.log("nextDaywk:" + nextDaywk);
-            // console.log("nextDay:" + nextDay);
-            // console.log("nowDateTime:" +nowDateTime);
-            // console.log("nowDateTime12:" + nowDateTime12);
-            // console.log("currUnixtime:" + currUnixtime());
-            // console.log("----");
-            //return false;
         }
     } catch (err) {
         console.error("subSunriseSunset:" + err);
@@ -240,15 +229,11 @@ const main = async () => {
 
                 } else {
 
-                    // 東京の座標を指定
-                    const lat = 35.6895;
-                    const lng = 139.6917;
-
                     // 日の出日の入りjsonファイルの場所の設定
                     const sunriseSunsetPath = jsonPath.join(__dirname, "../config/sunriseSunset.json");
 
                     // 日の出日の入ポスト
-                    postSubject = subSunriseSunset(sunriseSunsetPath, nowDateTime, lat, lng);
+                    postSubject = subSunriseSunset(sunriseSunsetPath, nowDateTime);
 
                 }
 
@@ -266,10 +251,6 @@ const main = async () => {
                     await relay.connect();
                     // console.log("autoPostatPresetTime:connected to relay");
                     connectedSw = 1;
-                    // /*
-                    //     jsonに設定された指定の時刻に対応する語句をポスト
-                    // */
-                    // autoPostatPresetTime(relay);
 
                     // ポスト
                     publishToRelay(relay, postEv);   
