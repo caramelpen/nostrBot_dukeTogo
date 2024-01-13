@@ -35,8 +35,8 @@ const replytoReply = async (relay)=>{
 
     sub.on("event", (ev) => {
         try {
-            // リプライしても安全なら、リプライイベントを組み立てて送信する
-            if (isSafeToReply(ev)) {
+            //// リプライしても安全なら、リプライイベントを組み立てて送信する ⇒ 暴走はないので制限は外す
+            //if (isSafeToReply(ev)) {
                 // 反応語句配列の数の範囲からランダム値を取得し、それを配列要素とする
                 const replyChrPresetIdx = random(0, replyChrJson.length - 1);
                 // 配列要素を決めたら、その配列に設定されている反応語句の設定配列の範囲からさらにランダム値を取得
@@ -46,7 +46,7 @@ const replytoReply = async (relay)=>{
                 // リプライ
                 const replyPost = composeReplyPost(replyChr, ev);
                 publishToRelay(relay, replyPost);
-            }
+            //}
         } catch (err) {
             console.error(err);
         }
