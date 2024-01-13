@@ -197,7 +197,13 @@
         ,"probability":0
     }
 
-
+    ,{
+        "orgPost": ["ネット"]
+        ,"replyPostChar": [
+                        "ネットの中では、大人も子供も、男も女もないんじゃないか？"
+                        ]
+        ,"probability":0
+    }
     
 
 ]
