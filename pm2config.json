@@ -1,0 +1,25 @@
+{
+    "apps": [
+        {
+            "name": "autoPostatPresetTime"
+            ,"script": "./dukuTogo/src/autoPostatPresetTime.js"
+            ,"exec_mode": "fork"
+            ,"instances": 0
+            ,"log_date_format": "YYYY-MM-DD HH:mm Z"
+        }
+        ,{
+            "name": "autoReply"
+            ,"script": "./dukuTogo/src/autoReply.js"
+            ,"exec_mode": "fork"
+            ,"instances": 0
+            ,"log_date_format": "YYYY-MM-DD HH:mm Z"
+        }
+        ,{
+            "name": "replytoReply"
+            ,"script": "./dukuTogo/src/replytoReply.js"
+            ,"exec_mode": "fork"
+            ,"instances": 0
+            ,"log_date_format": "YYYY-MM-DD HH:mm Z"
+        }
+    ]
+}
