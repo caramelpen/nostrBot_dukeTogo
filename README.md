@@ -18,21 +18,20 @@
 
 ### 1.製品識別
 <pre>
-nostr
-   ├─common
-   │      publishToRelay.js
-   │      utils.js
-   │
-   └─dukuTogo
-       ├─config
-       │      autoReply.json
-       │      presetDate.json
-       │      sunriseSunset.json
-       │
-       └─src
-               autoPostatPresetTime.js
-               autoReply.js
-               replytoReply.js
+│
+├─config
+│      autoReply.json
+│      presetDate.json
+│      sunriseSunset.json
+│
+└─src
+    │  autoPostatPresetTime.js
+    │  autoReply.js
+    │  replytoReply.js
+    │
+    └─common
+            publishToRelay.js
+            utils.js
 </pre>
 ##### 　
 ### 2.各ファイルの役割概要
