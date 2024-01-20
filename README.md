@@ -82,6 +82,6 @@ nostr
 ##### 　
 
 ### 5.謝辞
-#### ・Nostr Japan ( https://github.com/nostr-jp )のPeople様
+#### ・Nostr Japan ( https://github.com/nostr-jp )各位
 #### ・Don ( https://github.com/nikolat )様
 #### ・ひゅうが霄 ( https://showhyuga.blogspot.com/ )様
