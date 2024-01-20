@@ -18,7 +18,6 @@
 
 ### 1.製品識別
 <pre>
-│
 ├─config
 │      autoReply.json
 │      presetDate.json
