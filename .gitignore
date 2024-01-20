@@ -5,6 +5,7 @@ package-lock.json
 pnpm-lock.yaml
 .env
 pm2config.json
+pm2config_nostr.json
 README.md
 LICENSE
 # sunriseSunset.json
