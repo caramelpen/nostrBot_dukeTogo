@@ -60,7 +60,7 @@ nostr
 ##### 　　・リプライを受けるとautoReply.json に設定された設定値をポスト
 ##### 　
 
-### 3.各機能詳細
+### 3.各機能詳細（長いので各mdファイルに分割しました）
 
 ### 3-1.autoPostatPresetTime.js
 ##### ・README_autoPostatPresetTime.md をご覧ください
