@@ -5,8 +5,8 @@
  */
 require("websocket-polyfill");
 const { relayInit, getPublicKey, finishEvent, nip19 } = require("nostr-tools");
-const { currUnixtime, jsonOpen, isSafeToReply, random, probabilityDetermination } = require("../../common/utils.js");
-const { publishToRelay } = require("../../common/publishToRelay.js");
+const { currUnixtime, jsonOpen, isSafeToReply, random, probabilityDetermination } = require("./common/utils.js");
+const { publishToRelay } = require("./common/publishToRelay.js");
 
 const relayUrl = "wss://relay-jp.nostr.wirednet.jp";
 

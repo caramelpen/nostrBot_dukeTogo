@@ -8,8 +8,8 @@ const cron = require("node-cron");
 const { relayInit, getPublicKey, finishEvent, nip19 } = require("nostr-tools");
 
 const sunCalc = require("suncalc");
-const { currDateTime, currUnixtime, random, jsonOpen, writeJsonFile, formattedDateTime } = require("../../common/utils.js");
-const { publishToRelay } = require("../../common/publishToRelay.js");
+const { currDateTime, currUnixtime, random, jsonOpen, writeJsonFile, formattedDateTime } = require("./common/utils.js");
+const { publishToRelay } = require("./common/publishToRelay.js");
 
 let BOT_PRIVATE_KEY_HEX;
 let pubkey;
