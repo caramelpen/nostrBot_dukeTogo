@@ -36,27 +36,28 @@
 ##### 　
 ### 2.各ファイルの役割概要
 
-### 2-1.common ディレクトリ
-#### 　2-1-1.publishToRelay.js
+### 2-1.config ディレクトリ
+#### 　2-1-1.autoReply.json
+##### 　　・src\autoReply.js, replytoReply.js で使用（後述）
+#### 　2-1-2.presetDate.json
+##### 　　・src\autoPostatPresetTime.js で使用（後述）
+#### 　2-1-3.sunriseSunset.json
+##### 　　・src\autoPostatPresetTime.js で使用（後述）
+
+### 2-2.src ディレクトリ
+#### 　2-2-1.autoPostatPresetTime.js
+##### 　　・presetDate.json, sunriseSunset.json に設定された時刻や年月日分になると設定値をポスト
+#### 　2-2-2.autoReply.js
+##### 　　・autoReply.json に設定された語句を発見するとそれに対応する設定値をポスト
+#### 　2-2-3.replytoReply.js
+##### 　　・リプライを受けるとautoReply.json に設定された設定値をポスト
+
+### 2-3.src/common ディレクトリ
+#### 　2-3-1.publishToRelay.js
 ##### 　　・リレーにイベントを送信する
-#### 　2-1-2.utils.js
+#### 　2-3-2.utils.js
 ##### 　　・共通関数
 
-### 2-2.dukuTogo\config ディレクトリ
-#### 　2-2-1.autoReply.json
-##### 　　・dukuTogo\src\autoReply.js, replytoReply.js で使用（後述）
-#### 　2-2-2.presetDate.json
-##### 　　・dukuTogo\src\autoPostatPresetTime.js で使用（後述）
-#### 　2-2-3.sunriseSunset.json
-##### 　　・dukuTogo\src\autoPostatPresetTime.js で使用（後述）
-
-### 2-3.dukuTogo\src ディレクトリ
-#### 　2-3-1.autoPostatPresetTime.js
-##### 　　・presetDate.json, sunriseSunset.json に設定された時刻や年月日分になると設定値をポスト
-#### 　2-3-2.autoReply.js
-##### 　　・autoReply.json に設定された語句を発見するとそれに対応する設定値をポスト
-#### 　2-3-3.replytoReply.js
-##### 　　・リプライを受けるとautoReply.json に設定された設定値をポスト
 ##### 　
 
 ### 3.各機能詳細（長いので各mdファイルに分割しました）
