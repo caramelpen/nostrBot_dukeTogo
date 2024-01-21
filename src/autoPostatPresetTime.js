@@ -116,12 +116,12 @@ const subSunriseSunset = (sunriseSunsetPath, nowDateTime) => {
         const offset = sunriseSunsetJson.jpnTimezoneOffset1 * sunriseSunsetJson.jpnTimezoneOffset2 * 60 * 1000;
         //console.log("offset:" + offset);
         if(isPostSunrise == true || isPostSunset == true) {
-            const jpnNotation = nowDateTime12.substring(0 ,4) + "年"
-                                + (nowDateTime12.substring(4 ,6)).replace(/^0+/, '') + "月"
-                                + (nowDateTime12.substring(6 ,8)).replace(/^0+/, '') + "日" + " "
-                                + (nowDateTime12.substring(8 ,10)).replace(/^0+/, '') + "時" + 
-                                + (nowDateTime12.substring(10 ,12)).replace(/^0+/, '') + "分"; // .replace(/^0+/, '') はゼロサプレスの正規化表現
-
+            const nowDateTime12toString = nowDateTime12.toString();
+            const jpnNotation = nowDateTime12toString.substring(0 ,4) + "年"
+                                + (nowDateTime12toString.substring(4 ,6)).replace(/^0+/, '') + "月"
+                                + (nowDateTime12toString.substring(6 ,8)).replace(/^0+/, '') + "日" + " "
+                                + (nowDateTime12toString.substring(8 ,10)).replace(/^0+/, '') + "時" + 
+                                + (nowDateTime12toString.substring(10 ,12)).replace(/^0+/, '') + "分"; // .replace(/^0+/, '') はゼロサプレスの正規化表現
 
             // 明日の日の出日の入りの時刻を取得
             const times = sunCalc.getTimes(nextDay, lat, lng);
