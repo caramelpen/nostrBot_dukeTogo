@@ -1,5 +1,5 @@
 /**
- * 狙撃屋13bot(@dukuTogo)
+ * 狙撃屋13bot(@dukeTogo)
  * autoPostatPresetTime.js
  * jsonに設定された指定の時刻に対応する語句をポスト
  */

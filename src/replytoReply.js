@@ -1,5 +1,5 @@
 /**
- * 狙撃屋13bot(@dukuTogo)
+ * 狙撃屋13bot(@dukeTogo)
  * replytoReply.js
  * 受けたリプライに対してjsonに設定された語句でランダムでリプライする
  */
