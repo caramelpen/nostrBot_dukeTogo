@@ -112,10 +112,17 @@ const subSunriseSunset = (sunriseSunsetPath, nowDateTime) => {
                 isPostSunset = true;
             }
         }
-        // 海外サーバ設置の際の対応として、日本時間にできるようにjsonで対応
+        // 海外サーバ設置の際など、timedatectl set-timezone Asia/Tokyo を行ってもなぜか日本時刻が得られない対応として、日本時間にできるようにjsonで対応
         const offset = sunriseSunsetJson.jpnTimezoneOffset1 * sunriseSunsetJson.jpnTimezoneOffset2 * 60 * 1000;
         //console.log("offset:" + offset);
         if(isPostSunrise == true || isPostSunset == true) {
+            const jpnNotation = nowDateTime12.substring(0 ,4) + "年"
+                                + (nowDateTime12.substring(4 ,6)).replace(/^0+/, '') + "月"
+                                + (nowDateTime12.substring(6 ,8)).replace(/^0+/, '') + "日" + " "
+                                + (nowDateTime12.substring(8 ,10)).replace(/^0+/, '') + "時" + 
+                                + (nowDateTime12.substring(10 ,12)).replace(/^0+/, '') + "分"; // .replace(/^0+/, '') はゼロサプレスの正規化表現
+
+
             // 明日の日の出日の入りの時刻を取得
             const times = sunCalc.getTimes(nextDay, lat, lng);
             // 日の出と日の入りでjsonから得るプロパティが異なるため、処理を分ける（三項演算子で書いてもいいけど、isPostSunrise の真偽判断が全部に入るのはしっくりこないので避けた）
@@ -128,6 +135,7 @@ const subSunriseSunset = (sunriseSunsetPath, nowDateTime) => {
             if(isPostSunrise == true) {
                 // 明日の日の出時間を取得
                 nextSunriseorSunsetwk = new Date(times.sunrise.getTime() + offset);
+                // 各 json プロパティの取得
                 sunriseorSunset = "sunRise";
                 sunRiseorSunsetPostLength = sunriseSunsetJson.sunRisePost.length;
                 sunRiseorSunsetPost = "sunRisePost";
@@ -136,6 +144,7 @@ const subSunriseSunset = (sunriseSunsetPath, nowDateTime) => {
                 if(isPostSunset == true) {
                     // 明日の日の入り時間を取得
                     nextSunriseorSunsetwk = new Date(times.sunset.getTime() + offset);
+                    // 各 json プロパティの取得
                     sunriseorSunset = "sunSet";
                     sunRiseorSunsetPostLength = sunriseSunsetJson.sunSetPost.length;
                     sunRiseorSunsetPost = "sunSetPost";
@@ -146,12 +155,14 @@ const subSunriseSunset = (sunriseSunsetPath, nowDateTime) => {
             let nextSunriseorSunset = formattedDateTime(nextSunriseorSunsetwk);
             nextSunriseorSunset = nextSunriseorSunset.substring(0, 12); // 秒部分をカット
 
+            const postChrConst = "-" + sunriseSunsetJson[sunRiseorSunsetConst] + "(" +  sunriseSunsetJson.location + "／" + jpnNotation + ")-\n";
+
             // 設定されている投稿語句の設定数の範囲でランダム数を取得する
             const postIdx = random(0, sunRiseorSunsetPostLength - 1);
-            postEv = composePost(sunriseSunsetJson[sunRiseorSunsetConst] + sunriseSunsetJson[sunRiseorSunsetPost][postIdx]);
+            postEv = composePost(postChrConst + sunriseSunsetJson[sunRiseorSunsetPost][postIdx]);
 
             //console.log(sunriseorSunset);
-            // json ファイルへ次の日の出か日の入り時刻を書き込む
+            // 今回の投稿が日の出なら次の日の出、日の入りなら次の日の入りの時刻を json ファイルの sunRise(sunSet) プロパティへ書き込む
             writeJsonFile(sunriseSunsetPath, sunriseorSunset, nextSunriseorSunset);
             console.log("write json(" + sunriseorSunset + "):" + nextSunriseorSunset);
             return true;
