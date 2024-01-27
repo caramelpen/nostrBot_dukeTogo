@@ -99,7 +99,7 @@ const autoReply = async (relay) => {
                             publishToRelay(relay, replyPostorreactionPost);
                             if(postKb == 1) {
                                 // リプライ
-                                replyPostorreactionPost = composeReply(":" + contentReaction + ":", ev);
+                                replyPostorreactionPost = composeReplyEmoji(ev);
                                 publishToRelay(relay, replyPostorreactionPost);
                             }
                         }
@@ -132,6 +132,23 @@ const composeReply = (replyPostChar, targetEvent) => {
     // イベントID(ハッシュ値)計算・署名
     return finishEvent(ev, BOT_PRIVATE_KEY_HEX);
 };
+const composeReplyEmoji = (targetEvent) => {
+    const ev = {
+        pubkey: pubkey
+        ,kind: 1
+        ,content: ":" + contentReaction + ":"
+        ,tags: [ 
+            ["p",targetEvent.pubkey,""]
+            ,["e",targetEvent.id,""] 
+            ,["emoji", contentReaction, contentReactionImgURL]
+        ]
+        ,created_at: currUnixtime()
+    };
+
+    // イベントID(ハッシュ値)計算・署名
+    return finishEvent(ev, BOT_PRIVATE_KEY_HEX);
+};
+
 
 // リアクションイベントを組み立てる
 const composeReaction = (targetEvent) => {
