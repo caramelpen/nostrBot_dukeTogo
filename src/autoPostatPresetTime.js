@@ -55,8 +55,6 @@ const subPresetPost = (presetDatePath, nowDateTime) => {
                 const postIdx = random(0,target.postChar.length - 1);
                 postEv = composePost(target.postChar[postIdx]);
                 return true;
-            } else {
-                //console.log(targetDateTime);
             }
         }
         return false;
@@ -114,7 +112,6 @@ const subSunriseSunset = (sunriseSunsetPath, nowDateTime) => {
         }
         // 海外サーバ設置の際など、timedatectl set-timezone Asia/Tokyo を行ってもなぜか日本時刻が得られない対応として、日本時間にできるようにjsonで対応
         const offset = sunriseSunsetJson.jpnTimezoneOffset1 * sunriseSunsetJson.jpnTimezoneOffset2 * 60 * 1000;
-        //console.log("offset:" + offset);
         if(isPostSunrise == true || isPostSunset == true) {
             const nowDateTime12toString = nowDateTime12.toString();
             const jpnNotation = nowDateTime12toString.substring(0 ,4) + "年"
@@ -155,13 +152,12 @@ const subSunriseSunset = (sunriseSunsetPath, nowDateTime) => {
             let nextSunriseorSunset = formattedDateTime(nextSunriseorSunsetwk);
             nextSunriseorSunset = nextSunriseorSunset.substring(0, 12); // 秒部分をカット
 
-            const postChrConst = "-" + sunriseSunsetJson[sunRiseorSunsetConst] + "(" +  sunriseSunsetJson.location + "／" + jpnNotation + ")-\n";
+            const postChrConst = sunriseSunsetJson[sunRiseorSunsetConst] + "(" +  sunriseSunsetJson.location + "／" + jpnNotation + ")\n";
 
             // 設定されている投稿語句の設定数の範囲でランダム数を取得する
             const postIdx = random(0, sunRiseorSunsetPostLength - 1);
             postEv = composePost(postChrConst + sunriseSunsetJson[sunRiseorSunsetPost][postIdx]);
 
-            //console.log(sunriseorSunset);
             // 今回の投稿が日の出なら次の日の出、日の入りなら次の日の入りの時刻を json ファイルの sunRise(sunSet) プロパティへ書き込む
             writeJsonFile(sunriseSunsetPath, sunriseorSunset, nextSunriseorSunset);
             console.log("write json(" + sunriseorSunset + "):" + nextSunriseorSunset);
@@ -209,7 +205,6 @@ const main = async () => {
 
         // 秘密鍵
         require("dotenv").config();
-        // console.log(require("dotenv").config());
         const nsec = process.env.dukeTogo_BOT_PRIVATE_KEY;
         if (nsec === undefined) {
             console.error("nsec is not found");
@@ -260,7 +255,6 @@ const main = async () => {
                     });
 
                     await relay.connect();
-                    // console.log("autoPostatPresetTime:connected to relay");
                     connectedSw = 1;
 
                     // ポスト

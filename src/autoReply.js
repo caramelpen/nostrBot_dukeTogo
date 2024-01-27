@@ -13,6 +13,8 @@ const relayUrl = "wss://relay-jp.nostr.wirednet.jp";
 let BOT_PRIVATE_KEY_HEX;
 let pubkey;
 let adminPubkey = "";
+let nativeWords = "";
+let contentReaction = "";
 
 const autoReply = async (relay) => {
     // jsonの場所を割り出すために
@@ -23,7 +25,6 @@ const autoReply = async (relay) => {
 
     // 反応語句の格納されたjsonを取得
     const autoReplyJson = jsonOpen(autoReplyPath);
-    //console.log(Array.isArray(autoReplyJson));
     if(autoReplyJson === null){
         console.log("json file is not get");
         return;
@@ -37,49 +38,64 @@ const autoReply = async (relay) => {
         try {
             // フィードのポストの中にjsonで設定した値が存在するか
             const target = autoReplyJson.find(item => item.orgPost.some(post => ev.content.includes(post)));
-            if (target) {
+            // フィードのポストが nativeWords そのままか
+            const isNativeWords = ((nativeWords.length > 0 && ev.content === nativeWords) ? true : false);
+            // フィードのポストの中にjsonで設定した値が存在するか、フィードのポストが nativeWords そのままか
+            if (target || isNativeWords) {
                 // 存在しても自分のポストなら無視
                 if(ev.pubkey === pubkey){
                     // なにもしない
                     return;
                 } else {
-
-                    // リプライする相手の公開鍵が管理者のものであるか、反応語句の前方に「ゴルゴ」が含まれるか、あるいは確率判定でOKならリプライする
+                    // 誰かのポストが nativeWords そのものならリアクションする
+                    // リプライする相手の公開鍵が管理者のものであるか、反応語句の前方に nativeWords が含まれるか、あるいは確率判定でOKならリプライする
                     let canPostit = false;
-                    // リプライする相手の公開鍵が管理者のもの
-                    if(ev.pubkey === adminPubkey) {
+                    let postKb = 0;
+                    // 誰かのポストが nativeWords そのもの
+                    if(isNativeWords)　{
                         canPostit = true;
-                    } else {
-                        // 反応語句はjsonの何番目にいるか取得
-                        const orgPostIdx = target.orgPost.findIndex(element => ev.content.includes(element));
-                        if(orgPostIdx === -1) {
-                            return;
-                        }
-                        // 反応語句はポストの何文字目にいるか取得
-                        const chridx = ev.content.indexOf(target.orgPost[orgPostIdx]);
-                        // 反応語句の前方を収める
-                        const substr = ev.content.substring(0, chridx);
-                        // 反応語句の前方に「ゴルゴ」が含まれる
-                        if(substr.includes("ゴルゴ")) {
+                        postKb = 1;
+                    } else {                    
+                        // リプライする相手の公開鍵が管理者のもの
+                        if(ev.pubkey === adminPubkey) {
                             canPostit = true;
                         } else {
-                            // 確率判定でOK
-                            // target.probability は1～100で設定されている
-                            if(probabilityDetermination(target.probability)) {
+                            // 反応語句はjsonの何番目にいるか取得
+                            const orgPostIdx = target.orgPost.findIndex(element => ev.content.includes(element));
+                            if(orgPostIdx === -1) {
+                                return;
+                            }
+                            // 反応語句はポストの何文字目にいるか取得
+                            const chridx = ev.content.indexOf(target.orgPost[orgPostIdx]);
+                            // 反応語句の前方を収める
+                            const substr = ev.content.substring(0, chridx);
+                            // 反応語句の前方に nativeWords が含まれる
+                            if(nativeWords.length > 0 && substr.includes(nativeWords)) {
                                 canPostit = true;
+                            } else {
+                                // 確率判定でOKだった
+                                // target.probability は1～100で設定されている
+                                if(probabilityDetermination(target.probability)) {
+                                    canPostit = true;
+                                }
                             }
                         }
                     }
 
                     if(canPostit == true) {
-                        // リプライしても安全なら、リプライイベントを組み立てて送信する
+                        // リプライやリアクションしても安全なら、リプライイベントやリアクションイベントを組み立てて送信する
                         if (isSafeToReply(ev)) {
-                            // jsonに設定されている対応する反応語句の数を利用してランダムで反応語句を決める
-                            const randomIdx = random(0, target.replyPostChar.length - 1);
-                            //console.log(target.replyPostChar[randomIdx]);
-                            // リプライ
-                            const replyPost = composeReply(target.replyPostChar[randomIdx], ev);
-                            publishToRelay(relay, replyPost);
+                            let replyPostorreactionPost;
+                            if(postKb == 0) {
+                                // jsonに設定されている対応する反応語句の数を利用してランダムで反応語句を決める
+                                const randomIdx = random(0, target.replyPostChar.length - 1);
+                                // リプライ
+                                const replyPostorreactionPost = composeReply(target.replyPostChar[randomIdx], ev);
+                            } else {
+                                // リアクション
+                                const replyPostorreactionPost = composeReaction(ev);
+                            }
+                            publishToRelay(relay, replyPostorreactionPost);
                         }
                     } else {
                         // なにもしない
@@ -87,9 +103,6 @@ const autoReply = async (relay) => {
                     }
                   
                 }
-            } else {
-                // なにもしない
-                //console.log('Not found');
             }
         } catch (err){
             console.error(err);
@@ -114,12 +127,24 @@ const composeReply = (replyPostChar, targetEvent) => {
     return finishEvent(ev, BOT_PRIVATE_KEY_HEX);
 };
 
+// リアクションイベントを組み立てる
+const composeReaction = (targetEvent) => {
+    const ev = {
+        kind: 7
+        ,content: contentReaction
+        ,tags: [ 
+            ["p",targetEvent.pubkey,""]
+            ,["e",targetEvent.id,""] 
+        ]
+        ,created_at: currUnixtime(),
+    };
+}
+
 
 const main = async () => {
 
     // 秘密鍵
     require("dotenv").config();
-    //console.log(require("dotenv").config());
     const nsec = process.env.dukeTogo_BOT_PRIVATE_KEY;
     if (nsec === undefined) {
         console.error("nsec is not found");
@@ -131,9 +156,11 @@ const main = async () => {
         return;
     }
     BOT_PRIVATE_KEY_HEX = dr.data;
-    pubkey = getPublicKey(BOT_PRIVATE_KEY_HEX); // 秘密鍵から公開鍵の取得
-  
-    adminPubkey = process.env.admin_HEX_PUBKEY;
+    pubkey = getPublicKey(BOT_PRIVATE_KEY_HEX);     // 秘密鍵から公開鍵の取得
+    adminPubkey = process.env.admin_HEX_PUBKEY;     // bot管理者の公開鍵の取得
+    nativeWords = process.env.native_words;         // 固有語句（botの名称などを設定し、単独で反応する語句とする）
+    contentReaction = process.env.content_reaction; // 固有語句に反応するリアクションタグ
+
 
     // リレー
     const relay = relayInit(relayUrl);

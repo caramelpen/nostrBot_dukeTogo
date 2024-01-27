@@ -87,7 +87,6 @@ const main = async () => {
 
     // 秘密鍵
     require("dotenv").config();
-    // console.log(require("dotenv").config());
     const nsec = process.env.dukeTogo_BOT_PRIVATE_KEY;
     if (nsec === undefined) {
         console.error("nsec is not found");

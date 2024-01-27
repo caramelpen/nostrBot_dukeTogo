@@ -11,7 +11,7 @@ pub.on("failed", () => {
 });
 */
 relay.publish(ev).then(()=>{
-    console.log("publishToRelay:success!" + ev.content);
+    console.log("publishToRelay:success!" + ":" + ev.content);
 }).catch((err)=>{
                 console.error("publishToRelay:failed to send event." + ev.content + "-" + err);
             })
