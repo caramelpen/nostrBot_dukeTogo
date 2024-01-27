@@ -11,10 +11,11 @@ const { publishToRelay } = require("./common/publishToRelay.js");
 const relayUrl = "wss://relay-jp.nostr.wirednet.jp";
 
 let BOT_PRIVATE_KEY_HEX;
-let pubkey;
+let pubkey = "";
 let adminPubkey = "";
 let nativeWords = "";
 let contentReaction = "";
+let contentReactionImgURL = "";
 
 const autoReply = async (relay) => {
     // jsonの場所を割り出すために
@@ -90,12 +91,17 @@ const autoReply = async (relay) => {
                                 // jsonに設定されている対応する反応語句の数を利用してランダムで反応語句を決める
                                 const randomIdx = random(0, target.replyPostChar.length - 1);
                                 // リプライ
-                                const replyPostorreactionPost = composeReply(target.replyPostChar[randomIdx], ev);
+                                replyPostorreactionPost = composeReply(target.replyPostChar[randomIdx], ev);
                             } else {
                                 // リアクション
-                                const replyPostorreactionPost = composeReaction(ev);
+                                replyPostorreactionPost = composeReaction(ev);
                             }
                             publishToRelay(relay, replyPostorreactionPost);
+                            if(postKb == 1) {
+                                // リプライ
+                                replyPostorreactionPost = composeReply(":" + contentReaction + ":", ev);
+                                publishToRelay(relay, replyPostorreactionPost);
+                            }
                         }
                     } else {
                         // なにもしない
@@ -131,13 +137,17 @@ const composeReply = (replyPostChar, targetEvent) => {
 const composeReaction = (targetEvent) => {
     const ev = {
         kind: 7
-        ,content: contentReaction
+        ,content: ":" + contentReaction + ":"
         ,tags: [ 
             ["p",targetEvent.pubkey,""]
             ,["e",targetEvent.id,""] 
+            ,["emoji", contentReaction, contentReactionImgURL]
         ]
         ,created_at: currUnixtime(),
     };
+    
+    // イベントID(ハッシュ値)計算・署名
+    return finishEvent(ev, BOT_PRIVATE_KEY_HEX);
 }
 
 
@@ -156,11 +166,11 @@ const main = async () => {
         return;
     }
     BOT_PRIVATE_KEY_HEX = dr.data;
-    pubkey = getPublicKey(BOT_PRIVATE_KEY_HEX);     // 秘密鍵から公開鍵の取得
-    adminPubkey = process.env.admin_HEX_PUBKEY;     // bot管理者の公開鍵の取得
-    nativeWords = process.env.native_words;         // 固有語句（botの名称などを設定し、単独で反応する語句とする）
-    contentReaction = process.env.content_reaction; // 固有語句に反応するリアクションタグ
-
+    pubkey = getPublicKey(BOT_PRIVATE_KEY_HEX);                     // 秘密鍵から公開鍵の取得
+    adminPubkey = process.env.admin_HEX_PUBKEY;                     // bot管理者の公開鍵の取得
+    nativeWords = process.env.native_words;                         // 固有語句（botの名称などを設定し、単独で反応する語句とする）
+    contentReaction = process.env.content_reaction;                 // 固有語句に反応するリアクションタグ
+    contentReactionImgURL = process.env.content_reaction_imgURL;    // 固有語句に反応するリアクションタグのURL
 
     // リレー
     const relay = relayInit(relayUrl);
