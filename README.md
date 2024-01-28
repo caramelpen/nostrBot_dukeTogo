@@ -19,6 +19,7 @@
 ### 1.製品識別
 <pre>
 ├─config
+│      autoReaction.json
 │      autoReply.json
 │      presetDate.json
 │      sunriseSunset.json
@@ -36,11 +37,13 @@
 ### 2.各ファイルの役割概要
 
 ### 2-1.config ディレクトリ
-#### 　2-1-1.autoReply.json
+#### 　2-1-1.autoReaction.json
+##### 　　・src\autoReply.js で使用（後述）
+#### 　2-1-2.autoReply.json
 ##### 　　・src\autoReply.js, replytoReply.js で使用（後述）
-#### 　2-1-2.presetDate.json
+#### 　2-1-3.presetDate.json
 ##### 　　・src\autoPostatPresetTime.js で使用（後述）
-#### 　2-1-3.sunriseSunset.json
+#### 　2-1-4.sunriseSunset.json
 ##### 　　・src\autoPostatPresetTime.js で使用（後述）
 
 ### 2-2.src ディレクトリ
