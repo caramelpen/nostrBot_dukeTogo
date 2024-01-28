@@ -13,20 +13,22 @@ const relayUrl = "wss://relay-jp.nostr.wirednet.jp";
 let BOT_PRIVATE_KEY_HEX;
 let pubkey = "";
 let adminPubkey = "";
-let nativeWords = "";
-let contentReaction = "";
-let contentReactionImgURL = "";
+// let nativeWords = "";
+// let contentReaction = "";
+// let contentReactionImgURL = "";
 
 const autoReply = async (relay) => {
     // jsonの場所を割り出すために
     const jsonPath = require("path");
 
     // jsonファイルの場所の設定
+    const autoReactionPath = jsonPath.join(__dirname, "../config/autoReaction.json");
     const autoReplyPath = jsonPath.join(__dirname, "../config/autoReply.json");
-
+    
     // 反応語句の格納されたjsonを取得
+    const autoReactionJson = jsonOpen(autoReactionPath);
     const autoReplyJson = jsonOpen(autoReplyPath);
-    if(autoReplyJson === null){
+    if(autoReactionJson === null || autoReplyJson === null){
         console.log("json file is not get");
         return;
     }
@@ -39,20 +41,22 @@ const autoReply = async (relay) => {
         try {
             // フィードのポストの中にjsonで設定した値が存在するか
             const target = autoReplyJson.find(item => item.orgPost.some(post => ev.content.includes(post)));
-            // フィードのポストが nativeWords そのままか
-            const isNativeWords = ((nativeWords.length > 0 && ev.content === nativeWords) ? true : false);
-            // フィードのポストの中にjsonで設定した値が存在するか、フィードのポストが nativeWords そのままか
+            // フィードのポストが json の nativeWords プロパティそのものか
+            //const isNativeWords = ((nativeWords.length > 0 && ev.content === nativeWords) ? true : false);
+            const isNativeWords = ((autoReactionJson.nativeWords.length > 0 && ev.content === autoReactionJson.nativeWords) ? true : false);            
+
+            // フィードのポストの中にjsonで設定した値が存在するか、フィードのポストが json の nativeWords プロパティそのものか
             if (target || isNativeWords) {
                 // 存在しても自分のポストなら無視
                 if(ev.pubkey === pubkey){
                     // なにもしない
                     return;
                 } else {
-                    // 誰かのポストが nativeWords そのものならリアクションする
+                    // 誰かのポストが nativeWords そのものならリアクションと、そのリアクション絵文字でリプライする
                     // リプライする相手の公開鍵が管理者のものであるか、反応語句の前方に nativeWords が含まれるか、あるいは確率判定でOKならリプライする
                     let canPostit = false;
-                    let postKb = 0;
-                    // 誰かのポストが nativeWords そのもの
+                    let postKb = 0; // 誰かのポストが json の nativeWords プロパティそのもの区分
+                    // 誰かのポストが json の nativeWords プロパティそのもの
                     if(isNativeWords)　{
                         canPostit = true;
                         postKb = 1;
@@ -87,19 +91,24 @@ const autoReply = async (relay) => {
                         // リプライやリアクションしても安全なら、リプライイベントやリアクションイベントを組み立てて送信する
                         if (isSafeToReply(ev)) {
                             let replyPostorreactionPost;
+                            let randomReactionIdx;
                             if(postKb == 0) {
                                 // jsonに設定されている対応する反応語句の数を利用してランダムで反応語句を決める
                                 const randomIdx = random(0, target.replyPostChar.length - 1);
                                 // リプライ
                                 replyPostorreactionPost = composeReply(target.replyPostChar[randomIdx], ev);
                             } else {
+                                // jsonに設定されているリアクション絵文字の数を利用してランダムで反応語句を決める
+                                randomReactionIdx = random(0, autoReactionJson.contentReaction.length - 1);
+
                                 // リアクション
-                                replyPostorreactionPost = composeReaction(ev);
+                                replyPostorreactionPost = composeReaction(ev,autoReactionJson,randomReactionIdx);
                             }
                             publishToRelay(relay, replyPostorreactionPost);
+                            // 誰かのポストが nativeWords そのもの区分ならリアクション絵文字でリプライも行う
                             if(postKb == 1) {
                                 // リプライ
-                                replyPostorreactionPost = composeReplyEmoji(ev);
+                                replyPostorreactionPost = composeReplyEmoji(ev,autoReactionJson,randomReactionIdx);
                                 publishToRelay(relay, replyPostorreactionPost);
                             }
                         }
@@ -132,15 +141,16 @@ const composeReply = (replyPostChar, targetEvent) => {
     // イベントID(ハッシュ値)計算・署名
     return finishEvent(ev, BOT_PRIVATE_KEY_HEX);
 };
-const composeReplyEmoji = (targetEvent) => {
+// 絵文字リプライイベントを組み立てる
+const composeReplyEmoji = (targetEvent,autoReactionJson,randomReactionIdx) => {
     const ev = {
         pubkey: pubkey
         ,kind: 1
-        ,content: ":" + contentReaction + ":"
+        ,content: ":" + autoReactionJson.contentReaction[randomReactionIdx] + ":"
         ,tags: [ 
             ["p",targetEvent.pubkey,""]
             ,["e",targetEvent.id,""] 
-            ,["emoji", contentReaction, contentReactionImgURL]
+            ,["emoji", autoReactionJson.contentReaction[randomReactionIdx], autoReactionJson.reactionImgURL[randomReactionIdx]]
         ]
         ,created_at: currUnixtime()
     };
@@ -151,14 +161,14 @@ const composeReplyEmoji = (targetEvent) => {
 
 
 // リアクションイベントを組み立てる
-const composeReaction = (targetEvent) => {
+const composeReaction = (targetEvent,autoReactionJson,randomReactionIdx) => {
     const ev = {
         kind: 7
-        ,content: ":" + contentReaction + ":"
+        ,content: ":" + autoReactionJson.contentReaction[randomReactionIdx] + ":"
         ,tags: [ 
             ["p",targetEvent.pubkey,""]
             ,["e",targetEvent.id,""] 
-            ,["emoji", contentReaction, contentReactionImgURL]
+            ,["emoji", autoReactionJson.contentReaction[randomReactionIdx], autoReactionJson.reactionImgURL[randomReactionIdx]]
         ]
         ,created_at: currUnixtime(),
     };
