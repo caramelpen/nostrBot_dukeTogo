@@ -1,11 +1,13 @@
 {
     "nativeWords": "ゴルゴ"
     ,"contentReaction": [
-                    "rifle"
-                    ,"gun"
+                    "🔫"
+                    ,"Googlegun"
+                    ,"Sniper_AWM"
                 ]
     ,"reactionImgURL": [
-        "https://cdn.emojidex.com/emoji/seal/rifle.png"
-        ,"https://cdn.emojidex.com/emoji/seal/rifle.png"
+        ""
+        ,"https://cdn3.emoji.gg/emojis/6727_googlegun.png"
+        ,"https://cdn3.emoji.gg/emojis/3845-sniper-awm.png"
     ]                
 }

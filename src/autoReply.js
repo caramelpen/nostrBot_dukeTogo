@@ -13,9 +13,6 @@ const relayUrl = "wss://relay-jp.nostr.wirednet.jp";
 let BOT_PRIVATE_KEY_HEX;
 let pubkey = "";
 let adminPubkey = "";
-// let nativeWords = "";
-// let contentReaction = "";
-// let contentReactionImgURL = "";
 
 const autoReply = async (relay) => {
     // jsonの場所を割り出すために
@@ -100,13 +97,18 @@ const autoReply = async (relay) => {
                             } else {
                                 // jsonに設定されているリアクション絵文字の数を利用してランダムで反応語句を決める
                                 randomReactionIdx = random(0, autoReactionJson.contentReaction.length - 1);
-
-                                // リアクション
-                                replyPostorreactionPost = composeReaction(ev,autoReactionJson,randomReactionIdx);
+                                // randomReactionIdx 番目のカスタム絵文字URLが未設定ならそれはカスタム絵文字ではないので、リアクションせず、既存絵文字でリプライする
+                                if(autoReactionJson.reactionImgURL.length > 0) {
+                                    // リアクション
+                                    replyPostorreactionPost = composeReaction(ev,autoReactionJson,randomReactionIdx);
+                                } else {
+                                    // リプライ
+                                    replyPostorreactionPost = composeReply(autoReactionJson.contentReaction[randomReactionIdx], ev);
+                                }
                             }
                             publishToRelay(relay, replyPostorreactionPost);
-                            // 誰かのポストが nativeWords そのもの区分ならリアクション絵文字でリプライも行う
-                            if(postKb == 1) {
+                            // 誰かのポストが nativeWords そのもの区分で、かつ カスタム絵文字URLが設定されているならリアクション絵文字でリプライも行う
+                            if(postKb == 1 && autoReactionJson.reactionImgURL.length > 0 ) {
                                 // リプライ
                                 replyPostorreactionPost = composeReplyEmoji(ev,autoReactionJson,randomReactionIdx);
                                 publishToRelay(relay, replyPostorreactionPost);
@@ -195,9 +197,6 @@ const main = async () => {
     BOT_PRIVATE_KEY_HEX = dr.data;
     pubkey = getPublicKey(BOT_PRIVATE_KEY_HEX);                     // 秘密鍵から公開鍵の取得
     adminPubkey = process.env.admin_HEX_PUBKEY;                     // bot管理者の公開鍵の取得
-    nativeWords = process.env.native_words;                         // 固有語句（botの名称などを設定し、単独で反応する語句とする）
-    contentReaction = process.env.content_reaction;                 // 固有語句に反応するリアクションタグ
-    contentReactionImgURL = process.env.content_reaction_imgURL;    // 固有語句に反応するリアクションタグのURL
 
     // リレー
     const relay = relayInit(relayUrl);
