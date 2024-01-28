@@ -3,7 +3,7 @@
  * autoPostatPresetTime.js
  * jsonに設定された指定の時刻に対応する語句をポスト
  */
-//require("websocket-polyfill");
+require("websocket-polyfill");
 const cron = require("node-cron");
 const { relayInit, getPublicKey, finishEvent, nip19 } = require("nostr-tools");
 
