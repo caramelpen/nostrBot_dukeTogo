@@ -1,6 +1,6 @@
 # nostrBot_dukeTogo
 ## nostrのbotです
-### ・某狙撃屋13をキャラとして運用していますが、後述する各jsonファイルの内容を変更すれば他のキャラとして運用も可能なはずです
+### ・某狙撃屋13をキャラとして運用( @dukeTogo npub163qhxuj7sf4hagnzrayrfypfh5cld2lshcqzqsqpqc53fy6m87sqlrvjv9 )していますが、後述する各jsonファイルの内容を変更すれば他のキャラとして運用も可能なはずです
 ### ・ChatGPT と絡めたような大層なものではなく、設定された語句をランダムでポストする「ドラクエ村人的bot」です
 ##### 　
 
@@ -83,7 +83,11 @@
 ##### ・「 wss://relay-jp.nostr.wirednet.jp 」で運用させていただいています
 ##### 　
 
-### 5.謝辞
+### 5.ライセンス
+#### ・MIT No Attribution(MIT-0)です(詳しくは LICNECE ファイルをご覧ください)
+##### 　
+
+### 6.謝辞
 #### ・Nostr Japan ( https://github.com/nostr-jp )各位
 #### ・Don ( https://github.com/nikolat )様
 #### ・ひゅうが霄 ( https://showhyuga.blogspot.com/ )様
