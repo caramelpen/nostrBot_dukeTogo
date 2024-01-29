@@ -39,7 +39,6 @@ const autoReply = async (relay) => {
             // フィードのポストの中にjsonで設定した値が存在するか
             const target = autoReplyJson.find(item => item.orgPost.some(post => ev.content.includes(post)));
             // フィードのポストが json の nativeWords プロパティそのものか
-            //const isNativeWords = ((nativeWords.length > 0 && ev.content === nativeWords) ? true : false);
             const isNativeWords = ((autoReactionJson.nativeWords.length > 0 && ev.content === autoReactionJson.nativeWords) ? true : false);            
 
             // フィードのポストの中にjsonで設定した値が存在するか、フィードのポストが json の nativeWords プロパティそのものか

@@ -25,7 +25,6 @@ const subPresetPost = (presetDatePath, nowDateTime) => {
         const nowDateTimeMMDD = nowDateTime12.substring(4 ,8);  // 月日部分
         const nowDateTimeHHMM = nowDateTime12.substring(8 ,12); // 時刻部分
 
-        //console.log(nowDateTime12);    
         const presetDateJson = jsonOpen(presetDatePath);
         if(presetDateJson === null){
             console.error("subPresetPost:json file is not get");
@@ -77,7 +76,6 @@ const subSunriseSunset = (sunriseSunsetPath, nowDateTime) => {
 
         // 日の出と日没の格納されたjsonを取得
         const sunriseSunsetJson = jsonOpen(sunriseSunsetPath);
-        //console.log(Array.isArray(sunriseSunsetJson));
         if(sunriseSunsetJson === null){
             console.error("subSunriseSunset:json file is not get");
             return false;
