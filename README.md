@@ -93,3 +93,5 @@
 #### ・Nostr Japan ( https://github.com/nostr-jp )各位
 #### ・Don ( https://github.com/nikolat )様
 #### ・ひゅうが霄 ( https://showhyuga.blogspot.com/ )様
+#### ・名言まとめドットコム ( https://www.underwater-festival.com/00096-2/ )様
+#### ・劇画 Bombs away！( https://onihei-fan.com/?p=10214 )様
