@@ -38,48 +38,60 @@ const autoReply = async (relay) => {
         try {
             // フィードのポストの中にjsonで設定した値が存在するか
             const target = autoReplyJson.find(item => item.orgPost.some(post => ev.content.includes(post)));
-            // フィードのポストが json の nativeWords プロパティそのものか
-            const isNativeWords = ((autoReactionJson.nativeWords.length > 0 && ev.content === autoReactionJson.nativeWords) ? true : false);            
+            // フィードのポストが json の nativeWords プロパティそのものなら真
+            const isNativeWords = ((autoReactionJson.nativeWords.length > 0 && ev.content === autoReactionJson.nativeWords) ? true : false);
+            // フィードのポストが json の nativeWords プロパティそのものではないが、 nativeWords を含んでいるなら真
+            const isIncludeWord = (  isNativeWords == false && (ev.content).includes(autoReactionJson.nativeWords) ? true : false);            
 
-            // フィードのポストの中にjsonで設定した値が存在するか、フィードのポストが json の nativeWords プロパティそのものか
-            if (target || isNativeWords) {
-                // 存在しても自分のポストなら無視
+            // フィードのポストの中にjsonで設定した値が存在するか
+            // フィードのポストが json の nativeWords プロパティそのものか
+            // フィードのポストが json の nativeWords プロパティそのものではないが、 nativeWords を含んでいる
+            if ( target || isNativeWords || isIncludeWord ) {
+                // 自分のポストなら無視
                 if(ev.pubkey === pubkey){
                     // なにもしない
                     return;
                 } else {
-                    // 誰かのポストが nativeWords そのものならリアクションと、そのリアクション絵文字でリプライする
-                    // リプライする相手の公開鍵が管理者のものであるか、反応語句の前方に nativeWords が含まれるか、あるいは確率判定でOKならリプライする
+                    // ①誰かのポストが nativeWords そのものならリアクションと、そのリアクション絵文字でリプライする
+                    // ②誰かのポストが反応語句を含んでおり、その誰かが管理者のものであるか、反応語句の前方に nativeWords が含まれるか、反応語句の前方に nativeWords が含まれなくても確率判定でOKならリプライする
+                    // ③反応語句はなくても管理者のポストに nativeWords が含まれているならリプライする
                     let canPostit = false;
                     let postKb = 0; // 誰かのポストが json の nativeWords プロパティそのもの区分
                     // 誰かのポストが json の nativeWords プロパティそのもの
                     if(isNativeWords)　{
                         canPostit = true;
                         postKb = 1;
-                    } else {                    
-                        // リプライする相手の公開鍵が管理者のもの
-                        if(ev.pubkey === adminPubkey) {
-                            canPostit = true;
-                        } else {
-                            // 反応語句はjsonの何番目にいるか取得
-                            const orgPostIdx = target.orgPost.findIndex(element => ev.content.includes(element));
-                            if(orgPostIdx === -1) {
-                                return;
-                            }
-                            // 反応語句はポストの何文字目にいるか取得
-                            const chridx = ev.content.indexOf(target.orgPost[orgPostIdx]);
-                            // 反応語句の前方を収める
-                            const substr = ev.content.substring(0, chridx);
-                            // 反応語句の前方に nativeWords が含まれる
-                            if(nativeWords.length > 0 && substr.includes(nativeWords)) {
+                    } else {
+                        // 反応語句発見
+                        if(target) {
+                            // リプライする相手の公開鍵が管理者のもの
+                            if(ev.pubkey === adminPubkey) {
                                 canPostit = true;
                             } else {
-                                // 確率判定でOKだった
-                                // target.probability は1～100で設定されている
-                                if(probabilityDetermination(target.probability)) {
+                                // 反応語句はjsonの何番目にいるか取得
+                                const orgPostIdx = target.orgPost.findIndex(element => ev.content.includes(element));
+                                if(orgPostIdx === -1) {
+                                    return;
+                                }
+                                // 反応語句はポストの何文字目にいるか取得
+                                const chridx = ev.content.indexOf(target.orgPost[orgPostIdx]);
+                                // 反応語句の前方を収める
+                                const substr = ev.content.substring(0, chridx);
+                                // 反応語句の前方に nativeWords が含まれる
+                                if(autoReactionJson.nativeWords.length > 0 && substr.includes(autoReactionJson.nativeWords)) {
                                     canPostit = true;
+                                } else {
+                                    // 確率判定でOKだった
+                                    // target.probability は1～100で設定されている
+                                    if(probabilityDetermination(target.probability)) {
+                                        canPostit = true;
+                                    }
                                 }
                             }
+                        // 反応語句はなくても管理者のポストに nativeWords が含まれているなら
+                        } else if(isIncludeWord && ev.pubkey === adminPubkey) {
+                            canPostit = true;
+                            postKb = 2;
                         }
                     }
 
@@ -93,7 +105,7 @@ const autoReply = async (relay) => {
                                 const randomIdx = random(0, target.replyPostChar.length - 1);
                                 // リプライ
                                 replyPostorreactionPost = composeReply(target.replyPostChar[randomIdx], ev);
-                            } else {
+                            } else if(postKb == 1) {
                                 // jsonに設定されているリアクション絵文字の数を利用してランダムで反応語句を決める
                                 randomReactionIdx = random(0, autoReactionJson.contentReaction.length - 1);
                                 // randomReactionIdx 番目のカスタム絵文字URLが未設定ならそれはカスタム絵文字ではないので、リアクションせず、既存絵文字でリプライする
@@ -104,6 +116,15 @@ const autoReply = async (relay) => {
                                     // リプライ
                                     replyPostorreactionPost = composeReply(autoReactionJson.contentReaction[randomReactionIdx], ev);
                                 }
+                            } else if(postKb == 2) {
+                                // 反応語句配列の数の範囲からランダム値を取得し、それを配列要素とする
+                                const replyChrPresetIdx = random(0, autoReplyJson.length - 1);
+                                // 配列要素を決めたら、その配列に設定されている反応語句の設定配列の範囲からさらにランダム値を取得
+                                const replyChrIdx = random(0, autoReplyJson[replyChrPresetIdx].replyPostChar.length - 1);
+                                // リプライ語句決定
+                                const replyChr = autoReplyJson[replyChrPresetIdx].replyPostChar[replyChrIdx];
+                                // リプライ
+                                replyPostorreactionPost = composeReply(replyChr, ev);
                             }
                             publishToRelay(relay, replyPostorreactionPost);
                             // 誰かのポストが nativeWords そのもの区分で、かつ カスタム絵文字URLが設定されているならリアクション絵文字でリプライも行う
