@@ -36,13 +36,16 @@ const autoReply = async (relay) => {
                 );
     sub.on("event", (ev) => {
         try {
-            // フィードのポストの中にjsonで設定した値が存在するか
+            // フィードのポストの中にjsonで設定した値が存在するなら真
             const target = autoReplyJson.find(item => item.orgPost.some(post => ev.content.includes(post)));
-            // フィードのポストが json の nativeWords プロパティそのものなら真
-            const isNativeWords = ((autoReactionJson.nativeWords.length > 0 && ev.content === autoReactionJson.nativeWords) ? true : false);
-            // フィードのポストが json の nativeWords プロパティそのものではないが、 nativeWords を含んでいるなら真
+            // フィードのポストがjsonの nativeWords プロパティそのものなら真
+            const isNativeWords = ((autoReactionJson.nativeWords.length > 0 && autoReactionJson.nativeWords.some(name => name === ev.content)) ? true : false);
+            // フィードのポストがjsonの nativeWords プロパティそのものではないが、 nativeWords を含んでいるなら真
             const isIncludeWord = (  isNativeWords == false && (ev.content).includes(autoReactionJson.nativeWords) ? true : false);            
+            // 投稿者が管理者なら真
+            const isAdminPubkey = (ev.pubkey === adminPubkey ? true : false);
 
+            /*
             // フィードのポストの中にjsonで設定した値が存在するか
             // フィードのポストが json の nativeWords プロパティそのものか
             // フィードのポストが json の nativeWords プロパティそのものではないが、 nativeWords を含んでいる
@@ -139,6 +142,108 @@ const autoReply = async (relay) => {
                         return;
                     }
                   
+                }
+            }
+            */
+
+            // 作動区分
+            let postKb = 0;     
+            // 反応語句発見
+            if(target) {
+                // 投稿者が管理者
+                if(isAdminPubkey) {
+                    postKb = 1;     // リプライ
+                // 投稿者が管理者以外
+                } else {
+                    // 反応語句はjsonの何番目にいるか取得
+                    const orgPostIdx = target.orgPost.findIndex(element => ev.content.includes(element));
+                    // 反応語句は存在するはずだが、もし何らかの理由で見つからなかったらなにもしない
+                    if(orgPostIdx === -1) {
+                        return;
+                    }
+                    // 反応語句はポストの何文字目にいるか取得
+                    const chridx = ev.content.indexOf(target.orgPost[orgPostIdx]);
+                    // 反応語句の前方を収める
+                    const fowardSubstr = ev.content.substring(0, chridx);
+                    // 反応語句の前方に nativeWords が含まれる
+                    if(autoReactionJson.nativeWords.length > 0 && fowardSubstr.includes(autoReactionJson.nativeWords)) {
+                        postKb = 1;     // リプライ
+                    } else {
+                        // 確率判定でOKだった
+                        // target.probability は1～100で設定されている
+                        if(probabilityDetermination(target.probability)) {
+                            postKb = 1;     // リプライ
+                        }                        
+                    }
+                }
+
+            // 反応語句未発見
+            } else {
+                // 投稿者が管理者
+                if(isAdminPubkey) {
+                    // フィードのポストがjsonの nativeWords プロパティそのものではないが、ポスト内のどこかに nativeWords を含んでいる
+                    if(isIncludeWord) {
+                        postKb = 2;     // リプライ(全リプライ語句からのランダムリプライ)
+                    // フィードのポストがjsonの nativeWords プロパティそのもの
+                    } else if(isNativeWords) {
+                        postKb = 3;     // リアクションとリアクション絵文字でのリプライ
+                    }
+                // 投稿者が管理者以外
+                } else {
+                    // フィードのポストがjsonの nativeWords プロパティそのもの
+                    if(isNativeWords) {
+                        postKb = 3;     // リアクションとリアクション絵文字でのリプライ
+                    }
+                }
+
+            }
+
+            // 作動対象だ
+            if(postKb > 0) {
+                // リプライやリアクションしても安全なら、リプライイベントやリアクションイベントを組み立てて送信する
+                if (isSafeToReply(ev)) {
+                    let replyPostorreactionPost;
+                    let randomReactionIdx;
+                    if(postKb === 1) {
+                        // jsonに設定されている対応する反応語句の数を利用してランダムで反応語句を決める
+                        const randomIdx = random(0, target.replyPostChar.length - 1);
+                        // リプライ
+                        replyPostorreactionPost = composeReply(target.replyPostChar[randomIdx], ev);
+
+                    } else if(postKb === 2) {
+                        // 反応語句配列の数の範囲からランダム値を取得し、それを配列要素とする
+                        const replyChrPresetIdx = random(0, autoReplyJson.length - 1);
+                        // 配列要素を決めたら、その配列に設定されている反応語句の設定配列の範囲からさらにランダム値を取得
+                        const replyChrIdx = random(0, autoReplyJson[replyChrPresetIdx].replyPostChar.length - 1);
+                        // リプライ語句決定
+                        const replyChr = autoReplyJson[replyChrPresetIdx].replyPostChar[replyChrIdx];
+                        // リプライ
+                        replyPostorreactionPost = composeReply(replyChr, ev);
+
+                    } else if(postKb === 3) {
+                        // jsonに設定されているリアクション絵文字の数を利用してランダムで反応語句を決める
+                        randomReactionIdx = random(0, autoReactionJson.contentReaction.length - 1);
+                        // randomReactionIdx 番目のカスタム絵文字URLが設定されているならリアクション
+                        if(autoReactionJson.reactionImgURL.length > 0) {
+                            postKb = 4;
+                            // リアクション
+                            replyPostorreactionPost = composeReaction(ev,autoReactionJson,randomReactionIdx);
+                        // カスタム絵文字URLが未設定ならそれはカスタム絵文字ではないので、リアクションせず、既存絵文字でリプライする
+                        } else {
+                            // リプライ
+                            replyPostorreactionPost = composeReply(autoReactionJson.contentReaction[randomReactionIdx], ev);
+                        }
+                    }
+                    publishToRelay(relay, replyPostorreactionPost);
+                    // リアクションとリアクション絵文字でのリプライを行う動作区分で、かつカスタム絵文字URLが設定されているならリアクション絵文字でリプライも行う
+                    if(postKb === 4) {
+                        // リプライ
+                        replyPostorreactionPost = composeReplyEmoji(ev,autoReactionJson,randomReactionIdx);
+                        publishToRelay(relay, replyPostorreactionPost);
+                    }
+                } else {
+                    // なにもしない
+                    return;
                 }
             }
         } catch (err){
