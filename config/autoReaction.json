@@ -1,5 +1,5 @@
 {
-    "nativeWords": ["ゴルゴ","ｺﾞﾙｺﾞ","ゴルゴ13","ｺﾞﾙｺﾞ13","デューク東郷","ﾃﾞｭｰｸ東郷","デュークトウゴウ","ﾃﾞｭｰｸﾄｳｺﾞｳ"]
+    "nativeWords": ["ゴルゴ"]
     ,"contentReaction": [
                     "🔫"
                     ,"Googlegun"
@@ -10,4 +10,6 @@
         ,"https://cdn3.emoji.gg/emojis/6727_googlegun.png"
         ,"https://cdn3.emoji.gg/emojis/3845-sniper-awm.png"
     ]                
+
+    ,"wk_nativeWords": ["ゴルゴ","ｺﾞﾙｺﾞ","ゴルゴ13","ｺﾞﾙｺﾞ13","デューク東郷","ﾃﾞｭｰｸ東郷","デュークトウゴウ","ﾃﾞｭｰｸﾄｳｺﾞｳ"]
 }

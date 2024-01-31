@@ -41,7 +41,7 @@ const autoReply = async (relay) => {
             // フィードのポストがjsonの nativeWords プロパティそのものなら真
             const isNativeWords = ((autoReactionJson.nativeWords.length > 0 && autoReactionJson.nativeWords.some(name => name === ev.content)) ? true : false);
             // フィードのポストがjsonの nativeWords プロパティそのものではないが、 nativeWords を含んでいるなら真
-            const isIncludeWord = (  isNativeWords == false && (ev.content).includes(autoReactionJson.nativeWords) ? true : false);            
+            const isIncludeWord = ((isNativeWords == false && (ev.content).includes(autoReactionJson.nativeWords))? true : false);
             // 投稿者が管理者なら真
             const isAdminPubkey = (ev.pubkey === adminPubkey ? true : false);
 
@@ -320,8 +320,8 @@ const main = async () => {
         return;
     }
     BOT_PRIVATE_KEY_HEX = dr.data;
-    pubkey = getPublicKey(BOT_PRIVATE_KEY_HEX);                     // 秘密鍵から公開鍵の取得
-    adminPubkey = process.env.admin_HEX_PUBKEY;                     // bot管理者の公開鍵の取得
+    pubkey = getPublicKey(BOT_PRIVATE_KEY_HEX);               // 秘密鍵から公開鍵の取得
+    adminPubkey = process.env.admin_HEX_PUBKEY;               // bot管理者の公開鍵の取得
 
     // リレー
     const relay = relayInit(relayUrl);
