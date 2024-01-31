@@ -11,14 +11,14 @@
 | 5 | 未発見 | 管理者 | 発見(※1) | 100% | リアクション or リアクションとリプライ (※4) |
 | 6 | 未発見 | 一般 | 発見(※1) | 100% | リアクション or リアクションとリプライ (※4) |
 
-##### フィードを購読し、配列で設定してある autoReply.json の orgPost プロパティに設定された語句をフィードに「発見」
+##### 3-2-1.フィードを購読し、配列で設定してある autoReply.json の orgPost プロパティに設定された語句をフィードに「発見」
 ##### 1..envファイルの admin_HEX_PUBKEY (HEX値で設定してください) に設定した管理者の公開鍵のポストに対する反応なら、autoReaction.json の nativeWords プロパティに設定してある語句の有無に関係なく、autoReply.json の replyPostChar プロパティからランダム(※1)でリプライ語句を決定しリプライします
 
 ##### 2.管理者以外のポストに対する反応の場合、反応語句の前方に autoReaction.json の nativeWords プロパティの設定値を発見すると、autoReply.json の replyPostChar プロパティからランダム(※1)でリプライ語句を決定しリプライします
 
 ##### 3.管理者以外のポストに対する反応の場合、反応語句の前方に autoReaction.json の nativeWords プロパティの設定値が発見できないと、autoReply.json の probability プロパティに設定された確率を満たした時に限り、対応する配列で設定された autoReply.json の replyPostChar プロパティからランダム(※1)でリプライ語句を決定しリプライします
 
-##### フィードを購読し、配列で設定してある autoReply.json の orgPost プロパティに設定された語句をフィードから「未発見」
+##### 3-2-2.フィードを購読し、配列で設定してある autoReply.json の orgPost プロパティに設定された語句をフィードから「未発見」
 ##### 4..envファイルの admin_HEX_PUBKEY (HEX値で設定してください) に設定した管理者の公開鍵のポストであり、autoReaction.json の nativeWords プロパティに設定してある語句を含むポストなら、autoReply.json の 全 replyPostChar からランダム(※1)でリプライ語句を決定しリプライします
 
 ##### 5..envファイルの admin_HEX_PUBKEY (HEX値で設定してください) に設定した管理者の公開鍵のポストであり、autoReaction.json の nativeWords プロパティに設定してある語句そのもののポストなら、配列で設定してある autoReaction.json の contentReaction プロパティからランダム(※1)でリアクションするカスタム絵文字を取得し、その取得した要素番目に対応する autoReaction.json の reactionImgURL プロパティでリアクションし、さらに autoReaction.json の reactionImgURL プロパティを使用してリプライも行います
