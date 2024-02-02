@@ -72,7 +72,13 @@ const autoReply = async (relay) => {
                         // target.probability は1～100で設定されている
                         if(probabilityDetermination(target.probability)) {
                             postKb = 1;     // リプライ
-                        }                        
+                        } else {
+                            // 確率で外れたら倍の確率でやってみる
+                            if(probabilityDetermination(target.probability * 2)) {
+                                // リアクション
+                                postKb = 5;
+                            }
+                        }
                     }
                 }
 
@@ -123,7 +129,7 @@ const autoReply = async (relay) => {
                         // jsonに設定されているリアクション絵文字の数を利用してランダムで反応語句を決める
                         randomReactionIdx = random(0, autoReactionJson.contentReaction.length - 1);
                         // randomReactionIdx 番目のカスタム絵文字URLが設定されているならリアクション
-                        if(autoReactionJson.reactionImgURL.length > 0) {
+                        if(autoReactionJson.reactionImgURL[randomReactionIdx].length > 0) {
                             postKb = 4;
                             // リアクション
                             replyPostorreactionPost = composeReaction(ev,autoReactionJson,randomReactionIdx);
@@ -132,7 +138,22 @@ const autoReply = async (relay) => {
                             // リプライ
                             replyPostorreactionPost = composeReply(autoReactionJson.contentReaction[randomReactionIdx], ev);
                         }
+
+                    } else if(postKb === 5) {
+                        //100回まわる（100に意味はない　なんとなく）
+                        for (let i = 0; i < 100; i++) {
+                            randomReactionIdx = random(0, autoReactionJson.contentReaction.length - 1);
+                            // randomReactionIdx 番目のカスタム絵文字URLが設定されているならリアクション
+                            if(autoReactionJson.reactionImgURL[randomReactionIdx].length > 0) {
+                                // リアクション
+                                replyPostorreactionPost = composeReaction(ev,autoReactionJson,randomReactionIdx);
+                                break;
+                            }
+                        }
+                        // なにもしない
+                        return;
                     }
+
                     publishToRelay(relay, replyPostorreactionPost);
                     // リアクションとリアクション絵文字でのリプライを行う動作区分で、かつカスタム絵文字URLが設定されているならリアクション絵文字でリプライも行う
                     if(postKb === 4) {
