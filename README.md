@@ -52,9 +52,9 @@
 #### 　2-2-1.autoPostatPresetTime.js
 ##### 　　・presetDate.json と sunriseSunset.json に設定された時刻や年月日分になると設定値をポスト
 #### 　2-2-2.autoReply.js
-##### 　　・autoReaction.json と autoReply.json に設定された語句を発見するとそれに対応する設定値をポスト
+##### 　　・autoReaction.json と autoReply.json に設定された語句を発見するとそれに対応する設定値をリアクションやリプライ
 #### 　2-2-3.replytoReply.js
-##### 　　・リプライを受けるとautoReply.json に設定された設定値をポスト
+##### 　　・リプライを受けるとautoReply.json に設定された設定値でリプライ
 
 ### 2-3.src/common ディレクトリ
 #### 　2-3-1.publishToRelay.js
