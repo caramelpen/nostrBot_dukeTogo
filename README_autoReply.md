@@ -11,7 +11,7 @@
 | 5 | 未発見 | 管理者 | 発見(※A) | 100% | リアクション or リアクションとリプライ (※E) |
 | 6 | 未発見 | 一般 | 発見(※A) | 100% | リアクション or リアクションとリプライ (※E) |
 
-#### (※A)設定値がポスト内のどこかに存在するのではなく、ポストが設定値そのもの
+#### (※A)設定値がポスト内のどこかに存在するのではなく、ポストが設定値そのものの完全一致
 #### (※B)各反応語句に設定された確率
 #### (※C)各反応語句に設定された確率の倍
 #### (※D)全反応語句に設定されたリプライ語句全てからランダム
@@ -35,8 +35,7 @@
 ##### 　5..envファイルの admin_HEX_PUBKEY (HEX値で設定してください) に設定した管理者の公開鍵のポストであり、autoReaction.json の nativeWords プロパティに設定してある語句そのもののポストなら、配列で設定してある autoReaction.json の contentReaction プロパティからランダム(※1)でリアクションするカスタム絵文字を取得し、その取得した要素番目に対応する autoReaction.json の reactionImgURL プロパティでリアクションし、さらに autoReaction.json の reactionImgURL プロパティを使用してリプライも行います
 ##### 　※上記には例外があり、autoReaction.json の contentReaction プロパティがカスタム絵文字コードではなく既存絵文字を設定している場合は、autoReaction.json の reactionImgURL プロパティは未設定とし、リアクションは行わず、その絵文字でのリプライのみ行います
 ##### 　
-##### 　6.管理者以外のポストであり、autoReaction.json の nativeWords プロパティに設定してある語句そのもののポストなら、配列で設定してある autoReaction.json の contentReaction プロパティからランダム(※1)でリアクションするカスタム絵文字を取得し、その取得した要素番目に対応する autoReaction.json の reactionImgURL プロパティでリアクションし、さらに autoReaction.json の reactionImgURL プロパティを使用してリプライも行います
-##### 　※上記には例外があり、autoReaction.json の contentReaction プロパティがカスタム絵文字コードではなく既存絵文字を設定している場合は、autoReaction.json の reactionImgURL プロパティは未設定とし、リアクションは行わず、その絵文字でのリプライのみ行います
+##### 　6.管理者以外のポストであり、autoReaction.json の nativeWords プロパティに設定してある語句そのもののポストなら、5.に同じとなります
 
 ### 　
 ##### ・一度のポストに複数の反応語句があった場合はjsonの記述順で初めにヒットした orgPost の反応語句が対象になります
