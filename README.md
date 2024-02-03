@@ -49,6 +49,7 @@
 ##### 　　・内容は随時更新していきます
 #### 　2-1-4.sunriseSunset.json
 ##### 　　・src\autoPostatPresetTime.js で使用（後述）
+##### 　　・内容は随時更新していきます
 
 ### 2-2.src ディレクトリ
 #### 　2-2-1.autoPostatPresetTime.js
