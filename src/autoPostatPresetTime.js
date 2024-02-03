@@ -245,7 +245,7 @@ const main = async () => {
 
                     // リレー
                     const relayUrl = "wss://relay-jp.nostr.wirednet.jp";
-                    const relay = relayInit(relayUrl);
+                    const relay = await relayInit(relayUrl);
                     relay.on("error", () => {
                         console.error("autoPostatPresetTime:failed to connect");
                         relay.close();

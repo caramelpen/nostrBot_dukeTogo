@@ -101,7 +101,7 @@ const main = async () => {
     pubkey = getPublicKey(BOT_PRIVATE_KEY_HEX); // 秘密鍵から公開鍵の取得
 
     // リレー
-    const relay = relayInit(relayUrl);
+    const relay = await relayInit(relayUrl);
     relay.on("error", () => {
         console.error("replytoReply:failed to connect");
         relay.close();

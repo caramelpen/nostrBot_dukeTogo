@@ -244,7 +244,7 @@ const main = async () => {
     adminPubkey = process.env.admin_HEX_PUBKEY;               // bot管理者の公開鍵の取得
 
     // リレー
-    const relay = relayInit(relayUrl);
+    const relay = await relayInit(relayUrl);
     relay.on("error", () => {
         relay.close();
         console.error("autoReply:failed to connect");
