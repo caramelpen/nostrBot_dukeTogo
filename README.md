@@ -34,7 +34,7 @@
             publishToRelay.js
             utils.js
 </pre>
-##### 　
+
 ### 2.各ファイルの役割概要
 
 ### 2-1.config ディレクトリ
@@ -64,36 +64,32 @@
 - 2-3-2.utils.js
   - 共通関数
 
-##### 　
 
 ### 3.各機能詳細（長いので各mdファイルに分割しました）
 
-### 3-1.autoPostatPresetTime.js
-##### ・README_autoPostatPresetTime.md をご覧ください
+- 3-1.autoPostatPresetTime.js
+  - README_autoPostatPresetTime.md をご覧ください
 
-### 3-2.autoReply.js
-##### ・README_autoReply.md をご覧ください
+- 3-2.autoReply.js
+  - README_autoReply.md をご覧ください
 
-### 3-3.replytoReply.js
-##### ・README_replytoReply.md をご覧ください
-##### 　
+- 3-3.replytoReply.js
+  - README_replytoReply.md をご覧ください
 
 ### 4.その他
-#### 4-1.秘密鍵
-##### ・秘密鍵は .envファイルの BOT_PRIVATE_KEY (nsec...)から取得しています（0.で dotenv をインストールしているのはこのためです）
-#### 4-2. 3.各機能詳細内の※1について
-##### ・ランダムで語句を得る方法として、配列で設定した設定語句の要素数の範囲を用いてランダム値を取得し、それをそのまま配列の要素番号として使用し、語句を得ます
-#### 4-3.リレーについて
-##### ・「 wss://relay-jp.nostr.wirednet.jp 」で運用させていただいています
-##### 　
+- 4-1.秘密鍵
+  - 秘密鍵は .envファイルの BOT_PRIVATE_KEY (nsec...)から取得しています（0.で dotenv をインストールしているのはこのためです）
+- 4-2. 3.各機能詳細内の※1について
+  - ランダムで語句を得る方法として、配列で設定した設定語句の要素数の範囲を用いてランダム値を取得し、それをそのまま配列の要素番号として使用し、語句を得ます
+- 4-3.リレーについて
+  - 「 wss://relay-jp.nostr.wirednet.jp 」で運用させていただいています
 
 ### 5.ライセンス
-#### ・MIT No Attribution(MIT-0)です(詳しくは LICNECE ファイルをご覧ください)
-##### 　
+- MIT No Attribution(MIT-0)です(詳しくは LICNECE ファイルをご覧ください)
 
 ### 6.謝辞
-#### ・Nostr Japan ( https://github.com/nostr-jp )各位
-#### ・Don ( https://github.com/nikolat )様
-#### ・ひゅうが霄 ( https://showhyuga.blogspot.com/ )様
-#### ・名言まとめドットコム ( https://www.underwater-festival.com/00096-2/ )様
-#### ・劇画 Bombs away！( https://onihei-fan.com/?p=10214 )様
+- Nostr Japan ( https://github.com/nostr-jp )各位
+- Don ( https://github.com/nikolat )様
+- ひゅうが霄 ( https://showhyuga.blogspot.com/ )様
+- 名言まとめドットコム ( https://www.underwater-festival.com/00096-2/ )様
+- 劇画 Bombs away！( https://onihei-fan.com/?p=10214 )様
