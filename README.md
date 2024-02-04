@@ -4,10 +4,9 @@
  ( @dukeTogo npub163qhxuj7sf4hagnzrayrfypfh5cld2lshcqzqsqpqc53fy6m87sqlrvjv9 )
  をキャラとして運用していますが、後述する各jsonファイルの内容を変更すれば他のキャラとして運用も可能なはずです
 - ChatGPT と絡めたような大層なものではなく、設定された語句をランダムでポストする「ドラクエ村人的bot」です
-##### 　
 
 ### 0.事前準備
- - 以下のモジュール(バージョン)がインストールされています
+ 以下のモジュール(バージョン)がインストールされています
   - node.js (20.10.0)
   - npm (10.2.3)
   - nostr-tools (1.17.0)
@@ -39,10 +38,10 @@
 ### 2.各ファイルの役割概要
 
 ### 2-1.config ディレクトリ
-#### 　2-1-1.autoReaction.json
-##### 　　・src\autoReply.js で使用（後述）
-#### 　2-1-2.autoReply.json
-##### 　　・src\autoReply.js, replytoReply.js で使用（後述）
+- 2-1-1.autoReaction.json
+ - src\autoReply.js で使用（後述）
+- 2-1-2.autoReply.json
+ - src\autoReply.js, replytoReply.js で使用（後述）
 ##### 　　・内容は随時更新していきます
 #### 　2-1-3.presetDate.json
 ##### 　　・src\autoPostatPresetTime.js で使用（後述）
