@@ -1,9 +1,9 @@
 # nostrBot_dukeTogo
 ## nostrのbotです
-### ・某狙撃屋13
-### ( @dukeTogo npub163qhxuj7sf4hagnzrayrfypfh5cld2lshcqzqsqpqc53fy6m87sqlrvjv9 )
-### をキャラとして運用していますが、後述する各jsonファイルの内容を変更すれば他のキャラとして運用も可能なはずです
-### ・ChatGPT と絡めたような大層なものではなく、設定された語句をランダムでポストする「ドラクエ村人的bot」です
+- 某狙撃屋13
+ ( @dukeTogo npub163qhxuj7sf4hagnzrayrfypfh5cld2lshcqzqsqpqc53fy6m87sqlrvjv9 )
+ をキャラとして運用していますが、後述する各jsonファイルの内容を変更すれば他のキャラとして運用も可能なはずです
+- ChatGPT と絡めたような大層なものではなく、設定された語句をランダムでポストする「ドラクエ村人的bot」です
 ##### 　
 
 ### 0.事前準備
