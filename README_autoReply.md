@@ -24,8 +24,8 @@
 
   - 2.管理者以外のポストに対する反応の場合、反応語句の前方に autoReaction.json の nativeWords プロパティの設定値を発見すると、autoReply.json の replyPostChar プロパティからランダム(※1)でリプライ語句を決定しリプライします
 
-- 3.管理者以外のポストに対する反応の場合、反応語句の前方に autoReaction.json の nativeWords プロパティの設定値が発見できないと、autoReply.json の probability プロパティに設定された確率を満たした時に限り、対応する配列で設定された autoReply.json の replyPostChar プロパティからランダム(※1)でリプライ語句を決定しリプライします
-- 3.において確率を満たせなかった場合は、その確率の倍で再度判定を行い、満たせば配列で設定してある autoReaction.json の contentReaction プロパティからランダム(※1)でリアクションするカスタム絵文字を取得し、その取得した要素番目に対応する autoReaction.json の reactionImgURL が設定してあるならその reactionImgURL でリアクションします（ reactionImgURL に値が設定されているか100回繰り返し、設定された reactionImgURL を取得できた時点で繰り返しを終了します　100回繰り返しても reactionImgURL を取得できなければリアクションは行いません）
+  - 3.管理者以外のポストに対する反応の場合、反応語句の前方に autoReaction.json の nativeWords プロパティの設定値が発見できないと、autoReply.json の probability プロパティに設定された確率を満たした時に限り、対応する配列で設定された autoReply.json の replyPostChar プロパティからランダム(※1)でリプライ語句を決定しリプライします
+  - 3.において確率を満たせなかった場合は、その確率の倍で再度判定を行い、満たせば配列で設定してある autoReaction.json の contentReaction プロパティからランダム(※1)でリアクションするカスタム絵文字を取得し、その取得した要素番目に対応する autoReaction.json の reactionImgURL が設定してあるならその reactionImgURL でリアクションします（ reactionImgURL に値が設定されているか100回繰り返し、設定された reactionImgURL を取得できた時点で繰り返しを終了します　100回繰り返しても reactionImgURL を取得できなければリアクションは行いません）
 
 
 - 3-2-2.フィードを購読し、配列で設定してある autoReply.json の orgPost プロパティに設定された語句をフィードから「未発見」(No.4～6)
