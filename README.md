@@ -39,10 +39,10 @@
 
 ### 2-1.config ディレクトリ
 - 2-1-1.autoReaction.json
- - src\autoReply.js で使用（後述）
+　- src\autoReply.js で使用（後述）
 - 2-1-2.autoReply.json
- - src\autoReply.js, replytoReply.js で使用（後述）
-##### 　　・内容は随時更新していきます
+　- src\autoReply.js, replytoReply.js で使用（後述）
+　　- 内容は随時更新していきます
 #### 　2-1-3.presetDate.json
 ##### 　　・src\autoPostatPresetTime.js で使用（後述）
 ##### 　　・内容は随時更新していきます
