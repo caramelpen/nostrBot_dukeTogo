@@ -50,7 +50,7 @@ const jsonOpen = (jsonPath) => {
 /**
  * json の指定のプロパティへ値を書き込む
  */
-const asyncWriteJsonFile = async (jsonPath,propertyName,writeValue) => {
+const asyncWriteJsonFile = async (jsonPath, propertyName, writeValue) => {
     let jsonData;
     const fs = require("fs").promises;
     try {
@@ -63,14 +63,14 @@ const asyncWriteJsonFile = async (jsonPath,propertyName,writeValue) => {
 
         //jsonへ書き込み
         await fs.writeFile(jsonPath, jsonString, "utf8");
-        //console.log(`Property "${propertyName}" has been updated successfully.`);
+        console.log(`Property "${propertyName}" has been updated successfully.`);
         return true;
     } catch (err){
         console.error("json Read or Write Err:" + err);
         return false;
     }
 }
-const writeJsonFile = (jsonPath,propertyName,writeValue) => {
+const writeJsonFile = (jsonPath, propertyName, writeValue) => {
     let jsonData;
     const fs = require("fs");
     try {
@@ -83,7 +83,7 @@ const writeJsonFile = (jsonPath,propertyName,writeValue) => {
 
         //jsonへ書き込み
         fs.writeFileSync(jsonPath, jsonString, "utf8");
-        //console.log(`Property "${propertyName}" has been updated successfully.`);
+        console.log(`Property "${propertyName}" has been updated successfully.`);
         return true;
     } catch (err){
         console.error("json Read or Write Err:" + err);
@@ -135,7 +135,6 @@ const isSafeToReply = ({ pubkey, created_at }) => {
     // 公開鍵ごとに、最後にリプライを返した時刻(unixtime)を保持するMap
     const lastReplyTimePerPubkey = new Map();
 
-    //const now = currUnixtimeOrg();
     const now = currUnixtime();
 
     if (created_at < now - COOL_TIME_DUR_SEC) {
