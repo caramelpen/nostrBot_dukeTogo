@@ -185,7 +185,25 @@ const formattedDateTime = (date) => {
 * 確率判定
 */
 const probabilityDetermination = (probability) => {
-    return Math.random() < probability / 100;
+    // return Math.random() < probability / 100;
+    // 100なら無条件でOK
+    if(probability === 100) {
+        return true;
+    } else {
+        let randomCnt = 0;
+        // 100-引数値以上が判定基準
+        const standardValue = 100 - probability;
+        // 100回回って0か1かをランダムで取得し加算していく
+        for (let i = 1; i <= 100; i++) {
+            randomCnt += random(0 ,1);
+        }
+        // 基準を満たすならOK
+        if(standardValue <= randomCnt) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 }
 
 
