@@ -1,23 +1,23 @@
 {
-  "location": "東京"
-  ,"lat": 35.6895
-  ,"lng": 139.6917
-  ,"sunRise": "202402050640"
-  ,"sunRiseConst": "日の出"
-  ,"sunRisePost": [
-    "日の出だ…命拾いしたな…"
-    ,"…日の出だ"
-    ,"…日の出だ…　もういい加減、諦めたらどうだ…？"
-    ,"日の出だ… しかし助かったなおまえたち……おれと戦わずにすむ……"
-  ]
-  ,"sunSet": "202402051712"
-  ,"sunSetConst": "日没"
-  ,"sunSetPost": [
-    "日が沈む…　黄昏時は仕事もしやすい…"
-    ,"日没だ…"
-    ,"日没だ…　もういい加減、諦めたらどうだ…？"
-  ]
-  ,"jpnTimezoneOffset1": 0
-  ,"jpnTimezoneOffset2": 60
-  ,"detail": "timedatectl set-timezone Asia/Tokyo を行ってもなぜか日本時刻が得られない海外サーバの対応として、jpnTimezoneOffset1 に 9 jpnTimezoneOffset2 に 60 と設定すると日本時間になります（日本時刻が得られている場合はどちらかを 0 にすれば無効になります）"
+  "location": "東京",
+  "lat": 35.6895,
+  "lng": 139.6917,
+  "sunRise": "202402070638",
+  "sunRiseConst": "日の出",
+  "sunRisePost": [
+    "日の出だ…命拾いしたな…",
+    "…日の出だ",
+    "…日の出だ…　もういい加減、諦めたらどうだ…？",
+    "日の出だ… しかし助かったなおまえたち……おれと戦わずにすむ……"
+  ],
+  "sunSet": "202402071714",
+  "sunSetConst": "日没",
+  "sunSetPost": [
+    "日が沈む…　黄昏時は仕事もしやすい…",
+    "日没だ…",
+    "日没だ…　もういい加減、諦めたらどうだ…？"
+  ],
+  "jpnTimezoneOffset1": 0,
+  "jpnTimezoneOffset2": 60,
+  "detail": "timedatectl set-timezone Asia/Tokyo を行ってもなぜか日本時刻が得られない海外サーバの対応として、jpnTimezoneOffset1 に 9 jpnTimezoneOffset2 に 60 と設定すると日本時間になります（日本時刻が得られている場合はどちらかを 0 にすれば無効になります）"
 }
