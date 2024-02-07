@@ -69,7 +69,7 @@ const autoReply = async (relay) => {
                         postKb = 1;     // リプライ
                     } else {
                         // 確率判定でOKだった
-                        // target.probability は1～100で設定されている
+                        // target.probability は0～100で設定されている
                         if(probabilityDetermination(target.probability)) {
                             postKb = 1;     // リプライ
                         } else {
