@@ -360,7 +360,7 @@
     ,{
         "orgPost": ["チュートリアル","nostrチュートリアル"]
         ,"replyPostChar": [
-                        "…まずはここを見ろ… /nhttps://scrapbox.io/nostr/ /n有識者が随時更新をしてくれている…"
+                        "…まずはここを見ろ… \nhttps://scrapbox.io/nostr/ \n有識者が随時更新をしてくれている…"
                         ]
         ,"probability": 100
     }
