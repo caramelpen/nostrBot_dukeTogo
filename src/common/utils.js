@@ -185,27 +185,16 @@ const formattedDateTime = (date) => {
 * 確率判定
 */
 const probabilityDetermination = (probability) => {
-    // return Math.random() < probability / 100;
     // 100なら無条件でOK
     if(probability >= 100) {
         return true;
     } else {
+        // 0ならダメ
         if(probability <= 0) {
             return false;
         } else {
-            let randomCnt = 0;
-            // 100-引数値以上が判定基準
-            const standardValue = 100 - probability;
-            // 100回回って0か1かをランダムで取得し加算していく
-            for (let i = 1; i <= 100; i++) {
-                randomCnt += random(0 ,1);
-            }
-            // 基準を満たすならOK
-            if(standardValue <= randomCnt) {
-                return true;
-            } else {
-                return false;
-            }
+            // 1-100までの整数をランダムで取得し、基準を満たせばOK
+            return Math.floor(Math.random() * 100) + 1 <= probability;
         }
     }
 }
