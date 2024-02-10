@@ -184,12 +184,12 @@ const autoReply = async (relay) => {
 
 // 自分をフォローしている人なら真
 const chkMyFollower = async (relay, evPubkey) => {
-    ret = false;
+    let ret = false;
     try {
         // フィードを購読
-        const sub = await relay.sub(
+        const sub = relay.sub(
             [
-                { "kinds": [3], "authors": [evPubkey] }
+                { "kinds": [3], "authors": [evPubkey] } // 公開キー evPubkey のユーザ情報
             ]
         );
         await sub.on("event", (ev) => {
