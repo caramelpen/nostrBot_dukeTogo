@@ -183,7 +183,7 @@ const autoReply = async (relay) => {
 
 
 // 自分をフォローしている人なら真
-const chkMyFollower = async (relay, evPubkey) => {
+const chkMyFollower = (relay, evPubkey) => {
     let ret = false;
     try {
         // フィードを購読
@@ -192,7 +192,7 @@ const chkMyFollower = async (relay, evPubkey) => {
                 { "kinds": [3], "authors": [evPubkey] } // 公開キー evPubkey のユーザ情報
             ]
         );
-        await sub.on("event", (ev) => {
+        sub.on("event", (ev) => {
                 ret = ev.tags.some(tagArray => tagArray.includes(pubkey));    // 公開キー evPubkey のフォローの中に自分の公開キー pubkey がいるなら真
             }
         )
