@@ -49,6 +49,15 @@ const autoReply = async (relay) => {
             let postKb = 0;     
             // 反応語句発見
             if(target) {
+                // 全方位絡みを防ぐため、反応語句を発見しても自分をフォローしていない人には反応しないのが大前提
+                if(isAdminPubkey) { // 投稿者が管理者なら何かの手違いでフォローしていなくても有効にする
+                    // なにもしない
+                } else {
+                    if(!chkMyFollower(relay, ev.pubkey)) { // 自分のフォロアではない
+                        return; // なにもしないで終了
+                    }
+                }
+
                 // 投稿者が管理者
                 if(isAdminPubkey) {
                     postKb = 1;     // リプライ
@@ -95,8 +104,8 @@ const autoReply = async (relay) => {
                     }
                 // 投稿者が管理者以外
                 } else {
-                    // フィードのポストがjsonの nativeWords プロパティそのもの
-                    if(isNativeWords) {
+                    // フィードのポストがjsonの nativeWords プロパティそのもので、かつ自分をフォローしている人なら
+                    if(isNativeWords && chkMyFollower(relay, ev.pubkey)) {
                         postKb = 3;     // リアクションとリアクション絵文字でのリプライ
                     }
                 }
@@ -132,7 +141,7 @@ const autoReply = async (relay) => {
                         if(autoReactionJson.reactionImgURL[randomReactionIdx].length > 0) {
                             postKb = 4;
                             // リアクション
-                            replyPostorreactionPost = composeReaction(ev,autoReactionJson,randomReactionIdx);
+                            replyPostorreactionPost = composeReaction(ev, autoReactionJson, randomReactionIdx);
                         // カスタム絵文字URLが未設定ならそれはカスタム絵文字ではないので、リアクションせず、既存絵文字でリプライする
                         } else {
                             // リプライ
@@ -146,7 +155,7 @@ const autoReply = async (relay) => {
                             // randomReactionIdx 番目のカスタム絵文字URLが設定されているならリアクション
                             if(autoReactionJson.reactionImgURL[randomReactionIdx].length > 0) {
                                 // リアクション
-                                replyPostorreactionPost = composeReaction(ev,autoReactionJson,randomReactionIdx);
+                                replyPostorreactionPost = composeReaction(ev, autoReactionJson, randomReactionIdx);
                                 break;
                             }
                         }
@@ -158,7 +167,7 @@ const autoReply = async (relay) => {
                     // リアクションとリアクション絵文字でのリプライを行う動作区分で、かつカスタム絵文字URLが設定されているならリアクション絵文字でリプライも行う
                     if(postKb === 4) {
                         // リプライ
-                        replyPostorreactionPost = composeReplyEmoji(ev,autoReactionJson,randomReactionIdx);
+                        replyPostorreactionPost = composeReplyEmoji(ev, autoReactionJson, randomReactionIdx);
                         publishToRelay(relay, replyPostorreactionPost);
                     }
                 } else {
@@ -170,6 +179,28 @@ const autoReply = async (relay) => {
             console.error(err);
         }
     });
+}
+
+
+// 自分をフォローしている人なら真
+const chkMyFollower = async (relay, evPubkey) => {
+    ret = false;
+    try {
+        // フィードを購読
+        const sub = await relay.sub(
+            [
+                { "kinds": [3], "authors": [evPubkey] }
+            ]
+        );
+        await sub.on("event", (ev) => {
+                ret = ev.tags.some(tagArray => tagArray.includes(pubkey));    // 公開キー evPubkey のフォローの中に自分の公開キー pubkey がいるなら真
+            }
+        )
+    } catch(err) {
+        console.error("chkMyFollower:" + err);
+    } finally {
+        return ret;
+    }
 }
 
 // リプライイベントを組み立てる
