@@ -186,11 +186,13 @@ const autoReply = async (relay, followerPubkeys) => {
 const chkMyFollower = (followerPubkeys, evPubkey) => {
     let ret = false;
     try {
-        ret = followerPubkeys.some(tagArray => tagArray.includes(evPubkey));    // 公開キー evPubkey のフォローの中に自分の公開キー pubkey がいるなら真
+        if(followerPubkeys.length > 0) {
+            ret = followerPubkeys.some(tagArray => tagArray.includes(evPubkey));    // 公開キー evPubkey のフォローの中に自分の公開キー pubkey がいるなら真
+        }
     } catch(err) {
         console.error("chkMyFollower:" + err);
     } finally {
-        ret == true? console.log("chkMyFollower : pubkey [" + evPubkey + "] is your follower"):"";
+        // ret == true? console.log("chkMyFollower : pubkey [" + evPubkey + "] is your follower"):"";
         return ret;
     }
 }
@@ -281,15 +283,11 @@ const main = async () => {
     // フィードを購読
     const sub = relay.sub(
         [
-            //{ "kinds": [3], "authors": [evPubkey] } // 公開キー evPubkey のユーザ情報
             { "kinds": [3], "#p": [pubkey] }    // 自分の公開キー含まれるフォローリストを取得
         ]
     );
-    let followerPubkeys = [];
+    const followerPubkeys = [];
     sub.on("event", (ev) => {
-        // for (let i = 0; i < ev.tags.length; i++) {
-        //     followerPubkeys.push(ev.pubkey);    // 自分の公開キー含まれるフォローリストを配列に格納
-        // }
         ev.tags.forEach(tag => {
             followerPubkeys.push(ev.pubkey);
         });
