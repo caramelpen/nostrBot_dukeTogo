@@ -11,9 +11,10 @@ const sunCalc = require("suncalc");
 const { currDateTime, currUnixtime, random, jsonOpen, writeJsonFile, formattedDateTime } = require("./common/utils.js");
 const { publishToRelay } = require("./common/publishToRelay.js");
 
-let BOT_PRIVATE_KEY_HEX;
-let pubkey;
+let BOT_PRIVATE_KEY_HEX = "";
+let pubkey = "";
 let postEv;
+let relayUrl = "";
 
 
 // 定刻ポスト
@@ -244,7 +245,7 @@ const main = async () => {
                 if(postSubject == true) {
 
                     // リレー
-                    const relayUrl = "wss://relay-jp.nostr.wirednet.jp";
+                    relayUrl = process.env.RELAY_URL;    // リレーURL
                     const relay = await relayInit(relayUrl);
                     relay.on("error", () => {
                         console.error("autoPostatPresetTime:failed to connect");

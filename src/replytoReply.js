@@ -8,10 +8,9 @@ const { relayInit, getPublicKey, finishEvent, nip19 } = require("nostr-tools");
 const { currUnixtime, random, jsonOpen, isSafeToReply } = require("./common/utils.js");
 const { publishToRelay } = require("./common/publishToRelay.js");
 
-const relayUrl = "wss://relay-jp.nostr.wirednet.jp";
-
-let BOT_PRIVATE_KEY_HEX;
-let pubkey;
+let relayUrl = "";
+let BOT_PRIVATE_KEY_HEX = "";
+let pubkey = "";
 
 const replytoReply = async (relay)=>{
 
@@ -101,6 +100,7 @@ const main = async () => {
     pubkey = getPublicKey(BOT_PRIVATE_KEY_HEX); // 秘密鍵から公開鍵の取得
 
     // リレー
+    relayUrl = process.env.RELAY_URL;    // リレーURL
     const relay = await relayInit(relayUrl);
     relay.on("error", () => {
         console.error("replytoReply:failed to connect");
