@@ -8,10 +8,8 @@ const { relayInit, getPublicKey, finishEvent, nip19 } = require("nostr-tools");
 const { currUnixtime, jsonOpen, isSafeToReply, random, probabilityDetermination } = require("./common/utils.js");
 const { publishToRelay } = require("./common/publishToRelay.js");
 
-const relayUrl = "wss://relay-jp.nostr.wirednet.jp";
-//const relayUrl = "wss://relay.nostr.band";
-
-let BOT_PRIVATE_KEY_HEX;
+let relayUrl = "";
+let BOT_PRIVATE_KEY_HEX = "";
 let pubkey = "";
 let adminPubkey = "";
 
@@ -267,6 +265,8 @@ const main = async () => {
     BOT_PRIVATE_KEY_HEX = dr.data;
     pubkey = getPublicKey(BOT_PRIVATE_KEY_HEX);               // 秘密鍵から公開鍵の取得
     adminPubkey = process.env.admin_HEX_PUBKEY;               // bot管理者の公開鍵の取得
+    relayUrl = process.env.RELAY_URL;                         // リレーURL
+
 
     // リレー
     const relay = await relayInit(relayUrl);
