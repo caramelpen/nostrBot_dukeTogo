@@ -9,12 +9,13 @@ const { currUnixtime, jsonOpen, isSafeToReply, random, probabilityDetermination 
 const { publishToRelay } = require("./common/publishToRelay.js");
 
 const relayUrl = "wss://relay-jp.nostr.wirednet.jp";
+//const relayUrl = "wss://relay.nostr.band";
 
 let BOT_PRIVATE_KEY_HEX;
 let pubkey = "";
 let adminPubkey = "";
 
-const autoReply = async (relay) => {
+const autoReply = async (relay, followerPubkeys) => {
     // jsonの場所を割り出すために
     const jsonPath = require("path");
 
@@ -44,19 +45,18 @@ const autoReply = async (relay) => {
             const isIncludeWord = !isNativeWords && autoReactionJson.nativeWords.some(element => (ev.content).includes(element)) ? true : false; 
             // 投稿者が管理者なら真
             const isAdminPubkey = ev.pubkey === adminPubkey ? true : false;
+            // 公開キー ev.Pubkey のフォローの中に自分の公開キー pubkey がいるなら真
+            let isChkMyFollower = chkMyFollower(followerPubkeys, ev.pubkey);
+
+            // 投稿者が管理者なら何かの手違いでフォローしていなくてもフォローしているものとする
+            if(isAdminPubkey){
+                isChkMyFollower = true;
+            }
 
             // 作動区分
-            let postKb = 0;     
-            // 反応語句発見
-            if(target) {
-                // 全方位絡みを防ぐため、反応語句を発見しても自分をフォローしていない人には反応しないのが大前提
-                if(isAdminPubkey) { // 投稿者が管理者なら何かの手違いでフォローしていなくても有効にする
-                    // なにもしない
-                } else {
-                    if(!chkMyFollower(relay, ev.pubkey)) { // 自分のフォロアではない
-                        return; // なにもしないで終了
-                    }
-                }
+            let postKb = 0;
+            // 反応語句を発見し、自分をフォローしている人なら
+            if(target && isChkMyFollower == true) {
 
                 // 投稿者が管理者
                 if(isAdminPubkey) {
@@ -105,8 +105,10 @@ const autoReply = async (relay) => {
                 // 投稿者が管理者以外
                 } else {
                     // フィードのポストがjsonの nativeWords プロパティそのもので、かつ自分をフォローしている人なら
-                    if(isNativeWords && chkMyFollower(relay, ev.pubkey)) {
-                        postKb = 3;     // リアクションとリアクション絵文字でのリプライ
+                    if(isNativeWords) {
+                        if(isChkMyFollower) {
+                            postKb = 3;     // リアクションとリアクション絵文字でのリプライ
+                        }
                     }
                 }
 
@@ -182,23 +184,15 @@ const autoReply = async (relay) => {
 }
 
 
-// 自分をフォローしている人なら真
-const chkMyFollower = (relay, evPubkey) => {
+// 公開キー evPubkey のフォローの中に自分の公開キー pubkey がいるなら真
+const chkMyFollower = (followerPubkeys, evPubkey) => {
     let ret = false;
     try {
-        // フィードを購読
-        const sub = relay.sub(
-            [
-                { "kinds": [3], "authors": [evPubkey] } // 公開キー evPubkey のユーザ情報
-            ]
-        );
-        sub.on("event", (ev) => {
-                ret = ev.tags.some(tagArray => tagArray.includes(pubkey));    // 公開キー evPubkey のフォローの中に自分の公開キー pubkey がいるなら真
-            }
-        )
+        ret = followerPubkeys.some(tagArray => tagArray.includes(evPubkey));    // 公開キー evPubkey のフォローの中に自分の公開キー pubkey がいるなら真
     } catch(err) {
         console.error("chkMyFollower:" + err);
     } finally {
+        ret == true? console.log("chkMyFollower : pubkey [" + evPubkey + "] is your follower"):"";
         return ret;
     }
 }
@@ -281,15 +275,32 @@ const main = async () => {
         console.error("autoReply:failed to connect");
         return;
     });
-    await relay.connect(relay);
+    await relay.connect();
     console.log("autoReply:connected to relay");
 
+    // フィードを購読
+    const sub = relay.sub(
+        [
+            //{ "kinds": [3], "authors": [evPubkey] } // 公開キー evPubkey のユーザ情報
+            { "kinds": [3], "#p": [pubkey] }    // 自分の公開キー含まれるフォローリストを取得
+        ]
+    );
+    let followerPubkeys = [];
+    sub.on("event", (ev) => {
+        // for (let i = 0; i < ev.tags.length; i++) {
+        //     followerPubkeys.push(ev.pubkey);    // 自分の公開キー含まれるフォローリストを配列に格納
+        // }
+        ev.tags.forEach(tag => {
+            followerPubkeys.push(ev.pubkey);
+        });
+    });
+    
     try {
 
         /*
         フィードを購読し、リプライ対象となるポストがないか調べ、存在するならリプライする
         */
-        autoReply(relay);
+        autoReply(relay, followerPubkeys);
 
     } catch(err) {
         console.error(err);
