@@ -39,24 +39,24 @@
 
 ### 2-1.config ディレクトリ
 - 2-1-1.autoReaction.json
-  - src\autoReply.js で使用（後述）
+  - `src\autoReply.js`で使用（後述）
 - 2-1-2.autoReply.json
-  - src\autoReply.js, replytoReply.js で使用（後述）
+  - `src\autoReply.js`、`replytoReply.js`で使用（後述）
   - 内容は随時更新していきます
 - 2-1-3.presetDate.json
-  - src\autoPostatPresetTime.js で使用（後述）
+  - `src\autoPostatPresetTime.js`で使用（後述）
   - 内容は随時更新していきます
 - 2-1-4.sunriseSunset.json
-  - src\autoPostatPresetTime.js で使用（後述）
+  - `src\autoPostatPresetTime.js`で使用（後述）
   - 内容は随時更新していきます
 
 ### 2-2.src ディレクトリ
 - 2-2-1.autoPostatPresetTime.js
-  - presetDate.json と sunriseSunset.json に設定された時刻や年月日分になると設定値をポスト
+  - `presetDate.json`と`sunriseSunset.json`に設定された時刻や年月日分になると設定値をポスト
 - 2-2-2.autoReply.js
-  - autoReaction.json と autoReply.json に設定された語句を発見するとそれに対応する設定値をリアクションやリプライ
+  - `autoReaction.json`と`autoReply.json`に設定された語句を発見するとそれに対応する設定値をリアクションやリプライ
 - 2-2-3.replytoReply.js
-  - リプライを受けるとautoReply.json に設定された設定値でリプライ
+  - リプライを受けると`autoReply.json`に設定された設定値でリプライ
 
 ### 2-3.src/common ディレクトリ
 - 2-3-1.publishToRelay.js
@@ -68,22 +68,22 @@
 ### 3.各機能詳細（長いので各mdファイルに分割しました）
 
 - 3-1.autoPostatPresetTime.js
-  - README_autoPostatPresetTime.md をご覧ください
+  - `README_autoPostatPresetTime.md`をご覧ください
 
 - 3-2.autoReply.js
-  - README_autoReply.md をご覧ください
+  - `README_autoReply.md`をご覧ください
 
 - 3-3.replytoReply.js
-  - README_replytoReply.md をご覧ください
+  - `README_replytoReply.md`をご覧ください
 
 ### 4.その他
 - 4-1.秘密鍵
-  - 秘密鍵は .envファイルの BOT_PRIVATE_KEY (nsec...)から取得しています（0.で dotenv をインストールしているのはこのためです）
+  - 秘密鍵は`.env`ファイルの`BOT_PRIVATE_KEY`(nsec...)から取得しています（0.で`dotenv`をインストールしているのはこのためです）
 - 4-2. 3.各機能詳細内の※1について
   - ランダムで語句を得る方法として、配列で設定した設定語句の要素数の範囲を用いてランダム値を取得し、それをそのまま配列の要素番号として使用し、語句を得ます
 - 4-3.リレーについて
-  - 「 wss://relay-jp.nostr.wirednet.jp 」で運用させていただいています
-    (.env ファイルの RELAY_URL からリレーURLは取得しています)
+  - `wss://relay-jp.nostr.wirednet.jp`で運用させていただいています
+    (`.env`ファイルの`RELAY_URL`からリレーURLは取得しています)
 
 ### 5.ライセンス
 - MIT No Attribution(MIT-0)です(詳しくは LICNECE ファイルをご覧ください)
