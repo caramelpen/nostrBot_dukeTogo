@@ -192,7 +192,7 @@ const autoReply = async (relay) => {
 
 
 // 投稿者の公開キー evPubkey のフォローの中に自分の公開キー pubkey がいるなら真扱いとして配列にその投稿者の公開キーを詰める
-const chkMyFollower = async(relay, evPubkey) => {
+const chkMyFollower = (relay, evPubkey) => {
     try {
         // フィードを購読
         const sub = relay.sub(
@@ -201,7 +201,7 @@ const chkMyFollower = async(relay, evPubkey) => {
             ]
         );
         followerPubkeys = [];
-        await sub.on("event", (ev) => {
+        sub.on("event", (ev) => {
                 for (let i = 0; i < ev.tags.length; i++) {
                     if (ev.tags[i][1] === pubkey) { // "p","公開キー" という構成なので[1]
                         followerPubkeys.push(evPubkey);
