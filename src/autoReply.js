@@ -12,8 +12,9 @@ let relayUrl = "";
 let BOT_PRIVATE_KEY_HEX = "";
 let pubkey = "";
 let adminPubkey = "";
+let followerPubkeys = [];
 
-const autoReply = async (relay, followerPubkeys) => {
+const autoReply = async (relay) => {
     // jsonの場所を割り出すために
     const jsonPath = require("path");
 
@@ -43,47 +44,51 @@ const autoReply = async (relay, followerPubkeys) => {
             const isIncludeWord = !isNativeWords && autoReactionJson.nativeWords.some(element => (ev.content).includes(element)) ? true : false; 
             // 投稿者が管理者なら真
             const isAdminPubkey = ev.pubkey === adminPubkey ? true : false;
-            // 公開キー ev.Pubkey のフォローの中に自分の公開キー pubkey がいるなら真
-            let isChkMyFollower = chkMyFollower(followerPubkeys, ev.pubkey);
 
-            // 投稿者が管理者なら何かの手違いでフォローしていなくてもフォローしているものとする
-            if(isAdminPubkey){
-                isChkMyFollower = true;
-            }
-
+// if(ev.pubkey === "9649d6c5b931cb5a1c914ec3510643fa417ae28366411488388cde242651bf8b"){
+// let sk=0;
+// }
+            let isChkMyFollower = false;
             // 作動区分
             let postKb = 0;
-            // 反応語句を発見し、自分をフォローしている人なら
-            if(target && isChkMyFollower == true) {
+            // 反応語句を発見
+            if(target) {
 
                 // 投稿者が管理者
                 if(isAdminPubkey) {
                     postKb = 1;     // リプライ
                 // 投稿者が管理者以外
                 } else {
-                    // 反応語句はjsonの何番目にいるか取得
-                    const orgPostIdx = target.orgPost.findIndex(element => ev.content.includes(element));
-                    // 反応語句は存在するはずだが、もし何らかの理由で見つからなかったらなにもしない
-                    if(orgPostIdx === -1) {
-                        return;
-                    }
-                    // 反応語句はポストの何文字目にいるか取得
-                    const chridx = ev.content.indexOf(target.orgPost[orgPostIdx]);
-                    // 反応語句の前方を収める
-                    const fowardSubstr = ev.content.substring(0, chridx);
-                    // 反応語句の前方に nativeWords が含まれる
-                    if(autoReactionJson.nativeWords.length > 0 && fowardSubstr.includes(autoReactionJson.nativeWords)) {
-                        postKb = 1;     // リプライ
-                    } else {
-                        // 確率判定でOKだった
-                        // target.probability は0～100で設定されている
-                        if(probabilityDetermination(target.probability)) {
+
+                    chkMyFollower(relay, ev.pubkey);
+                    // 公開キー ev.Pubkey のフォローの中に自分の公開キー pubkey がいるなら真
+                    isChkMyFollower = followerPubkeys.length > 0 ? true: false;
+                    
+                    if(isChkMyFollower) {
+                        // 反応語句はjsonの何番目にいるか取得
+                        const orgPostIdx = target.orgPost.findIndex(element => ev.content.includes(element));
+                        // 反応語句は存在するはずだが、もし何らかの理由で見つからなかったらなにもしない
+                        if(orgPostIdx === -1) {
+                            return;
+                        }
+                        // 反応語句はポストの何文字目にいるか取得
+                        const chridx = ev.content.indexOf(target.orgPost[orgPostIdx]);
+                        // 反応語句の前方を収める
+                        const fowardSubstr = ev.content.substring(0, chridx);
+                        // 反応語句の前方に nativeWords が含まれる
+                        if(autoReactionJson.nativeWords.length > 0 && fowardSubstr.includes(autoReactionJson.nativeWords)) {
                             postKb = 1;     // リプライ
                         } else {
-                            // 確率で外れたら倍の確率でやってみる
-                            if(probabilityDetermination(target.probability * 2)) {
-                                // リアクション
-                                postKb = 5;
+                            // 確率判定でOKだった
+                            // target.probability は0～100で設定されている
+                            if(probabilityDetermination(target.probability)) {
+                                postKb = 1;     // リプライ
+                            } else {
+                                // 確率で外れたら倍の確率でやってみる
+                                if(probabilityDetermination(target.probability * 2)) {
+                                    // リアクション
+                                    postKb = 5;
+                                }
                             }
                         }
                     }
@@ -104,6 +109,10 @@ const autoReply = async (relay, followerPubkeys) => {
                 } else {
                     // フィードのポストがjsonの nativeWords プロパティそのもので、かつ自分をフォローしている人なら
                     if(isNativeWords) {
+
+                        chkMyFollower(relay, ev.pubkey);
+                        isChkMyFollower = followerPubkeys.length > 0 ? true: false;
+
                         if(isChkMyFollower) {
                             postKb = 3;     // リアクションとリアクション絵文字でのリプライ
                         }
@@ -182,18 +191,27 @@ const autoReply = async (relay, followerPubkeys) => {
 }
 
 
-// 公開キー evPubkey のフォローの中に自分の公開キー pubkey がいるなら真
-const chkMyFollower = (followerPubkeys, evPubkey) => {
-    let ret = false;
+// 投稿者の公開キー evPubkey のフォローの中に自分の公開キー pubkey がいるなら真扱いとして配列にその投稿者の公開キーを詰める
+const chkMyFollower = async(relay, evPubkey) => {
     try {
-        if(followerPubkeys.length > 0) {
-            ret = followerPubkeys.some(tagArray => tagArray.includes(evPubkey));    // 公開キー evPubkey のフォローの中に自分の公開キー pubkey がいるなら真
-        }
+        // フィードを購読
+        const sub = relay.sub(
+            [
+                { "kinds": [3], "authors": [evPubkey] }
+            ]
+        );
+        followerPubkeys = [];
+        await sub.on("event", (ev) => {
+                for (let i = 0; i < ev.tags.length; i++) {
+                    if (ev.tags[i][1] === pubkey) { // "p","公開キー" という構成なので[1]
+                        followerPubkeys.push(evPubkey);
+                        break;
+                    }
+                }
+            }
+        );
     } catch(err) {
         console.error("chkMyFollower:" + err);
-    } finally {
-        // ret == true? console.log("chkMyFollower : pubkey [" + evPubkey + "] is your follower"):"";
-        return ret;
     }
 }
 
@@ -279,26 +297,12 @@ const main = async () => {
     });
     await relay.connect();
     console.log("autoReply:connected to relay");
-
-    // フィードを購読
-    const sub = relay.sub(
-        [
-            { "kinds": [3], "#p": [pubkey] }    // 自分の公開キー含まれるフォローリストを取得
-        ]
-    );
-    const followerPubkeys = [];
-    sub.on("event", (ev) => {
-        ev.tags.forEach(tag => {
-            followerPubkeys.push(ev.pubkey);
-        });
-    });
     
     try {
-
         /*
         フィードを購読し、リプライ対象となるポストがないか調べ、存在するならリプライする
         */
-        autoReply(relay, followerPubkeys);
+        autoReply(relay);
 
     } catch(err) {
         console.error(err);
