@@ -34,7 +34,7 @@ const autoReply = async (relay) => {
     const sub = relay.sub(
                 [{ kinds: [1] }]
                 );
-    sub.on("event", (ev) => {
+    sub.on("event", async (ev) => {
         try {
             // フィードのポストの中にjsonで設定した値が存在するなら真
             const target = autoReplyJson.find(item => item.orgPost.some(post => ev.content.includes(post)));
@@ -60,7 +60,7 @@ const autoReply = async (relay) => {
                 // 投稿者が管理者以外
                 } else {
 
-                    chkMyFollower(relay, ev.pubkey);
+                    await chkMyFollower(relay, ev.pubkey);
                     // 公開キー ev.Pubkey のフォローの中に自分の公開キー pubkey がいるなら真
                     isChkMyFollower = followerPubkeys.length > 0 ? true: false;
                     
@@ -109,8 +109,7 @@ const autoReply = async (relay) => {
                 } else {
                     // フィードのポストがjsonの nativeWords プロパティそのもので、かつ自分をフォローしている人なら
                     if(isNativeWords) {
-
-                        chkMyFollower(relay, ev.pubkey);
+                        await chkMyFollower(relay, ev.pubkey);
                         isChkMyFollower = followerPubkeys.length > 0 ? true: false;
 
                         if(isChkMyFollower) {
