@@ -12,7 +12,6 @@ let relayUrl = "";
 let BOT_PRIVATE_KEY_HEX = "";
 let pubkey = "";
 let adminPubkey = "";
-let followerPubkeys = [];
 
 const autoReply = async (relay) => {
     // jsonの場所を割り出すために
@@ -45,9 +44,6 @@ const autoReply = async (relay) => {
             // 投稿者が管理者なら真
             const isAdminPubkey = ev.pubkey === adminPubkey ? true : false;
 
-// if(ev.pubkey === "9649d6c5b931cb5a1c914ec3510643fa417ae28366411488388cde242651bf8b"){
-// let sk=0;
-// }
             let isChkMyFollower = false;
             // 作動区分
             let postKb = 0;
@@ -59,11 +55,8 @@ const autoReply = async (relay) => {
                     postKb = 1;     // リプライ
                 // 投稿者が管理者以外
                 } else {
-
-                    await chkMyFollower(relay, ev.pubkey);
                     // 公開キー ev.Pubkey のフォローの中に自分の公開キー pubkey がいるなら真
-                    isChkMyFollower = followerPubkeys.length > 0 ? true: false;
-                    
+                    isChkMyFollower = await chkMyFollower(relay, ev.pubkey);
                     if(isChkMyFollower) {
                         // 反応語句はjsonの何番目にいるか取得
                         const orgPostIdx = target.orgPost.findIndex(element => ev.content.includes(element));
@@ -109,9 +102,7 @@ const autoReply = async (relay) => {
                 } else {
                     // フィードのポストがjsonの nativeWords プロパティそのもので、かつ自分をフォローしている人なら
                     if(isNativeWords) {
-                        await chkMyFollower(relay, ev.pubkey);
-                        isChkMyFollower = followerPubkeys.length > 0 ? true: false;
-
+                        isChkMyFollower = await chkMyFollower(relay, ev.pubkey);
                         if(isChkMyFollower) {
                             postKb = 3;     // リアクションとリアクション絵文字でのリプライ
                         }
@@ -192,26 +183,26 @@ const autoReply = async (relay) => {
 
 // 投稿者の公開キー evPubkey のフォローの中に自分の公開キー pubkey がいるなら真扱いとして配列にその投稿者の公開キーを詰める
 const chkMyFollower = (relay, evPubkey) => {
-    try {
+    return new Promise((resolve, reject) => {
         // フィードを購読
         const sub = relay.sub(
             [
                 { "kinds": [3], "authors": [evPubkey] }
             ]
         );
-        followerPubkeys = [];
-        sub.on("event", (ev) => {
-                for (let i = 0; i < ev.tags.length; i++) {
-                    if (ev.tags[i][1] === pubkey) { // "p","公開キー" という構成なので[1]
-                        followerPubkeys.push(evPubkey);
-                        break;
-                    }
+        try {
+            sub.on("event",  (ev) => {
+                const hasMatch = ev.tags.some(tag => tag[1] === pubkey);    // "p","公開キー" という構成なので[1]
+                if (hasMatch) {
+                    resolve(true);
+                } else {
+                    resolve(false);
                 }
-            }
-        );
-    } catch(err) {
-        console.error("chkMyFollower:" + err);
-    }
+            });
+        } catch {
+            reject(false);
+        }
+    });
 }
 
 // リプライイベントを組み立てる
