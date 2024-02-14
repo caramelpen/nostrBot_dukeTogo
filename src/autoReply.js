@@ -68,8 +68,8 @@ const autoReply = async (relay) => {
                         const chridx = ev.content.indexOf(target.orgPost[orgPostIdx]);
                         // 反応語句の前方を収める
                         const fowardSubstr = ev.content.substring(0, chridx);
-                        // 反応語句の前方に nativeWords が含まれる
-                        if(autoReactionJson.nativeWords.length > 0 && fowardSubstr.includes(autoReactionJson.nativeWords)) {
+                        // 反応語句の前方に配列で設定した nativeWords が含まれる
+                        if(autoReactionJson.nativeWords.length > 0 && autoReactionJson.nativeWords.some(word => fowardSubstr.includes(word))) {
                             postKb = 1;     // リプライ
                         } else {
                             // 確率判定でOKだった
