@@ -181,7 +181,7 @@ const autoReply = async (relay) => {
 }
 
 
-// 投稿者の公開キー evPubkey のフォローの中に自分の公開キー pubkey がいるなら真扱いとして配列にその投稿者の公開キーを詰める
+// 投稿者の公開キー evPubkey のフォローの中に自分の公開キー pubkey がいるなら真
 const chkMyFollower = (relay, evPubkey) => {
     return new Promise((resolve, reject) => {
         // フィードを購読
