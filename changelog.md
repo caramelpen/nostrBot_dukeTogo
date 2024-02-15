@@ -1,3 +1,7 @@
+## ver.240215
+- replytoReply.js
+    - リプライを受けたら`autoReply.json`にある全`replyPostChar`プロパティからランダムで選んでリプライしていたものを見直し、  受けたリプライ語句の中に`autoReply.json`の`orgPost`プロパティに設定してある反応語句が含まれていたら、その反応語句に対応する`replyPostChar`プロパティ内からランダムでリプライ語句を選んでリプライする仕様に変更
+
 ## ver.240214
 - autoReply.json
     - フォロア取得の不具合の修正
