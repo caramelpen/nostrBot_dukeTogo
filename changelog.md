@@ -1,3 +1,7 @@
+## ver.240216
+- replytoReply.js
+    - 購読するフィードに`tag`が設定されているものに対して処理は行うよう明示
+
 ## ver.240215
 - replytoReply.js
     - リプライを受けたら`autoReply.json`にある全`replyPostChar`プロパティからランダムで選んでリプライしていたものを見直し、受けたリプライ文字列の中に`autoReply.json`の`orgPost`プロパティに設定してある反応語句が含まれていたら、その反応語句に対応する`replyPostChar`プロパティ内からランダムでリプライ語句を選んでリプライする仕様に変更（受けたリプライ文字列の中に反応語句が含まれていなければ、従来どおり`autoReply.json`にある全`replyPostChar`プロパティからランダムで選んでリプライ）
