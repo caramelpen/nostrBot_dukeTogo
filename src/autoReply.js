@@ -118,7 +118,7 @@ const autoReply = async (relay) => {
                     let replyPostorreactionPost;
                     let randomReactionIdx;
                     if(postKb === 1) {
-                        // jsonに設定されている対応する反応語句の数を利用してランダムで反応語句を決める
+                        // jsonに設定されている対応するリプライ語句の数を利用してランダムでリプライ語句を決める
                         const randomIdx = random(0, target.replyPostChar.length - 1);
                         // リプライ
                         replyPostorreactionPost = composeReply(target.replyPostChar[randomIdx], ev);
@@ -126,7 +126,7 @@ const autoReply = async (relay) => {
                     } else if(postKb === 2) {
                         // 反応語句配列の数の範囲からランダム値を取得し、それを配列要素とする
                         const replyChrPresetIdx = random(0, autoReplyJson.length - 1);
-                        // 配列要素を決めたら、その配列に設定されている反応語句の設定配列の範囲からさらにランダム値を取得
+                        // 配列要素を決めたら、その配列に設定されているリプライ語句の設定配列の範囲からさらにランダム値を取得
                         const replyChrIdx = random(0, autoReplyJson[replyChrPresetIdx].replyPostChar.length - 1);
                         // リプライ語句決定
                         const replyChr = autoReplyJson[replyChrPresetIdx].replyPostChar[replyChrIdx];
@@ -148,7 +148,7 @@ const autoReply = async (relay) => {
                         }
 
                     } else if(postKb === 5) {
-                        //100回まわる（100に意味はない　なんとなく）
+                        //100回まわってカスタム絵文字URLが設定されている要素をランダム取得出来たらリアクション（100に意味はない　なんとなく）
                         for (let i = 0; i < 100; i++) {
                             randomReactionIdx = random(0, autoReactionJson.contentReaction.length - 1);
                             // randomReactionIdx 番目のカスタム絵文字URLが設定されているならリアクション
