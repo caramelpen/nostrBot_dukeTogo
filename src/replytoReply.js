@@ -34,54 +34,58 @@ const replytoReply = async (relay)=>{
     sub.on("event", (ev) => {
         try {
 
-            // リプライしても安全なら、リプライイベントを組み立てて送信する
-            if (isSafeToReply(ev)) {
-                // 作動区分
-                let postKb = 0;
-                // フィードのポストの中にjsonで設定した値が存在するなら真
-                const target = replyChrJson.find(item => item.orgPost.some(post => ev.content.includes(post)));
-                // 反応語句を見つけたならそれに対応するリプライ語句を使ってリプライを返す
-                if(target) {
+            // (一応明示)リプライなので有効とするのはtagに値があるもののみ
+            if(ev.tags.length > 0) {
 
-                    // 反応語句はjsonの何番目にいるか取得
-                    const orgPostIdx = target.orgPost.findIndex(element => ev.content.includes(element));
-                    // 反応語句は存在するはずだが、もし何らかの理由で見つからなかったら
-                    if(orgPostIdx === -1) {
-                        postKb = 1; // 全リプライ語句からのランダムリプライ
-                    } else {
-                        postKb = 2; //反応語句に対応するリプライ語句を使ってリプライを返す
-                    }
+                // リプライしても安全なら、リプライイベントを組み立てて送信する
+                if (isSafeToReply(ev)) {
+                    // 作動区分
+                    let postKb = 0;
+                    // フィードのポストの中にjsonで設定した値が存在するなら真
+                    const target = replyChrJson.find(item => item.orgPost.some(post => ev.content.includes(post)));
+                    // 反応語句を見つけたならそれに対応するリプライ語句を使ってリプライを返す
+                    if(target) {
 
-                } else {
-                    postKb = 1; // 全リプライ語句からのランダムリプライ
-                }
-
-                // 作動対象だ
-                if(postKb > 0) {
-                    let replyChr = "";
-                    if(postKb === 1){
-                        // 反応語句配列の数の範囲からランダム値を取得し、それを配列要素とする
-                        const replyChrPresetIdx = random(0, replyChrJson.length - 1);
-                        // 配列要素を決めたら、その配列に設定されている反応語句の設定配列の範囲からさらにランダム値を取得
-                        const replyChrIdx = random(0, replyChrJson[replyChrPresetIdx].replyPostChar.length - 1);
-                        // リプライ語句決定
-                        replyChr = replyChrJson[replyChrPresetIdx].replyPostChar[replyChrIdx];
-                    } else {
-                        if(postKb === 2) {
-                            // jsonに設定されている対応するリプライの数を利用してランダムでリプライ語句を決める
-                            const randomIdx = random(0, target.replyPostChar.length - 1);
-                            // リプライ語句決定
-                            replyChr = target.replyPostChar[randomIdx];
+                        // 反応語句はjsonの何番目にいるか取得
+                        const orgPostIdx = target.orgPost.findIndex(element => ev.content.includes(element));
+                        // 反応語句は存在するはずだが、もし何らかの理由で見つからなかったら
+                        if(orgPostIdx === -1) {
+                            postKb = 1; // 全リプライ語句からのランダムリプライ
+                        } else {
+                            postKb = 2; //反応語句に対応するリプライ語句を使ってリプライを返す
                         }
+
+                    } else {
+                        postKb = 1; // 全リプライ語句からのランダムリプライ
                     }
-                    if(replyChr.length > 0) {   //念のため
-                        // リプライ
-                        const replyPost = composeReplyPost(replyChr, ev);
-                        publishToRelay(relay, replyPost);
+
+                    // 作動対象だ
+                    if(postKb > 0) {
+                        let replyChr = "";
+                        if(postKb === 1){
+                            // 反応語句配列の数の範囲からランダム値を取得し、それを配列要素とする
+                            const replyChrPresetIdx = random(0, replyChrJson.length - 1);
+                            // 配列要素を決めたら、その配列に設定されている反応語句の設定配列の範囲からさらにランダム値を取得
+                            const replyChrIdx = random(0, replyChrJson[replyChrPresetIdx].replyPostChar.length - 1);
+                            // リプライ語句決定
+                            replyChr = replyChrJson[replyChrPresetIdx].replyPostChar[replyChrIdx];
+                        } else {
+                            if(postKb === 2) {
+                                // jsonに設定されている対応するリプライの数を利用してランダムでリプライ語句を決める
+                                const randomIdx = random(0, target.replyPostChar.length - 1);
+                                // リプライ語句決定
+                                replyChr = target.replyPostChar[randomIdx];
+                            }
+                        }
+                        if(replyChr.length > 0) {   //念のため
+                            // リプライ
+                            const replyPost = composeReplyPost(replyChr, ev);
+                            publishToRelay(relay, replyPost);
+                            return;
+                        }
+                    } else {
                         return;
                     }
-                } else {
-                    return;
                 }
 
             }
