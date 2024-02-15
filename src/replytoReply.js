@@ -55,16 +55,6 @@ const replytoReply = async (relay)=>{
 
                 } else {
                     postKb = 1; // 全リプライ語句からのランダムリプライ
-
-                    // // 反応語句配列の数の範囲からランダム値を取得し、それを配列要素とする
-                    // const replyChrPresetIdx = random(0, replyChrJson.length - 1);
-                    // // 配列要素を決めたら、その配列に設定されている反応語句の設定配列の範囲からさらにランダム値を取得
-                    // const replyChrIdx = random(0, replyChrJson[replyChrPresetIdx].replyPostChar.length - 1);
-                    // // リプライ語句決定
-                    // const replyChr = replyChrJson[replyChrPresetIdx].replyPostChar[replyChrIdx];
-                    // // リプライ
-                    // const replyPost = composeReplyPost(replyChr, ev);
-                    // publishToRelay(relay, replyPost);
                 }
 
                 // 作動対象だ
