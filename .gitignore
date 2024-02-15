@@ -1,5 +1,4 @@
 node_modules
-
 yarn.lock
 package-lock.json
 pnpm-lock.yaml
@@ -8,12 +7,6 @@ pm2config.json
 pm2config_nostr.json
 README.md
 LICENSE
-# sunriseSunset.json
-# ./dukuTogo/config/sunriseSunset.json
-# dukuTogo/config/sunriseSunset.json
-# /dukuTogo/config/sunriseSunset.json
 package.json
 /.log
 /_tst
-nohup.out
-versionHistory.txt
