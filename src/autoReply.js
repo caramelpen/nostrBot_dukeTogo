@@ -31,10 +31,19 @@ const autoReply = async (relay) => {
 
     // フィードを購読
     const sub = relay.sub(
-                [{ kinds: [1] }]
+            [
+                { kinds: [1] 
+                }
+            ]
                 );
     sub.on("event", async (ev) => {
         try {
+
+            // 有効とするのはtagが空のもののみ
+            if(ev.tags.length > 0){
+                return;
+            }
+
             // フィードのポストの中にjsonで設定した値が存在するなら真
             const target = autoReplyJson.find(item => item.orgPost.some(post => ev.content.includes(post)));
             // フィードのポストがjsonの nativeWords プロパティそのものなら真

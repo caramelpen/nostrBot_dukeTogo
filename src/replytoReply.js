@@ -27,7 +27,6 @@ const replytoReply = async (relay)=>{
         [
             { "kinds": [1] 
             ,"#p":[pubkey]
-            ,
             }
         ]
     );
@@ -67,17 +66,22 @@ const replytoReply = async (relay)=>{
                         const replyChrIdx = random(0, replyChrJson[replyChrPresetIdx].replyPostChar.length - 1);
                         // リプライ語句決定
                         replyChr = replyChrJson[replyChrPresetIdx].replyPostChar[replyChrIdx];
-                    } else if(postKb === 2) {
-                        // jsonに設定されている対応するリプライの数を利用してランダムでリプライ語句を決める
-                        const randomIdx = random(0, target.replyPostChar.length - 1);
-                        // リプライ語句決定
-                        replyChr = target.replyPostChar[randomIdx];
+                    } else {
+                        if(postKb === 2) {
+                            // jsonに設定されている対応するリプライの数を利用してランダムでリプライ語句を決める
+                            const randomIdx = random(0, target.replyPostChar.length - 1);
+                            // リプライ語句決定
+                            replyChr = target.replyPostChar[randomIdx];
+                        }
                     }
-                    if(replyChr.length > 0) {
+                    if(replyChr.length > 0) {   //念のため
                         // リプライ
                         const replyPost = composeReplyPost(replyChr, ev);
                         publishToRelay(relay, replyPost);
+                        return;
                     }
+                } else {
+                    return;
                 }
 
             }
