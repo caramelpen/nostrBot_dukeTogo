@@ -10,11 +10,19 @@ const { relayInit, getPublicKey, finishEvent, nip19 } = require("nostr-tools");
 const sunCalc = require("suncalc");
 const { currDateTime, currUnixtime, random, jsonOpen, writeJsonFile, formattedDateTime } = require("./common/utils.js");
 const { publishToRelay } = require("./common/publishToRelay.js");
+const { toGitHubPush } = require("./common/gitHubCooperation.js");
 
 let BOT_PRIVATE_KEY_HEX = "";
 let pubkey = "";
 let postEv;
 let relayUrl = "";
+
+let sunriseorSunset = "";
+
+let gitUserName = "";
+let gitUserMail = "";
+let gitOrigin = "";
+let gitBranch = "";
 
 
 // 定刻ポスト
@@ -123,7 +131,7 @@ const subSunriseSunset = (sunriseSunsetPath, nowDateTime) => {
             const times = sunCalc.getTimes(nextDay, lat, lng);
             // 日の出と日の入りでjsonから得るプロパティが異なるため、処理を分ける（三項演算子で書いてもいいけど、isPostSunrise の真偽判断が全部に入るのはしっくりこないので避けた）
             let nextSunriseorSunsetwk;
-            let sunriseorSunset = "";
+            sunriseorSunset = "";
             let sunRiseorSunsetPostLength = 0;
             let sunRiseorSunsetPost = "";
             let sunRiseorSunsetConst = "";
@@ -155,6 +163,7 @@ const subSunriseSunset = (sunriseSunsetPath, nowDateTime) => {
 
             // 設定されている投稿語句の設定数の範囲でランダム数を取得する
             const postIdx = random(0, sunRiseorSunsetPostLength - 1);
+            // 投稿イベントを組み立て
             postEv = composePost(postChrConst + sunriseSunsetJson[sunRiseorSunsetPost][postIdx]);
 
             // 今回の投稿が日の出なら次の日の出、日の入りなら次の日の入りの時刻を json ファイルの sunRise(sunSet) プロパティへ書き込む
@@ -217,14 +226,19 @@ const main = async () => {
         BOT_PRIVATE_KEY_HEX = dr.data;
         pubkey = getPublicKey(BOT_PRIVATE_KEY_HEX); // 秘密鍵から公開鍵の取得
 
-
+        gitUserName = process.env.GIT_USER_NAME;
+        gitUserMail = process.env.GIT_USER_EMAIL;
+        gitOrigin = process.env.GIT_ORIGIN;
+        gitBranch = process.env.GIT_BRANCH;
+        
         for (let i = 1; i <= 2; i++) {
             let postSubject = false;
             let connectedSw = 0;
 
             try {
 
-                if(i==1) {
+                let sunriseSunsetPath = "";
+                if(i === 1) {
 
                     // 定刻ポストjsonファイルの場所の設定
                     const presetDatePath =  jsonPath.join(__dirname, "../config/presetDate.json");
@@ -235,14 +249,14 @@ const main = async () => {
                 } else {
 
                     // 日の出日の入りjsonファイルの場所の設定
-                    const sunriseSunsetPath = jsonPath.join(__dirname, "../config/sunriseSunset.json");
+                    sunriseSunsetPath = jsonPath.join(__dirname, "../config/sunriseSunset.json");
 
                     // 日の出日の入ポスト
                     postSubject = subSunriseSunset(sunriseSunsetPath, nowDateTime);
 
                 }
 
-                if(postSubject == true) {
+                if(postSubject) {
 
                     // リレー
                     relayUrl = process.env.RELAY_URL;    // リレーURL
@@ -257,7 +271,13 @@ const main = async () => {
                     connectedSw = 1;
 
                     // ポスト
-                    publishToRelay(relay, postEv);   
+                    publishToRelay(relay, postEv);
+
+                    // // 日の出日の入りポストなら
+                    // if(i === 2) {
+                    //     const repoPath = jsonPath.resolve(__dirname, "../..");  // リポジトリのパスを指定
+                    //     await toGitHubPush(repoPath, sunriseSunsetPath, gitUserName, gitUserMail, "[auto]" + sunriseorSunset + " daily update", gitOrigin, gitBranch);
+                    // }
 
                 }
 
