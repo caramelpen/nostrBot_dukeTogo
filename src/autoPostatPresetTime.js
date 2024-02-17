@@ -12,6 +12,7 @@ const { currDateTime, currUnixtime, random, jsonOpen, writeJsonFile, formattedDa
 const { publishToRelay } = require("./common/publishToRelay.js");
 const { toGitHubPush } = require("./common/gitHubCooperation.js");
 
+let sunriseSunsetJson = null;
 let BOT_PRIVATE_KEY_HEX = "";
 let pubkey = "";
 let postEv;
@@ -84,7 +85,8 @@ const subSunriseSunset = (sunriseSunsetPath, nowDateTime) => {
         let isPostSunset = false;
 
         // 日の出と日没の格納されたjsonを取得
-        const sunriseSunsetJson = jsonOpen(sunriseSunsetPath);
+        sunriseSunsetJson = null;
+        sunriseSunsetJson = jsonOpen(sunriseSunsetPath);
         if(sunriseSunsetJson === null){
             console.error("subSunriseSunset:json file is not get");
             return false;
@@ -276,9 +278,13 @@ const main = async () => {
 
                     // 日の出日の入りポストなら更新されたjsonファイルをGitHubへプッシュする
                     if(i === 2) {
-                        const fileNamewk = sunriseSunsetPath.split("/").pop();
-                        const sunriseSunsetPathSingle = `config/${fileNamewk}`; // "../config/sunriseSunset.json" を "config/sunriseSunset.json" の形にする
-                        await toGitHubPush(gitRepoName, sunriseSunsetPath, sunriseSunsetPathSingle, gitUserName, gitToken, "[auto]" + sunriseorSunset + " daily update", gitBranch);
+                        // GitHubへプッシュする
+                        if(sunriseSunsetJson.gitHubPush === 1) {
+                            const fileNamewk = sunriseSunsetPath.split("/").pop();
+                            const sunriseSunsetPathSingle = `config/${fileNamewk}`; // "../config/sunriseSunset.json" を "config/sunriseSunset.json" の形にする
+                            await toGitHubPush(gitRepoName, sunriseSunsetPath, sunriseSunsetPathSingle, gitUserName, gitToken, "[auto]" + sunriseorSunset + " daily update", gitBranch);
+                            console.log("sunriseSunset.json is commit/push");
+                        }
                     }
 
                 }
