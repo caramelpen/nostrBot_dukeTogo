@@ -19,6 +19,7 @@
     "日没だ…　もういい加減、諦めたらどうだ…？",
     "日没だ…　今日も生き延びたな…"
   ],
+  "gitHubPush": 1,
   "jpnTimezoneOffset1": 0,
   "jpnTimezoneOffset2": 60,
   "detail": "海外サーバの対応として timedatectl set-timezone Asia/Tokyo を行ってもなぜか日本時刻が得られないことの対策として、jpnTimezoneOffset1 に 9 jpnTimezoneOffset2 に 60 と設定すると日本時間になります（日本時刻が得られている場合はどちらかを 0 にすれば無効になります）"
