@@ -1,3 +1,9 @@
+## ver.240217
+- `common/gitHubCooperation.js`の新規追加
+- autoPostatPresetTime.js
+    - 日の出（日の入り）ポストを行ったら、更新された`sunriseSunset.json`を自動でGitHubへコミットプッシュする機能の追加
+    - 上記を行うため、`octokit`のインストール
+
 ## ver.240216
 - replytoReply.js
     - 購読するフィードに`tag`が設定されているものに対して処理は行うよう明示
