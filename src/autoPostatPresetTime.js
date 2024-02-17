@@ -20,8 +20,8 @@ let relayUrl = "";
 let sunriseorSunset = "";
 
 let gitUserName = "";
-let gitUserMail = "";
-let gitOrigin = "";
+let gitRepoName = "";
+let gitToken = "";
 let gitBranch = "";
 
 
@@ -227,10 +227,10 @@ const main = async () => {
         pubkey = getPublicKey(BOT_PRIVATE_KEY_HEX); // 秘密鍵から公開鍵の取得
 
         gitUserName = process.env.GIT_USER_NAME;
-        gitUserMail = process.env.GIT_USER_EMAIL;
-        gitOrigin = process.env.GIT_ORIGIN;
+        gitRepoName = process.env.GIT_REPO;
+        gitToken = process.env.GIT_TOKEN;
         gitBranch = process.env.GIT_BRANCH;
-        
+
         for (let i = 1; i <= 2; i++) {
             let postSubject = false;
             let connectedSw = 0;
@@ -238,6 +238,7 @@ const main = async () => {
             try {
 
                 let sunriseSunsetPath = "";
+
                 if(i === 1) {
 
                     // 定刻ポストjsonファイルの場所の設定
@@ -273,11 +274,12 @@ const main = async () => {
                     // ポスト
                     publishToRelay(relay, postEv);
 
-                    // // 日の出日の入りポストなら
-                    // if(i === 2) {
-                    //     const repoPath = jsonPath.resolve(__dirname, "../..");  // リポジトリのパスを指定
-                    //     await toGitHubPush(repoPath, sunriseSunsetPath, gitUserName, gitUserMail, "[auto]" + sunriseorSunset + " daily update", gitOrigin, gitBranch);
-                    // }
+                    // 日の出日の入りポストなら更新されたjsonファイルをGitHubへプッシュする
+                    if(i === 2) {
+                        const fileNamewk = sunriseSunsetPath.split("/").pop();
+                        const sunriseSunsetPathSingle = `config/${fileNamewk}`; // "../config/sunriseSunset.json" を "config/sunriseSunset.json" の形にする
+                        await toGitHubPush(gitRepoName, sunriseSunsetPath, sunriseSunsetPathSingle, gitUserName, gitToken, "[auto]" + sunriseorSunset + " daily update", gitBranch);
+                    }
 
                 }
 

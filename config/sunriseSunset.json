@@ -21,5 +21,5 @@
   ],
   "jpnTimezoneOffset1": 0,
   "jpnTimezoneOffset2": 60,
-  "detail": "timedatectl set-timezone Asia/Tokyo を行ってもなぜか日本時刻が得られない海外サーバの対応として、jpnTimezoneOffset1 に 9 jpnTimezoneOffset2 に 60 と設定すると日本時間になります（日本時刻が得られている場合はどちらかを 0 にすれば無効になります）"
+  "detail": "海外サーバの対応として timedatectl set-timezone Asia/Tokyo を行ったのにも関わらずなぜか日本時刻が得られない場合は、jpnTimezoneOffset1 に 9 jpnTimezoneOffset2 に 60 と設定すると日本時間になります（日本時刻が得られている場合はどちらかを 0 にすれば無効になります）"
 }
