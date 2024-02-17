@@ -14,6 +14,7 @@
   - dotenv (16.3.1) ... .envファイルが使用できます
   - node-cron (3.0.3) ...cronが使えます
   - suncalc (1.9.0) ...日の出日の入り時刻を取得できます
+  - octokit (3.1.2) ...GitHubへのプッシュで使用しています
   - ほかに環境によってはPM2などの永続化に対応したモジュールを必要に応じて使用してください
  　
 
@@ -31,6 +32,7 @@
     │  replytoReply.js
     │
     └─common
+            gitHubCooperation.js 
             publishToRelay.js
             utils.js
 </pre>
@@ -59,9 +61,11 @@
   - リプライを受けると`autoReply.json`に設定された設定値でリプライ
 
 ### 2-3.src/common ディレクトリ
-- 2-3-1.publishToRelay.js
+- 2-3-1.gitHubCooperation.js
+  - GitHubとの連携（現在はプッシュ）機能
+- 2-3-2.publishToRelay.js
   - リレーにイベントを送信する
-- 2-3-2.utils.js
+- 2-3-3.utils.js
   - 共通関数
 
 
