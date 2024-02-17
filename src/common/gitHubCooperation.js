@@ -40,16 +40,16 @@ const toGitHubPush = async (repoName, filePath, relativePath, gitUserName, gitTo
         // ファイルをリポジトリにプッシュ
         await octokit.rest.repos.createOrUpdateFileContents({
             owner: gitUserName,
-            repo: repoName,//"nostrBot_dukeTogo",
-            path: relativePath, //"config/sunriseSunset.json",
+            repo: repoName,
+            path: relativePath,
             message: comment,
             content: Buffer.from(fileContent).toString("base64"),
             branch: branch, // プッシュ先のブランチ名
-            sha: fileSha // ファイルの SHA ハッシュ
+            sha: fileSha    // ファイルの SHA ハッシュ
         });
 
     } catch (err) {
-        console.error(err);
+        console.error("GitHubPush is Err:"+ err);
         throw err;  // ここでエラーをスローして、呼び出し元でも把握ができるようにする
     }
 }
