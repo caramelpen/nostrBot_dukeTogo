@@ -4,9 +4,7 @@ package-lock.json
 pnpm-lock.yaml
 .env
 pm2config.json
-pm2config_nostr.json
-README.md
-LICENSE
 package.json
 /.log
 /_tst
+gitHubCooperation.js
