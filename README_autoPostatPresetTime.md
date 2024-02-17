@@ -17,11 +17,11 @@
 - `timedatectl set-timezone Asia/Tokyo`を行っても日本時刻を得られず、UTC時刻になる海外サーバの場合などは、`jpnTimezoneOffset1`プロパティ に「9」、`jpnTimezoneOffset2`プロパティ に「60」と設定すると日本時間になります（日本時刻を得られている際はどちらかのプロパティを 0 にすれば無効になります）
   
 - 日の出/日の入りをポストしたら、次の日の出/日の入り時刻を検出し、jsonの`sunRise`/`sunSet`プロパティを更新します
-  - jsonの`gitHubPush`プロパティが1の場合はGitHubへ`.env`の`GIT_USER_NAME`、`GIT_REPO`、`GIT_TOKEN`、`GIT_BRANCH`を使用してコミットとプッシュを行います
+  - jsonの`gitHubPush`プロパティが1の場合はGitHubへ`.env`の`GIT_USER_NAME`、`GIT_REPO`、`GIT_TOKEN`、`GIT_BRANCH`を使用してコミットとプッシュを行います（そのため`octokit`をインストールしています）
   
-- 1分間隔で処理を行うため、node-cron@3.0.3 をインストールしています
+- 1分間隔で処理を行うため、`node-cron`をインストールしています
   
-- 日の出日の入り時刻を取得するため suncalc@1.9.0 をインストールしています
+- 日の出日の入り時刻を取得するため`suncalc`をインストールしています
 
 ##### ※1について
 - `README.md`の 4-2.3. をご覧ください
