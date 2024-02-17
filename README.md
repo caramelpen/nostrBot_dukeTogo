@@ -42,6 +42,7 @@
 ### 2-1.config ディレクトリ
 - 2-1-1.autoReaction.json
   - `src\autoReply.js`で使用（後述）
+  - 内容は随時更新していきます
 - 2-1-2.autoReply.json
   - `src\autoReply.js`、`replytoReply.js`で使用（後述）
   - 内容は随時更新していきます
