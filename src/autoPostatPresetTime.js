@@ -161,12 +161,12 @@ const subSunriseSunset = (sunriseSunsetPath, nowDateTime) => {
             let nextSunriseorSunset = formattedDateTime(nextSunriseorSunsetwk);
             nextSunriseorSunset = nextSunriseorSunset.substring(0, 12); // 秒部分をカット
 
-            const postChrConst = sunriseSunsetJson[sunRiseorSunsetConst] + "(" +  sunriseSunsetJson.location + "／" + jpnNotation + ")\n";
+            const postChrConst = sunriseSunsetJson[sunriseorSunsetConst] + "(" +  sunriseSunsetJson.location + "／" + jpnNotation + ")\n";
 
             // 設定されている投稿語句の設定数の範囲でランダム数を取得する
-            const postIdx = random(0, sunRiseorSunsetPostLength - 1);
+            const postIdx = random(0, sunriseorSunsetPostLength - 1);
             // 投稿イベントを組み立て
-            postEv = composePost(postChrConst + sunriseSunsetJson[sunRiseorSunsetPost][postIdx]);
+            postEv = composePost(postChrConst + sunriseSunsetJson[sunriseorSunsetPost][postIdx]);
 
             // 今回の投稿が日の出なら次の日の出、日の入りなら次の日の入りの時刻を json ファイルの sunRise(sunSet) プロパティへ書き込む
             writeJsonFile(sunriseSunsetPath, sunriseorSunset, nextSunriseorSunset);
