@@ -1,5 +1,5 @@
 ## ver.240218
-- config/sunriseSunset.json
+- sunriseSunset.json
     - プロパティ名の修正
 - autoPostatPresetTime.js
     - `config/sunriseSunset.json`のプロパティ名修正に伴う変数名の修正
