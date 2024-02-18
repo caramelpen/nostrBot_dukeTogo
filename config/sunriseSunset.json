@@ -2,17 +2,17 @@
   "location": "東京",
   "lat": 35.6895,
   "lng": 139.6917,
-  "sunRise": "202402190626",
-  "sunRiseConst": "日の出",
-  "sunRisePost": [
+  "sunrise": "202402190626",
+  "sunriseConst": "日の出",
+  "sunrisePost": [
     "日の出だ…命拾いしたな…",
     "…日の出だ",
     "…日の出だ…　もういい加減、諦めたらどうだ…？",
     "日の出だ… しかし助かったなおまえたち……おれと戦わずにすむ……"
   ],
-  "sunSet": "202402181725",
-  "sunSetConst": "日没",
-  "sunSetPost": [
+  "sunset": "202402181725",
+  "sunsetConst": "日没",
+  "sunsetPost": [
     "日が沈む…",
     "日が沈む…　黄昏時は仕事もしやすい…",
     "日没だ…",

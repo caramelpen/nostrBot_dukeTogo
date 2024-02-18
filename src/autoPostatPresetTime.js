@@ -134,27 +134,27 @@ const subSunriseSunset = (sunriseSunsetPath, nowDateTime) => {
             // 日の出と日の入りでjsonから得るプロパティが異なるため、処理を分ける（三項演算子で書いてもいいけど、isPostSunrise の真偽判断が全部に入るのはしっくりこないので避けた）
             let nextSunriseorSunsetwk;
             sunriseorSunset = "";
-            let sunRiseorSunsetPostLength = 0;
-            let sunRiseorSunsetPost = "";
-            let sunRiseorSunsetConst = "";
+            let sunriseorSunsetPostLength = 0;
+            let sunriseorSunsetPost = "";
+            let sunriseorSunsetConst = "";
             
             if(isPostSunrise == true) {
                 // 明日の日の出時間を取得
                 nextSunriseorSunsetwk = new Date(times.sunrise.getTime() + offset);
                 // 各 json プロパティの取得
-                sunriseorSunset = "sunRise";
-                sunRiseorSunsetPostLength = sunriseSunsetJson.sunRisePost.length;
-                sunRiseorSunsetPost = "sunRisePost";
-                sunRiseorSunsetConst = "sunRiseConst";
+                sunriseorSunset = "sunrise";
+                sunriseorSunsetPostLength = sunriseSunsetJson.sunRisePost.length;
+                sunriseorSunsetPost = "sunrisePost";
+                sunriseorSunsetConst = "sunriseConst";
             } else {
                 if(isPostSunset == true) {
                     // 明日の日の入り時間を取得
                     nextSunriseorSunsetwk = new Date(times.sunset.getTime() + offset);
                     // 各 json プロパティの取得
-                    sunriseorSunset = "sunSet";
-                    sunRiseorSunsetPostLength = sunriseSunsetJson.sunSetPost.length;
-                    sunRiseorSunsetPost = "sunSetPost";
-                    sunRiseorSunsetConst = "sunSetConst";
+                    sunriseorSunset = "sunset";
+                    sunriseorSunsetPostLength = sunriseSunsetJson.sunSetPost.length;
+                    sunriseorSunsetPost = "sunsetPost";
+                    sunriseorSunsetConst = "sunsetConst";
                 }
             }
 
