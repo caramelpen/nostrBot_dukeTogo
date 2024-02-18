@@ -2,7 +2,7 @@
 - config/sunriseSunset.json
     - プロパティ名の修正
 - autoPostatPresetTime.js
-    - 'config/sunriseSunset.json`のプロパティ名修正に伴う変数名の修正
+    - `config/sunriseSunset.json`のプロパティ名修正に伴う変数名の修正
 
 ## ver.240217
 - `common/gitHubCooperation.js`の新規追加
