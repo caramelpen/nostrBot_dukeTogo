@@ -1,3 +1,7 @@
+## ver.240219
+- autoPostatPresetTime.js
+    - 変数変更漏れによるバグ修正
+
 ## ver.240218
 - sunriseSunset.json
     - プロパティ名の修正
