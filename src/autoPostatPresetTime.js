@@ -97,8 +97,8 @@ const subSunriseSunset = (sunriseSunsetPath, nowDateTime) => {
         const lng = sunriseSunsetJson.lng;
 
         // jsonファイルから日の出と日の入りの日時を取得
-        const sunrise = sunriseSunsetJson.sunRise;
-        const sunset = sunriseSunsetJson.sunSet;
+        const sunrise = sunriseSunsetJson.sunrise;
+        const sunset = sunriseSunsetJson.sunset;
 
         // 明日の日付
         const nextDaywk = nowDateTime.substring(0 ,4) + "/" 
@@ -143,7 +143,7 @@ const subSunriseSunset = (sunriseSunsetPath, nowDateTime) => {
                 nextSunriseorSunsetwk = new Date(times.sunrise.getTime() + offset);
                 // 各 json プロパティの取得
                 sunriseorSunset = "sunrise";
-                sunriseorSunsetPostLength = sunriseSunsetJson.sunRisePost.length;
+                sunriseorSunsetPostLength = sunriseSunsetJson.sunrisePost.length;
                 sunriseorSunsetPost = "sunrisePost";
                 sunriseorSunsetConst = "sunriseConst";
             } else {
@@ -152,7 +152,7 @@ const subSunriseSunset = (sunriseSunsetPath, nowDateTime) => {
                     nextSunriseorSunsetwk = new Date(times.sunset.getTime() + offset);
                     // 各 json プロパティの取得
                     sunriseorSunset = "sunset";
-                    sunriseorSunsetPostLength = sunriseSunsetJson.sunSetPost.length;
+                    sunriseorSunsetPostLength = sunriseSunsetJson.sunsetPost.length;
                     sunriseorSunsetPost = "sunsetPost";
                     sunriseorSunsetConst = "sunsetConst";
                 }
