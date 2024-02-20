@@ -266,6 +266,9 @@ const composeReaction = (targetEvent,autoReactionJson,randomReactionIdx) => {
 }
 
 
+/****************
+ * メイン
+ ***************/
 const main = async () => {
 
     // 秘密鍵
