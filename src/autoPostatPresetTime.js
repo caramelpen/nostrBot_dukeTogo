@@ -204,7 +204,7 @@ const composePost = (postChar) => {
  * メイン
  ***************/
 const main = async () => {
-    cron.schedule ("* * * * *", async () => {  // 分単位
+    cron.schedule("* * * * *", async () => {  // 分単位
 
         // 現在日時
         const nowDate = currDateTime();
