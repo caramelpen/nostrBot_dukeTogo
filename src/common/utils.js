@@ -56,7 +56,7 @@ const asyncWriteJsonFile = async (jsonPath, propertyName, writeValue, idx) => {
     try {
         const data = await fs.readFile(jsonPath, "utf8");
         jsonData = JSON.parse(data);
-        if(idx > -1) {
+        if(idx < 0) {
             jsonData[propertyName] = writeValue;
         } else {
             jsonData[idx][propertyName] = writeValue;
@@ -80,7 +80,7 @@ const writeJsonFile = (jsonPath, propertyName, writeValue, idx) => {
     try {
         const data = fs.readFileSync(jsonPath, "utf8");
         jsonData = JSON.parse(data);
-        if(idx > -1) {
+        if(idx < 0) {
             jsonData[propertyName] = writeValue;
         } else {
             jsonData[idx][propertyName] = writeValue;
