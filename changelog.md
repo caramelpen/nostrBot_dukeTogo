@@ -1,3 +1,6 @@
+## ver.240221
+- `infoUpNotification.js`、`infoUpNotification.json`の新規追加
+
 ## ver.240219
 - autoPostatPresetTime.js
     - 変数変更漏れによるバグ修正
