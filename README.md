@@ -24,8 +24,8 @@
 ├─config
 │      autoReaction.json
 │      autoReply.json
-│      presetDate.json
 │      infoUpNotification.json
+│      presetDate.json
 │      sunriseSunset.json
 │
 └─src
