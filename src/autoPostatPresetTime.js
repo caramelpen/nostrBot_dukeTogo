@@ -169,7 +169,7 @@ const subSunriseSunset = (sunriseSunsetPath, nowDateTime) => {
             postEv = composePost(postChrConst + sunriseSunsetJson[sunriseorSunsetPost][postIdx]);
 
             // 今回の投稿が日の出なら次の日の出、日の入りなら次の日の入りの時刻を json ファイルの sunRise(sunSet) プロパティへ書き込む
-            writeJsonFile(sunriseSunsetPath, sunriseorSunset, nextSunriseorSunset);
+            writeJsonFile(sunriseSunsetPath, sunriseorSunset, nextSunriseorSunset, -1);
             console.log("write json(" + sunriseorSunset + "):" + nextSunriseorSunset);
             return true;
         }

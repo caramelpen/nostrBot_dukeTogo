@@ -50,13 +50,17 @@ const jsonOpen = (jsonPath) => {
 /**
  * json の指定のプロパティへ値を書き込む
  */
-const asyncWriteJsonFile = async (jsonPath, propertyName, writeValue) => {
+const asyncWriteJsonFile = async (jsonPath, propertyName, writeValue, idx) => {
     let jsonData;
     const fs = require("fs").promises;
     try {
         const data = await fs.readFile(jsonPath, "utf8");
         jsonData = JSON.parse(data);
-        jsonData[propertyName] = writeValue;
+        if(idx > -1) {
+            jsonData[propertyName] = writeValue;
+        } else {
+            jsonData[idx][propertyName] = writeValue;
+        }
 
         // JSONデータを文字列に変換
         const jsonString = JSON.stringify(jsonData, null, 2);
@@ -70,13 +74,17 @@ const asyncWriteJsonFile = async (jsonPath, propertyName, writeValue) => {
         return false;
     }
 }
-const writeJsonFile = (jsonPath, propertyName, writeValue) => {
+const writeJsonFile = (jsonPath, propertyName, writeValue, idx) => {
     let jsonData;
     const fs = require("fs");
     try {
         const data = fs.readFileSync(jsonPath, "utf8");
         jsonData = JSON.parse(data);
-        jsonData[propertyName] = writeValue;
+        if(idx > -1) {
+            jsonData[propertyName] = writeValue;
+        } else {
+            jsonData[idx][propertyName] = writeValue;
+        }
 
         // JSONデータを文字列に変換
         const jsonString = JSON.stringify(jsonData, null, 2);
