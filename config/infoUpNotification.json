@@ -1,0 +1,20 @@
+[
+  {
+    "rss": "https://scrapbox.io/api/feed/nostr",
+    "url": "https://scrapbox.io/nostr/",
+    "contentsIdx": 0,
+    "nickName": "nostr scrapbox",
+    "rssContents": "https://scrapbox.io/nostr/furoyaMon, 19 Feb 2024 05:35:54 GMT",
+    "constComment": [
+      "が更新されている…",
+      "が更新されているようだ…",
+      "が更新されたようだ…"
+    ],
+    "comment": [
+      "よく調べてみることだ…な…",
+      "疑問な点はここで調べてみることだ…な…",
+      "お前に有益な情報かどうかは、俺の知ったことではない…"
+    ],
+    "gitHubPush": 1
+  }
+]
