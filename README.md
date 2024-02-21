@@ -49,11 +49,12 @@
 - 2-1-2.autoReply.json
   - `src\autoReply.js`、`replytoReply.js`で使用（後述）
   - 内容は随時更新していきます
-- 2-1-3.presetDate.json
+- 2-1-3.infoUpNotification.json
+  - `src\infoUpNotification.js`で使用（後述）
+  - 内容は随時更新していきます
+- 2-1-4.presetDate.json
   - `src\autoPostatPresetTime.js`で使用（後述）
   - 内容は随時更新していきます
-- 2-1-4.infoUpNotification.json
-  - `src\infoUpNotification.js`で使用（後述）
 - 2-1-5.sunriseSunset.json
   - `src\autoPostatPresetTime.js`で使用（後述）
   - 内容は随時更新していきます
