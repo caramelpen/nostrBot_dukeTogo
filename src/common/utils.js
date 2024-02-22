@@ -192,6 +192,20 @@ const formattedDateTime = (date) => {
 /*
 * 確率判定
 */
+// const probabilityDetermination = (probability) => {
+//     // 100なら無条件でOK
+//     if(probability >= 100) {
+//         return true;
+//     } else {
+//         // 0ならダメ
+//         if(probability <= 0) {
+//             return false;
+//         } else {
+//             // 1-100までの整数をランダムで取得し、基準を満たせばOK
+//             return Math.floor(Math.random() * 100) + 1 <= probability;
+//         }
+//     }
+// }
 const probabilityDetermination = (probability) => {
     // 100なら無条件でOK
     if(probability >= 100) {
@@ -201,11 +215,17 @@ const probabilityDetermination = (probability) => {
         if(probability <= 0) {
             return false;
         } else {
-            // 1-100までの整数をランダムで取得し、基準を満たせばOK
-            return Math.floor(Math.random() * 100) + 1 <= probability;
+            const randomInt = crypto.randomBytes(2).readUInt16BE(0) + 1;  // 1 から 65536 の範囲
+            const maxRange = 65536;
+            const probabilityThreshold = Math.floor((probability/ 100) * maxRange);
+            return randomInt <= probabilityThreshold;
         }
     }
 }
+
+
+
+
 
 
 /**
