@@ -1,7 +1,7 @@
 /**
  * 狙撃屋13bot(@dukeTogo)
  * infoUpNotification.js
- * jsonファイルに記載されたURLの更新情報をポストする
+ * jsonファイルに記載されたURLの更新情報をRSSフィードを用いてポストする
  */
 require("websocket-polyfill");
 const { relayInit, getPublicKey, finishEvent, nip19 } = require("nostr-tools");
