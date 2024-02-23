@@ -217,7 +217,7 @@ const probabilityDetermination = (probability) => {
         } else {
             const randomInt = crypto.randomBytes(2).readUInt16BE(0) + 1;  // 1 から 65536 の範囲
             const maxRange = 65536;
-            const probabilityThreshold = Math.floor((probability/ 100) * maxRange);
+            const probabilityThreshold = Math.floor((probability / 100) * maxRange);
             return randomInt <= probabilityThreshold;
         }
     }
