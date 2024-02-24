@@ -28,7 +28,7 @@ const infoUpNotification = async (rssJsonPath, rssJson, i) => {
         const rssParser = new parser();
         const previousData = rssJson[i].rssContents;
         const feed = await rssParser.parseURL(rssJson[i].rss);
-        const newData = feed.items[rssJson[i].contentsIdx].link + feed.items[rssJson[i].contentsIdx].pubDate;
+        const newData = feed.items[rssJson[i].contentsIdx].guid + feed.items[rssJson[i].contentsIdx].pubDate;
 
         if (newData !== previousData) {
             // ポスト準備
