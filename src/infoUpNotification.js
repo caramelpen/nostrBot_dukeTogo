@@ -111,7 +111,7 @@ const main = async () => {
         const json= require("path");
         // 更新監視jsonファイルの場所の設定
         const jsonPath =  json.join(__dirname, "../config/infoUpNotification.json");
-        // 反応語句の格納されたjsonを取得
+        // 取得RSS情報の格納されたjsonを取得
         const rssJson = jsonOpen(jsonPath);
         if(rssJson === null){
             console.log("json file is not get");
