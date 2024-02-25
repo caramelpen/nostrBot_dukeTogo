@@ -1,3 +1,5 @@
+const crypto = require("crypto");
+
 // 現在の日本時間を取得
 const currDateTime = () => new Date();
 
