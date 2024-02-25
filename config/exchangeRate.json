@@ -8,8 +8,8 @@
     ,{
         "orgPost": ["通貨リスト", "通貨一覧"]
         ,"sw": 0
-        ,"replyPostChar": ["だ…"]
-        ,"nonGet": [""]
+        ,"replyPostChar": []
+        ,"nonGet": []
     }
 
 ]    
