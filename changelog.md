@@ -1,5 +1,5 @@
 ## ver.240225
-- `exchangeRate.json`を追加し'autoReply.js`に通貨為替レート機能の追加
+- `exchangeRate.json`を追加し`autoReply.js`に通貨為替レート機能の追加
 
 ## ver.240221
 - `infoUpNotification.js`、`infoUpNotification.json`の新規追加
