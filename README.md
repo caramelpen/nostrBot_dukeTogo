@@ -16,14 +16,16 @@
   - suncalc (1.9.0) ...日の出日の入り時刻を取得できます
   - octokit (3.1.2) ...GitHubへのプッシュで使用しています
   - rss-parser (3.13.0) ...RSSフィードの購読を行います
+  - axios (1.6.7) ...通貨の為替レートの取得のために使用しています
   - ほかに環境によってはPM2などの永続化に対応したモジュールを必要に応じて使用してください
- 　
+
 
 ### 1.製品識別
 <pre>
 ├─config
 │      autoReaction.json
 │      autoReply.json
+│      exchangeRate.json
 │      infoUpNotification.json
 │      presetDate.json
 │      sunriseSunset.json
@@ -49,13 +51,15 @@
 - 2-1-2.autoReply.json
   - `src\autoReply.js`、`replytoReply.js`で使用（後述）
   - 内容は随時更新していきます
-- 2-1-3.infoUpNotification.json
+- 2-1-3.exchangeRate.json  
+  - `src\autoReply.js`で使用（後述）
+- 2-1-4.infoUpNotification.json
   - `src\infoUpNotification.js`で使用（後述）
   - 内容は随時更新していきます
-- 2-1-4.presetDate.json
+- 2-1-5.presetDate.json
   - `src\autoPostatPresetTime.js`で使用（後述）
   - 内容は随時更新していきます
-- 2-1-5.sunriseSunset.json
+- 2-1-6.sunriseSunset.json
   - `src\autoPostatPresetTime.js`で使用（後述）
   - 内容は随時更新していきます
 
@@ -63,7 +67,7 @@
 - 2-2-1.autoPostatPresetTime.js
   - `presetDate.json`と`sunriseSunset.json`に設定された時刻や年月日分になると設定値をポスト
 - 2-2-2.autoReply.js
-  - `autoReaction.json`と`autoReply.json`に設定された語句を発見するとそれに対応する設定値をリアクションやリプライ
+  - `autoReaction.json`、`exchangeRate.json`、`autoReply.json`に設定された語句を発見するとそれに対応する設定値をリアクションやリプライ
 - 2-2-3.infoUpNotification.js
   - `infoUpNotification.json`に設定されたRSSフィードを1時間おきに購読し、変更があればポスト
 - 2-2-4.replytoReply.js

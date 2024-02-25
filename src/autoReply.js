@@ -61,11 +61,12 @@ const autoReply = async (relay) => {
                 // 作動区分
                 let postKb = 0;
                 
-                let arrayRet = [];
                 let replyChr = "";
 
-                // 優先反応語句を発見し、フィードのポストがjsonの nativeWords プロパティそのものではなくて、 nativeWords を含んでいる
-                if(priorityTarget && isIncludeWord) {
+                // 優先反応語句を発見し、フィードのポストがjsonの nativeWords プロパティそのものではなくて、 nativeWords を含んでいる（APIキーが取得できていて当然）
+                if(apiKey.length > 0 && priorityTarget && isIncludeWord) {
+                    let arrayRet = [];
+
                     // 投稿者が管理者
                     if(isAdminPubkey) {
                         isChkMyFollower = true;
