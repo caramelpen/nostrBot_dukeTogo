@@ -4,6 +4,7 @@
  * フィードを購読し、リプライ対象となるポストがないか調べ、存在するならリプライ等の動作をする
  */
 require("websocket-polyfill");
+const axios = require("axios");
 const { relayInit, getPublicKey, finishEvent, nip19 } = require("nostr-tools");
 const { currUnixtime, jsonOpen, isSafeToReply, random, probabilityDetermination } = require("./common/utils.js");
 const { publishToRelay } = require("./common/publishToRelay.js");
@@ -12,6 +13,7 @@ let relayUrl = "";
 let BOT_PRIVATE_KEY_HEX = "";
 let pubkey = "";
 let adminPubkey = "";
+let apiKey = "";
 
 const autoReply = async (relay) => {
     // jsonの場所を割り出すために
@@ -20,11 +22,14 @@ const autoReply = async (relay) => {
     // jsonファイルの場所の設定
     const autoReactionPath = jsonPath.join(__dirname, "../config/autoReaction.json");
     const autoReplyPath = jsonPath.join(__dirname, "../config/autoReply.json");
+    const exchangeRatePath = jsonPath.join(__dirname, "../config/exchangeRate.json");
+
     
     // 反応語句の格納されたjsonを取得
     const autoReactionJson = jsonOpen(autoReactionPath);
     const autoReplyJson = jsonOpen(autoReplyPath);
-    if(autoReactionJson === null || autoReplyJson === null){
+    const exchangeRateJson = jsonOpen(exchangeRatePath);    
+    if(autoReactionJson === null || autoReplyJson === null || exchangeRateJson === null){
         console.log("json file is not get");
         return;
     }
@@ -43,6 +48,7 @@ const autoReply = async (relay) => {
             if(ev.tags.length <= 0) {
 
                 // フィードのポストの中にjsonで設定した値が存在するなら真
+                const priorityTarget = exchangeRateJson.find(item => item.orgPost.some(post => ev.content.includes(post)));
                 const target = autoReplyJson.find(item => item.orgPost.some(post => ev.content.includes(post)));
                 // フィードのポストがjsonの nativeWords プロパティそのものなら真
                 const isNativeWords = autoReactionJson.nativeWords.length > 0 && autoReactionJson.nativeWords.some(name => name === ev.content) ? true : false;
@@ -50,74 +56,145 @@ const autoReply = async (relay) => {
                 const isIncludeWord = !isNativeWords && autoReactionJson.nativeWords.some(element => (ev.content).includes(element)) ? true : false; 
                 // 投稿者が管理者なら真
                 const isAdminPubkey = ev.pubkey === adminPubkey ? true : false;
-
+                // 公開キー ev.Pubkey のフォローの中に自分の公開キー pubkey がいるなら真
                 let isChkMyFollower = false;
                 // 作動区分
                 let postKb = 0;
-                // 反応語句を発見
-                if(target) {
+                
+                let arrayRet = [];
+                let replyChr = "";
 
+                // 優先反応語句を発見し、フィードのポストがjsonの nativeWords プロパティそのものではなくて、 nativeWords を含んでいる
+                if(priorityTarget && isIncludeWord) {
                     // 投稿者が管理者
                     if(isAdminPubkey) {
-                        postKb = 1;     // リプライ
+                        isChkMyFollower = true;
                     // 投稿者が管理者以外
                     } else {
                         // 公開キー ev.Pubkey のフォローの中に自分の公開キー pubkey がいるなら真
                         isChkMyFollower = await chkMyFollower(relay, ev.pubkey);
-                        if(isChkMyFollower) {
-                            // 反応語句はjsonの何番目にいるか取得
-                            const orgPostIdx = target.orgPost.findIndex(element => ev.content.includes(element));
-                            // 反応語句は存在するはずだが、もし何らかの理由で見つからなかったらなにもしない
-                            if(orgPostIdx === -1) {
-                                return;
-                            }
-                            // 反応語句はポストの何文字目にいるか取得
-                            const chridx = ev.content.indexOf(target.orgPost[orgPostIdx]);
-                            // 反応語句の前方を収める
-                            const fowardSubstr = ev.content.substring(0, chridx);
-                            // 反応語句の前方に配列で設定した nativeWords が含まれる
-                            if(autoReactionJson.nativeWords.length > 0 && autoReactionJson.nativeWords.some(word => fowardSubstr.includes(word))) {
-                                postKb = 1;     // リプライ
+                    }
+                    if(isChkMyFollower) {
+
+                        // 反応語句はjsonの何番目にいるか取得
+                        const orgPostIdx = priorityTarget.orgPost.findIndex(element => ev.content.includes(element));
+                        // 反応語句は存在するはずだが、もし何らかの理由で見つからなかったらなにもしない
+                        if(orgPostIdx === -1) {
+                            return;
+                        }
+
+
+                        // 反応語句はポストの何文字目にいるか取得
+                        const chridx = ev.content.indexOf(priorityTarget.orgPost[orgPostIdx]);
+                        // 反応語句の前方を収める
+                        const fowardSubstr = ev.content.substring(0, chridx);
+                        // 反応語句の前方に配列で設定した nativeWords が含まれる
+                        if(autoReactionJson.nativeWords.length > 0 && autoReactionJson.nativeWords.some(word => fowardSubstr.includes(word))) {
+                            arrayRet = [];
+                            // 通貨レート
+                            if(priorityTarget.sw === 1) {
+                                // 正規表現パターンを構築
+                                const pattern = new RegExp(`(.{0,3})${priorityTarget.orgPost}(.{0,3})`);
+
+                                // 文字列を検索し、一致した部分を取得
+                                const match = ev.content.match(pattern);
+
+                                if (match) {
+                                    const preceding = match[1]; // 前の3文字
+                                    const following = match[2]; // 後ろの3文字
+                                    arrayRet = await getAvailableCurrencies(preceding, following, priorityTarget.sw);
+                                    if(arrayRet.length <= 0) {
+                                        replyChr = priorityTarget.nonGet[0];
+                                    } else {
+                                        replyChr = "1 " + preceding + " は " + arrayRet[0] + " " + following + " " + priorityTarget.replyPostChar[0];
+                                    }
+                                }
+                            // 通貨一覧
                             } else {
-                                // 確率判定でOKだった
-                                // target.probability は0～100で設定されている
-                                if(probabilityDetermination(target.probability)) {
+                                arrayRet = await getAvailableCurrencies("", "", priorityTarget.sw);
+                                replyChr = "";
+                                let j = 1;
+                                for (let i = 0; i < arrayRet.length; i++) {
+                                    replyChr += (replyChr.length > 0 ? "," : "") + arrayRet[i];
+                                    if(j === 10) { // 10個ごとに改行
+                                        j = 0;
+                                        replyChr += (i < arrayRet.length - 1? "\n": "");
+                                    }
+                                    j++;
+                                }
+                            }
+
+                            if(arrayRet.length > 0){
+                                postKb = 50;
+                            }
+                        }
+                    }
+                } else {
+                    
+                    // 反応語句を発見
+                    if(target) {
+
+                        // 投稿者が管理者
+                        if(isAdminPubkey) {
+                            postKb = 1;     // リプライ
+                        // 投稿者が管理者以外
+                        } else {
+                            // 公開キー ev.Pubkey のフォローの中に自分の公開キー pubkey がいるなら真
+                            isChkMyFollower = await chkMyFollower(relay, ev.pubkey);
+                            if(isChkMyFollower) {
+                                // 反応語句はjsonの何番目にいるか取得
+                                const orgPostIdx = target.orgPost.findIndex(element => ev.content.includes(element));
+                                // 反応語句は存在するはずだが、もし何らかの理由で見つからなかったらなにもしない
+                                if(orgPostIdx === -1) {
+                                    return;
+                                }
+                                // 反応語句はポストの何文字目にいるか取得
+                                const chridx = ev.content.indexOf(target.orgPost[orgPostIdx]);
+                                // 反応語句の前方を収める
+                                const fowardSubstr = ev.content.substring(0, chridx);
+                                // 反応語句の前方に配列で設定した nativeWords が含まれる
+                                if(autoReactionJson.nativeWords.length > 0 && autoReactionJson.nativeWords.some(word => fowardSubstr.includes(word))) {
                                     postKb = 1;     // リプライ
                                 } else {
-                                    // 確率で外れたら倍の確率でやってみる
-                                    if(probabilityDetermination(target.probability * 2)) {
-                                        // リアクション
-                                        postKb = 5;
+                                    // 確率判定でOKだった
+                                    // target.probability は0～100で設定されている
+                                    if(probabilityDetermination(target.probability)) {
+                                        postKb = 1;     // リプライ
+                                    } else {
+                                        // 確率で外れたら倍の確率でやってみる
+                                        if(probabilityDetermination(target.probability * 2)) {
+                                            // リアクション
+                                            postKb = 5;
+                                        }
                                     }
                                 }
                             }
                         }
-                    }
 
-                // 反応語句未発見
-                } else {
-                    // 投稿者が管理者
-                    if(isAdminPubkey) {
-                        // フィードのポストがjsonの nativeWords プロパティそのものではないが、ポスト内のどこかに nativeWords を含んでいる
-                        if(isIncludeWord) {
-                            postKb = 2;     // リプライ(全リプライ語句からのランダムリプライ)
-                        // フィードのポストがjsonの nativeWords プロパティそのもの
-                        } else if(isNativeWords) {
-                            postKb = 3;     // リアクションとリアクション絵文字でのリプライ
-                        }
-                    // 投稿者が管理者以外
+                    // 反応語句未発見
                     } else {
-                        // フィードのポストがjsonの nativeWords プロパティそのもので、かつ自分をフォローしている人なら
-                        if(isNativeWords) {
-                            isChkMyFollower = await chkMyFollower(relay, ev.pubkey);
-                            if(isChkMyFollower) {
+                        // 投稿者が管理者
+                        if(isAdminPubkey) {
+                            // フィードのポストがjsonの nativeWords プロパティそのものではないが、ポスト内のどこかに nativeWords を含んでいる
+                            if(isIncludeWord) {
+                                postKb = 2;     // リプライ(全リプライ語句からのランダムリプライ)
+                            // フィードのポストがjsonの nativeWords プロパティそのもの
+                            } else if(isNativeWords) {
                                 postKb = 3;     // リアクションとリアクション絵文字でのリプライ
                             }
+                        // 投稿者が管理者以外
+                        } else {
+                            // フィードのポストがjsonの nativeWords プロパティそのもので、かつ自分をフォローしている人なら
+                            if(isNativeWords) {
+                                isChkMyFollower = await chkMyFollower(relay, ev.pubkey);
+                                if(isChkMyFollower) {
+                                    postKb = 3;     // リアクションとリアクション絵文字でのリプライ
+                                }
+                            }
                         }
+
                     }
-
                 }
-
                 // 作動対象だ
                 if(postKb > 0) {
                     // リプライやリアクションしても安全なら、リプライイベントやリアクションイベントを組み立てて送信する
@@ -136,7 +213,7 @@ const autoReply = async (relay) => {
                             // 配列要素を決めたら、その配列に設定されているリプライ語句の設定配列の範囲からさらにランダム値を取得
                             const replyChrIdx = random(0, autoReplyJson[replyChrPresetIdx].replyPostChar.length - 1);
                             // リプライ語句決定
-                            const replyChr = autoReplyJson[replyChrPresetIdx].replyPostChar[replyChrIdx];
+                            replyChr = autoReplyJson[replyChrPresetIdx].replyPostChar[replyChrIdx];
                             // リプライ
                             replyPostorreactionPost = composeReply(replyChr, ev);
 
@@ -167,6 +244,12 @@ const autoReply = async (relay) => {
                             }
                             // なにもしない
                             return;
+
+
+                        } else if(postKb === 50) {
+                            // リプライ
+                            replyPostorreactionPost = composeReply(replyChr, ev);
+
                         }
 
                         publishToRelay(relay, replyPostorreactionPost);
@@ -212,6 +295,58 @@ const chkMyFollower = (relay, evPubkey) => {
         }
     });
 }
+
+
+
+
+// 利用可能な通貨の一覧を取得する関数
+const  getAvailableCurrencies = async (baseCurrency, targetCurrency, funcSw ) => {
+    let arrayRet = [];
+
+    if(funcSw === 1) {
+        if(baseCurrency.length <= 0 || targetCurrency.length <= 0) {
+            // なにもしない
+            return;
+        }
+    } else {
+        if(baseCurrency.length <= 0){
+            baseCurrency = "JPY";   // なんでもいい
+        }
+    }
+
+    // Open Exchange Rates のエンドポイント
+    const API_URL = "https://open.er-api.com/v6/latest/" + baseCurrency;    // 通貨一覧を得るだけならbaseは要らないと思うのが普通なのだが、何か設定しないとだめらしい
+
+    try {
+
+        const response = await axios.get(API_URL, {
+            headers: {"Authorization": `Token ${apiKey}`}
+        });
+        
+        if(funcSw === 1) {
+            const exchangeRate = response.data.rates[targetCurrency];
+            arrayRet.push(exchangeRate);    // 通貨リストの返りは配列なので、こっちも配列にして揃える
+            return arrayRet;
+        } else {
+            const exchangeRates = response.data.rates;
+            for (const currency in exchangeRates) {
+                // push() メソッドを使用して値を追加
+                arrayRet.push(currency);
+            }
+            // 昇順でソートしてから返す
+            return arrayRet.sort((a, b) => a.localeCompare(b));
+        }
+
+    } catch (error) {
+        console.error("getAvailableCurrencies:", error);
+    }
+}
+
+
+
+
+
+
 
 // リプライイベントを組み立てる
 const composeReply = (replyPostChar, targetEvent) => {
@@ -287,6 +422,7 @@ const main = async () => {
     pubkey = getPublicKey(BOT_PRIVATE_KEY_HEX);               // 秘密鍵から公開鍵の取得
     adminPubkey = process.env.admin_HEX_PUBKEY;               // bot管理者の公開鍵の取得
     relayUrl = process.env.RELAY_URL;                         // リレーURL
+    apiKey = process.env.OPEN_EXCHANGE_RATES_API;             // open exchange rates のAPI
 
 
     // リレー
