@@ -63,7 +63,7 @@ const autoReply = async (relay) => {
                 
                 let replyChr = "";
 
-                // 優先反応語句を発見し、フィードのポストがjsonの nativeWords プロパティそのものではなくて、 nativeWords を含んでいる（APIキーが取得できていて当然）
+                // 通貨反応語句を優先反応語句とし、フィードのポストがjsonの nativeWords プロパティそのものではなくて、 nativeWords を含んでいる（APIキーが取得できていて当然）
                 if(apiKey.length > 0 && priorityTarget && isIncludeWord) {
                     let arrayRet = [];
 
@@ -106,6 +106,7 @@ const autoReply = async (relay) => {
                                     arrayRet = await getAvailableCurrencies(preceding, following, priorityTarget.sw);
                                     if(arrayRet.length <= 0) {
                                         replyChr = priorityTarget.nonGet[0];
+                                        postKb = 50;    // 通貨単位は無効であることをポストするので有効とする
                                     } else {
                                         replyChr = "1 " + preceding + " は " + arrayRet[0] + " " + following + " " + priorityTarget.replyPostChar[0];
                                     }
@@ -268,6 +269,7 @@ const autoReply = async (relay) => {
             }
         } catch (err){
             console.error(err);
+            throw err;
         }
     });
 }
@@ -302,44 +304,54 @@ const chkMyFollower = (relay, evPubkey) => {
 
 // 利用可能な通貨の一覧を取得する関数
 const  getAvailableCurrencies = async (baseCurrency, targetCurrency, funcSw ) => {
+    let currencyList = [];
     let arrayRet = [];
 
+    // 為替レート
     if(funcSw === 1) {
         if(baseCurrency.length <= 0 || targetCurrency.length <= 0) {
             // なにもしない
-            return;
-        }
-    } else {
-        if(baseCurrency.length <= 0){
-            baseCurrency = "JPY";   // なんでもいい
+            return arrayRet;
         }
     }
 
     // Open Exchange Rates のエンドポイント
-    const API_URL = "https://open.er-api.com/v6/latest/" + baseCurrency;    // 通貨一覧を得るだけならbaseは要らないと思うのが普通なのだが、何か設定しないとだめらしい
+    const API_URL_LATEST = "https://openexchangerates.org/api/latest.json";
 
     try {
 
-        const response = await axios.get(API_URL, {
+        const allCurrencies = await axios.get(API_URL_LATEST, {
             headers: {"Authorization": `Token ${apiKey}`}
         });
+
+        // 通貨リストを収める
+        const currencies = allCurrencies.data.rates;
+        for (const currency in currencies) {
+            // push() メソッドを使用して値を追加
+            currencyList.push(currency);
+        }
         
+        // 為替レート
         if(funcSw === 1) {
-            const exchangeRate = response.data.rates[targetCurrency];
-            arrayRet.push(exchangeRate);    // 通貨リストの返りは配列なので、こっちも配列にして揃える
-            return arrayRet;
-        } else {
-            const exchangeRates = response.data.rates;
-            for (const currency in exchangeRates) {
-                // push() メソッドを使用して値を追加
-                arrayRet.push(currency);
+            // 引数の通貨は存在しているか
+            if(currencyList.includes(baseCurrency) && currencyList.includes(targetCurrency)) {
+                const API_URL = "https://open.er-api.com/v6/latest/" + baseCurrency;
+                const bases = await axios.get(API_URL, {
+                    headers: {"Authorization": `Token ${apiKey}`}
+                });
+                const exchangeRate = bases.data.rates[targetCurrency];
+                arrayRet.push(exchangeRate);    // 通貨リストの返りは配列なので、こっちも配列にして揃える
             }
-            // 昇順でソートしてから返す
-            return arrayRet.sort((a, b) => a.localeCompare(b));
+            return arrayRet;
+
+        } else {
+            // 通貨リストをそのまま返す
+            return currencyList;
         }
 
-    } catch (error) {
-        console.error("getAvailableCurrencies:", error);
+    } catch (err) {
+        console.error("getAvailableCurrencies:", err);
+        throw err;
     }
 }
 
