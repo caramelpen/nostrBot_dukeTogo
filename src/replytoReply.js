@@ -83,8 +83,8 @@ const replytoReply = async (relay)=>{
                             publishToRelay(relay, replyPost);
                             return;
                         }
-                    } else {
-                        return;
+                    // } else {
+                    //     return;
                     }
                 }
 
