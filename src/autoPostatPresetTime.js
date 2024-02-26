@@ -172,6 +172,8 @@ const subSunriseSunset = (sunriseSunsetPath, nowDateTime) => {
             writeJsonFile(sunriseSunsetPath, sunriseorSunset, nextSunriseorSunset, -1);
             console.log("write json(" + sunriseorSunset + "):" + nextSunriseorSunset);
             return true;
+        } else {
+            return false;
         }
     } catch (err) {
         console.error("subSunriseSunset:" + err);
