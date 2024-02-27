@@ -81,7 +81,7 @@ const replytoReply = async (relay)=>{
                             // リプライ
                             const replyPost = composeReplyPost(replyChr, ev);
                             publishToRelay(relay, replyPost);
-                            return;
+                            //return;
                         }
                     }
                 }
