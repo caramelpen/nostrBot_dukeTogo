@@ -5,7 +5,7 @@
  */
 require("websocket-polyfill");
 const { relayInit, getPublicKey, finishEvent, nip19 } = require("nostr-tools");
-const { currUnixtime, random, jsonOpen, isSafeToReply } = require("./common/utils.js");
+const { currUnixtime, random, jsonOpen, jsonSetandOpen, isSafeToReply } = require("./common/utils.js");
 const { publishToRelay } = require("./common/publishToRelay.js");
 
 let relayUrl = "";
@@ -14,13 +14,17 @@ let pubkey = "";
 
 const replytoReply = async (relay)=>{
 
-    // jsonの場所を割り出すために
-    const jsonPath = require("path");
-
-    // リプライ語句入りjsonファイルの場所の設定（自動リプライ時に使用しているjsonの反応語句をそのまま利用する）
-    const replyChrJsonPath = jsonPath.join(__dirname, "../config/autoReply.json");
+    // // jsonの場所を割り出すために
+    // const jsonPath = require("path");
+    // // リプライ語句入りjsonファイルの場所の設定（自動リプライ時に使用しているjsonの反応語句をそのまま利用する）
+    // const replyChrJsonPath = jsonPath.join(__dirname, "../config/autoReply.json");
     // 反応語句の格納されたjsonを取得
-    const replyChrJson = jsonOpen(replyChrJsonPath);
+    // const replyChrJson = jsonOpen(replyChrJsonPath);
+    const replyChrJson = await jsonSetandOpen("../../config/autoReply.json");  //configの場所はここからみれば../config/だが、util関数の場所から見れば../../config/となる
+    if(replyChrJson === null){
+        console.error("replytoReply:json file is not get");
+        return false;
+    }
 
     // このBotの公開鍵へのリプライを絞り込むフィルタを設定して、イベントを購読する
     const sub = relay.sub(

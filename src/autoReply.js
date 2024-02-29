@@ -6,7 +6,7 @@
 require("websocket-polyfill");
 const axios = require("axios");
 const { relayInit, getPublicKey, finishEvent, nip19 } = require("nostr-tools");
-const { currUnixtime, jsonOpen, isSafeToReply, random, probabilityDetermination } = require("./common/utils.js");
+const { currUnixtime, jsonOpen, jsonSetandOpen, isSafeToReply, random, probabilityDetermination } = require("./common/utils.js");
 const { publishToRelay } = require("./common/publishToRelay.js");
 
 let relayUrl = "";
@@ -280,14 +280,16 @@ const funcObj = {
 
 
 const autoReply = async (relay) => {
-    const jsonCommonPath = "../config/";
+    const jsonCommonPath = "../../config/";    // configの場所はここからみれば../config/だが、util関数の場所から見れば../../config/となる
     // jsonの場所を割り出すために
-    const jsonPath = require("path");
+    //const jsonPath = require("path");
     // jsonファイルの場所の設定
-    const autoReactionPath = jsonPath.join(__dirname, jsonCommonPath + "autoReaction.json");
-    const autoReactionJson = jsonOpen(autoReactionPath);
-    const autoReplyPriorityOrderPath = jsonPath.join(__dirname, jsonCommonPath + "autoReplyPriorityOrder.json");
-    const autoReplyPriorityOrderJson = jsonOpen(autoReplyPriorityOrderPath);
+    //const autoReactionPath = jsonPath.join(__dirname, jsonCommonPath + "autoReaction.json");
+    //const autoReactionJson = jsonOpen(autoReactionPath);
+    const autoReactionJson = await jsonSetandOpen(jsonCommonPath + "autoReaction.json");
+    //const autoReplyPriorityOrderPath = jsonPath.join(__dirname, jsonCommonPath + "autoReplyPriorityOrder.json");
+    //const autoReplyPriorityOrderJson = jsonOpen(autoReplyPriorityOrderPath);
+    const autoReplyPriorityOrderJson = await jsonSetandOpen(jsonCommonPath + "autoReplyPriorityOrder.json");
 
     if(autoReactionJson === null || autoReplyPriorityOrderJson === null) {
         console.log("json file is not get");
@@ -306,8 +308,10 @@ const autoReply = async (relay) => {
             if(ev.tags.length <= 0) {
                 for(let i = 0; i <= autoReplyPriorityOrderJson.funcName.length - 1; i++) {
                     postKb = 0;
-                    let funcJsonPath = jsonPath.join(__dirname, "../config/" + autoReplyPriorityOrderJson.useJsonFile[i]);
-                    let funcJson = jsonOpen(funcJsonPath);
+                    //let funcJsonPath = jsonPath.join(__dirname, "../config/" + autoReplyPriorityOrderJson.useJsonFile[i]);
+                    //let funcJson = jsonOpen(funcJsonPath);
+                    let funcJson = jsonSetandOpen("../../config/" + autoReplyPriorityOrderJson.useJsonFile[i]); // configの場所はここからみれば../config/だが、util関数の場所から見れば../../config/となる
+
                     if(funcJson === null) {
                         console.log("json file is not get");
                         return;
