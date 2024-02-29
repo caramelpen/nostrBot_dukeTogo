@@ -15,14 +15,15 @@ let pubkey = "";
 let adminPubkey = "";
 let apiKey = "";
 // 作動区分
-let postKb = 0;
+let postCategory = 0;
 let replyChr = "";
 
-// 為替
-const exchangeRate = async (relay, ev, funcJson, autoReactionJson) => {
+
+// 機能投稿
+const functionalPosting = async (relay, ev, functionalPostingJson, autoReactionJson) => {
     try {
         // フィードのポストの中にjsonで設定した値が存在するなら真
-        const priorityTarget = funcJson.find(item => item.orgPost.some(post => ev.content.includes(post)));
+        const target = functionalPostingJson.find(item => item.orgPost.some(post => ev.content.includes(post)));
         // フィードのポストがjsonの nativeWords プロパティそのものなら真
         const isNativeWords = autoReactionJson.nativeWords.length > 0 && autoReactionJson.nativeWords.some(name => name === ev.content) ? true : false;
         // フィードのポストがjsonの nativeWords プロパティそのものではなくて、 nativeWords を含んでいるなら真
@@ -32,7 +33,77 @@ const exchangeRate = async (relay, ev, funcJson, autoReactionJson) => {
         // 公開キー ev.Pubkey のフォローの中に自分の公開キー pubkey がいるなら真
         let isChkMyFollower = false;
         // 作動区分
-        postKb = 0;
+        postCategory = 0;
+
+        replyChr = "";
+        // 反応語句が存在し、フィードのポストがjsonの nativeWords プロパティそのものではなくて、 nativeWords を含んでいる
+        if(target && isIncludeWord) {
+
+            // 投稿者が管理者
+            if(isAdminPubkey) {
+                // 自分のフォロアと同じ扱い
+                isChkMyFollower = true;
+            // 投稿者が管理者以外
+            } else {
+                // 公開キー ev.Pubkey のフォローの中に自分の公開キー pubkey がいるなら真
+                isChkMyFollower = await chkMyFollower(relay, ev.pubkey);
+            }
+            if(isChkMyFollower) {
+
+                // 反応語句はjsonの何番目にいるか取得
+                const orgPostIdx = target.orgPost.findIndex(element => ev.content.includes(element));
+                // 反応語句は存在するはずだが、もし何らかの理由で見つからなかったらなにもしない
+                if(orgPostIdx === -1) {
+                    return;
+                }
+
+                // 反応語句はポストの何文字目にいるか取得
+                const chridx = ev.content.indexOf(target.orgPost[orgPostIdx]);
+                // 反応語句の前方を収める
+                const fowardSubstr = ev.content.substring(0, chridx);
+                // 反応語句の前方に配列で設定した nativeWords が含まれる
+                if(autoReactionJson.nativeWords.length > 0 && autoReactionJson.nativeWords.some(word => fowardSubstr.includes(word))) {
+                    // リプライ語句をためる
+                    replyChr = "";
+                    for(let i = 0; i <= target.replyPostChar.length - 1; i++) {
+                        replyChr += target.replyPostChar[i];
+                    }
+                    postCategory = 1;
+                }
+
+                // 作動対象だ
+                if(postCategory > 0) {
+                    // リプライやリアクションしても安全なら、リプライイベントやリアクションイベントを組み立てて送信する
+                    if (isSafeToReply(ev)) {
+                        // リプライ
+                        const replyPost = composeReply(replyChr, ev);
+                        publishToRelay(relay, replyPost);
+                    }
+                }
+            }
+        }
+
+    } catch (err) {
+        throw err;
+    }
+
+}
+
+// 為替
+const exchangeRate = async (relay, ev, exchangeRate, autoReactionJson) => {
+    try {
+        // フィードのポストの中にjsonで設定した値が存在するなら真
+        const priorityTarget = exchangeRate.find(item => item.orgPost.some(post => ev.content.includes(post)));
+        // フィードのポストがjsonの nativeWords プロパティそのものなら真
+        const isNativeWords = autoReactionJson.nativeWords.length > 0 && autoReactionJson.nativeWords.some(name => name === ev.content) ? true : false;
+        // フィードのポストがjsonの nativeWords プロパティそのものではなくて、 nativeWords を含んでいるなら真
+        const isIncludeWord = !isNativeWords && autoReactionJson.nativeWords.some(element => (ev.content).includes(element)) ? true : false; 
+        // 投稿者が管理者なら真
+        const isAdminPubkey = ev.pubkey === adminPubkey ? true : false;
+        // 公開キー ev.Pubkey のフォローの中に自分の公開キー pubkey がいるなら真
+        let isChkMyFollower = false;
+        // 作動区分
+        postCategory = 0;
 
         replyChr = "";
 
@@ -79,7 +150,7 @@ const exchangeRate = async (relay, ev, funcJson, autoReactionJson) => {
                             arrayRet = await getAvailableCurrencies(preceding, following, priorityTarget.sw);
                             if(arrayRet.length <= 0) {
                                 replyChr = priorityTarget.nonGet[0];
-                                postKb = 50;    // 通貨単位は無効であることをポストするので有効とする
+                                postCategory = 1;    // 通貨単位は無効であることをポストするので有効とする
                             } else {
                                 replyChr = "1 " + preceding + " は " + arrayRet[0] + " " + following + " " + priorityTarget.replyPostChar[0];
                             }
@@ -100,13 +171,13 @@ const exchangeRate = async (relay, ev, funcJson, autoReactionJson) => {
                     }
 
                     if(arrayRet.length > 0) {
-                        postKb = 1;
+                        postCategory = 1;
                     }                    
                 }
             }
         }
         // 作動対象だ
-        if(postKb > 0) {
+        if(postCategory > 0) {
             // リプライやリアクションしても安全なら、リプライイベントやリアクションイベントを組み立てて送信する
             if (isSafeToReply(ev)) {
                 // リプライ
@@ -124,10 +195,10 @@ const exchangeRate = async (relay, ev, funcJson, autoReactionJson) => {
 }
 
 // 通常反応リプライ
-const normalAutoReply = async (relay, ev, funcJson, autoReactionJson) => {
+const normalAutoReply = async (relay, ev, autoReplyJson, autoReactionJson) => {
     try {
         // フィードのポストの中にjsonで設定した値が存在するなら真
-        const target = funcJson.find(item => item.orgPost.some(post => ev.content.includes(post)));
+        const target = autoReplyJson.find(item => item.orgPost.some(post => ev.content.includes(post)));
         // フィードのポストがjsonの nativeWords プロパティそのものなら真
         const isNativeWords = autoReactionJson.nativeWords.length > 0 && autoReactionJson.nativeWords.some(name => name === ev.content) ? true : false;
         // フィードのポストがjsonの nativeWords プロパティそのものではなくて、 nativeWords を含んでいるなら真
@@ -137,14 +208,14 @@ const normalAutoReply = async (relay, ev, funcJson, autoReactionJson) => {
         // 公開キー ev.Pubkey のフォローの中に自分の公開キー pubkey がいるなら真
         let isChkMyFollower = false;
         // 作動区分
-        postKb = 0;
+        postCategory = 0;
         
         // 反応語句を発見
         if(target) {
 
             // 投稿者が管理者
             if(isAdminPubkey) {
-                postKb = 1;     // リプライ
+                postCategory = 1;     // リプライ
             // 投稿者が管理者以外
             } else {
                 // 公開キー ev.Pubkey のフォローの中に自分の公開キー pubkey がいるなら真
@@ -162,17 +233,17 @@ const normalAutoReply = async (relay, ev, funcJson, autoReactionJson) => {
                     const fowardSubstr = ev.content.substring(0, chridx);
                     // 反応語句の前方に配列で設定した nativeWords が含まれる
                     if(autoReactionJson.nativeWords.length > 0 && autoReactionJson.nativeWords.some(word => fowardSubstr.includes(word))) {
-                        postKb = 1;     // リプライ
+                        postCategory = 1;     // リプライ
                     } else {
                         // 確率判定でOKだった
                         // target.probability は0～100で設定されている
                         if(probabilityDetermination(target.probability)) {
-                            postKb = 1;     // リプライ
+                            postCategory = 1;     // リプライ
                         } else {
                             // 確率で外れたら倍の確率でやってみる
                             if(probabilityDetermination(target.probability * 2)) {
                                 // リアクション
-                                postKb = 5;
+                                postCategory = 5;
                             }
                         }
                     }
@@ -185,10 +256,10 @@ const normalAutoReply = async (relay, ev, funcJson, autoReactionJson) => {
             if(isAdminPubkey) {
                 // フィードのポストがjsonの nativeWords プロパティそのものではないが、ポスト内のどこかに nativeWords を含んでいる
                 if(isIncludeWord) {
-                    postKb = 2;     // リプライ(全リプライ語句からのランダムリプライ)
+                    postCategory = 2;     // リプライ(全リプライ語句からのランダムリプライ)
                 // フィードのポストがjsonの nativeWords プロパティそのもの
                 } else if(isNativeWords) {
-                    postKb = 3;     // リアクションとリアクション絵文字でのリプライ
+                    postCategory = 3;     // リアクションとリアクション絵文字でのリプライ
                 }
             // 投稿者が管理者以外
             } else {
@@ -196,7 +267,7 @@ const normalAutoReply = async (relay, ev, funcJson, autoReactionJson) => {
                 if(isNativeWords) {
                     isChkMyFollower = await chkMyFollower(relay, ev.pubkey);
                     if(isChkMyFollower) {
-                        postKb = 3;     // リアクションとリアクション絵文字でのリプライ
+                        postCategory = 3;     // リアクションとリアクション絵文字でのリプライ
                     }
                 }
             }
@@ -204,20 +275,20 @@ const normalAutoReply = async (relay, ev, funcJson, autoReactionJson) => {
         }
 
         // 作動対象だ
-        if(postKb > 0) {
+        if(postCategory > 0) {
             replyChr = "";
 
             // リプライやリアクションしても安全なら、リプライイベントやリアクションイベントを組み立てて送信する
             if (isSafeToReply(ev)) {
                 let replyPostorreactionPost;
                 let randomReactionIdx;
-                if(postKb === 1) {
+                if(postCategory === 1) {
                     // jsonに設定されている対応するリプライ語句の数を利用してランダムでリプライ語句を決める
                     const randomIdx = random(0, target.replyPostChar.length - 1);
                     // リプライ
                     replyPostorreactionPost = composeReply(target.replyPostChar[randomIdx], ev);
 
-                } else if(postKb === 2) {
+                } else if(postCategory === 2) {
                     // 反応語句配列の数の範囲からランダム値を取得し、それを配列要素とする
                     const replyChrPresetIdx = random(0, autoReplyJson.length - 1);
                     // 配列要素を決めたら、その配列に設定されているリプライ語句の設定配列の範囲からさらにランダム値を取得
@@ -227,12 +298,12 @@ const normalAutoReply = async (relay, ev, funcJson, autoReactionJson) => {
                     // リプライ
                     replyPostorreactionPost = composeReply(replyChr, ev);
 
-                } else if(postKb === 3) {
+                } else if(postCategory === 3) {
                     // jsonに設定されているリアクション絵文字の数を利用してランダムで反応語句を決める
                     randomReactionIdx = random(0, autoReactionJson.contentReaction.length - 1);
                     // randomReactionIdx 番目のカスタム絵文字URLが設定されているならリアクション
                     if(autoReactionJson.reactionImgURL[randomReactionIdx].length > 0) {
-                        postKb = 4;
+                        postCategory = 4;
                         // リアクション
                         replyPostorreactionPost = composeReaction(ev, autoReactionJson, randomReactionIdx);
                     // カスタム絵文字URLが未設定ならそれはカスタム絵文字ではないので、リアクションせず、既存絵文字でリプライする
@@ -241,7 +312,7 @@ const normalAutoReply = async (relay, ev, funcJson, autoReactionJson) => {
                         replyPostorreactionPost = composeReply(autoReactionJson.contentReaction[randomReactionIdx], ev);
                     }
 
-                } else if(postKb === 5) {
+                } else if(postCategory === 5) {
                     //100回まわってカスタム絵文字URLが設定されている要素をランダム取得出来たらリアクション（100に意味はない　なんとなく）
                     for (let i = 0; i < 100; i++) {
                         randomReactionIdx = random(0, autoReactionJson.contentReaction.length - 1);
@@ -258,7 +329,7 @@ const normalAutoReply = async (relay, ev, funcJson, autoReactionJson) => {
 
                 publishToRelay(relay, replyPostorreactionPost);
                 // リアクションとリアクション絵文字でのリプライを行う動作区分で、かつカスタム絵文字URLが設定されているならリアクション絵文字でリプライも行う
-                if(postKb === 4) {
+                if(postCategory === 4) {
                     // リプライ
                     replyPostorreactionPost = composeReplyEmoji(ev, autoReactionJson, randomReactionIdx);
                     publishToRelay(relay, replyPostorreactionPost);
@@ -275,29 +346,21 @@ const normalAutoReply = async (relay, ev, funcJson, autoReactionJson) => {
 }
 
 
+// ディスパッチのオブジェクト
 const funcObj = {
-    exchangeRate
+    functionalPosting
+    ,exchangeRate
     ,normalAutoReply
 }
 
+// ディスパッチの設定値
+const funcConfig = {
+    funcName: ["functionalPosting", "exchangeRate", "normalAutoReply"]                       // useJsonFile の記述順と対応させる
+    ,useJsonFile: ["functionalPosting.json", "exchangeRate.json", "autoReply.json"]          // funcName の記述順と対応させる
+    ,operationCategory: [0, 1, 1]                                                           // 1ならポストできたら次へ進めない（useJsonFileやuncName の記述順と対応させる）
+}
 
 const autoReply = async (relay) => {
-    const jsonCommonPath = "../../config/";    // configの場所はここからみれば../config/だが、util関数の場所から見れば../../config/となる
-    // jsonの場所を割り出すために
-    //const jsonPath = require("path");
-    // jsonファイルの場所の設定
-    //const autoReactionPath = jsonPath.join(__dirname, jsonCommonPath + "autoReaction.json");
-    //const autoReactionJson = jsonOpen(autoReactionPath);
-    const autoReactionJson = await jsonSetandOpen(jsonCommonPath + "autoReaction.json");
-    //const autoReplyPriorityOrderPath = jsonPath.join(__dirname, jsonCommonPath + "autoReplyPriorityOrder.json");
-    //const autoReplyPriorityOrderJson = jsonOpen(autoReplyPriorityOrderPath);
-    const autoReplyPriorityOrderJson = await jsonSetandOpen(jsonCommonPath + "autoReplyPriorityOrder.json");
-
-    if(autoReactionJson === null || autoReplyPriorityOrderJson === null) {
-        console.log("json file is not get");
-        return;
-    }
-
     // フィードを購読
     const sub = relay.sub(
         [
@@ -308,19 +371,27 @@ const autoReply = async (relay) => {
         try {
             // 有効とするのはtagが空のもののみ
             if(ev.tags.length <= 0) {
-                for(let i = 0; i <= autoReplyPriorityOrderJson.funcName.length - 1; i++) {
-                    postKb = 0;
-                    //let funcJsonPath = jsonPath.join(__dirname, "../config/" + autoReplyPriorityOrderJson.useJsonFile[i]);
-                    //let funcJson = jsonOpen(funcJsonPath);
-                    let funcJson = jsonSetandOpen("../../config/" + autoReplyPriorityOrderJson.useJsonFile[i]); // configの場所はここからみれば../config/だが、util関数の場所から見れば../../config/となる
 
+                const jsonCommonPath = "../../config/";    // configの場所はここからみれば../config/だが、util関数の場所から見れば../../config/となる
+                // jsonの場所を割り出しと設定
+                const autoReactionJson = await jsonSetandOpen(jsonCommonPath + "autoReaction.json");    
+            
+                if(autoReactionJson === null) {
+                    console.log("json file is not get");
+                    return;
+                }
+
+                for(let i = 0; i <= funcConfig.funcName.length - 1; i++) {
+                    postCategory = 0;
+                    let funcJson = await jsonSetandOpen(jsonCommonPath + funcConfig.useJsonFile[i]); // configの場所はここからみれば../config/だが、util関数の場所から見れば../../config/となる
                     if(funcJson === null) {
                         console.log("json file is not get");
                         return;
                     }
-                    // 処理の実行
-                    await funcObj[autoReplyPriorityOrderJson.funcName[i]](relay, ev, funcJson, autoReactionJson);
-                    if(postKb >= 1) {
+                    // 処理の実行はディスパッチで行い、スリム化をはかる
+                    await funcObj[funcConfig.funcName[i]](relay, ev, funcJson, autoReactionJson);
+                    // ポストできていて、次へ進めない区分なら
+                    if(postCategory >= 1 && funcConfig.operationCategory[i] === 1) {
                         break;
                     }
                 }

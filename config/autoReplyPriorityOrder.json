@@ -1,5 +1,0 @@
-{
-    "funcName": ["exchangeRate", "normalAutoReply"]
-    ,"useJsonFile": ["exchangeRate.json", "autoReply.json"]
-}
-  

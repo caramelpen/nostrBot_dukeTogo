@@ -108,11 +108,15 @@ const main = async () => {
     cron.schedule("0 * * * *", () => {  // 1時間単位
         
         // jsonの場所を割り出すために
-        const json= require("path");
+        //const json = require("path");
         // 更新監視jsonファイルの場所の設定
-        const jsonPath =  json.join(__dirname, "../config/infoUpNotification.json");
+        //const jsonPath =  json.join(__dirname, "../config/infoUpNotification.json");
         // 取得RSS情報の格納されたjsonを取得
-        const rssJson = jsonOpen(jsonPath);
+        //const rssJson = jsonOpen(jsonPath);
+
+        // 更新監視jsonファイルの場所の割り出しと設定
+        const rssJson = jsonSetandOpen("../../config/infoUpNotification.json"); // configの場所はここからみれば../config/だが、util関数の場所から見れば../../config/となる
+
         if(rssJson === null){
             console.log("json file is not get");
             return;

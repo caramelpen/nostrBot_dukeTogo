@@ -20,7 +20,9 @@ const replytoReply = async (relay)=>{
     // const replyChrJsonPath = jsonPath.join(__dirname, "../config/autoReply.json");
     // 反応語句の格納されたjsonを取得
     // const replyChrJson = jsonOpen(replyChrJsonPath);
-    const replyChrJson = await jsonSetandOpen("../../config/autoReply.json");  //configの場所はここからみれば../config/だが、util関数の場所から見れば../../config/となる
+
+    // jsonの場所を割り出しとリプライ語句入りjsonファイルの場所の設定（自動リプライ時に使用しているjsonの反応語句をそのまま利用する）
+    const replyChrJson = await jsonSetandOpen("../../config/autoReply.json");  // configの場所はここからみれば../config/だが、util関数の場所から見れば../../config/となる
     if(replyChrJson === null){
         console.error("replytoReply:json file is not get");
         return false;
