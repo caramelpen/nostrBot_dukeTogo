@@ -8,7 +8,7 @@ const cron = require("node-cron");
 const { relayInit, getPublicKey, finishEvent, nip19 } = require("nostr-tools");
 
 const sunCalc = require("suncalc");
-const { currDateTime, currUnixtime, random, jsonOpen, jsonSetandOpen, writeJsonFile, formattedDateTime } = require("./common/utils.js");
+const { currDateTime, currUnixtime, random, jsonSetandOpen, writeJsonFile, formattedDateTime } = require("./common/utils.js");
 const { publishToRelay } = require("./common/publishToRelay.js");
 const { toGitHubPush } = require("./common/gitHubCooperation.js");
 
@@ -35,7 +35,6 @@ const subPresetPost = (presetDatePath, nowDateTime) => {
         const nowDateTimeMMDD = nowDateTime12.substring(4 ,8);  // 月日部分
         const nowDateTimeHHMM = nowDateTime12.substring(8 ,12); // 時刻部分
 
-        // const presetDateJson = jsonOpen(presetDatePath);
         const presetDateJson = jsonSetandOpen(presetDatePath);
         if(presetDateJson === null){
             console.error("subPresetPost:json file is not get");
@@ -87,7 +86,6 @@ const subSunriseSunset = (sunriseSunsetPath, nowDateTime) => {
 
         // 日の出と日没の格納されたjsonを取得
         sunriseSunsetJson = null;
-        //sunriseSunsetJson = jsonOpen(sunriseSunsetPath);
         sunriseSunsetJson = jsonSetandOpen(sunriseSunsetPath);
         if(sunriseSunsetJson === null){
             console.error("subSunriseSunset:json file is not get");
@@ -214,9 +212,6 @@ const main = async () => {
         const nowDate = currDateTime();
         const nowDateTime = formattedDateTime(new Date(nowDate));
 
-        // // jsonの場所を割り出すために
-        // const jsonPath = require("path");
-
         // 秘密鍵
         require("dotenv").config();
         const nsec = process.env.BOT_PRIVATE_KEY;
@@ -247,23 +242,10 @@ const main = async () => {
                 const jsonPathCommon = "../../config/"; // configの場所はここからみれば../config/だが、util関数の場所から見れば../../config/となる
                 if(i === 1) {
 
-                    // // 定刻ポストjsonファイルの場所の設定
-                    // const presetDatePath =  jsonPath.join(__dirname, "../config/presetDate.json");
-
-                    // // 定刻ポスト
-                    // postSubject = subPresetPost(presetDatePath, nowDateTime);
-
                     // 定刻ポスト
                     postSubject = subPresetPost(jsonPathCommon + "presetDate.json", nowDateTime);
 
-
                 } else {
-
-                    // // 日の出日の入りjsonファイルの場所の設定
-                    // sunriseSunsetPath = jsonPath.join(__dirname, "../config/sunriseSunset.json");
-
-                    // // 日の出日の入ポスト
-                    // postSubject = subSunriseSunset(sunriseSunsetPath, nowDateTime);
 
                     // 日の出日の入ポスト
                     postSubject = subSunriseSunset(jsonPathCommon + "sunriseSunset.json", nowDateTime);
