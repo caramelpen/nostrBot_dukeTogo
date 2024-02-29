@@ -18,6 +18,7 @@ let apiKey = "";
 let postKb = 0;
 let replyChr = "";
 
+// 為替
 const exchangeRate = async (relay, ev, funcJson, autoReactionJson) => {
     try {
         // フィードのポストの中にjsonで設定した値が存在するなら真
@@ -122,6 +123,7 @@ const exchangeRate = async (relay, ev, funcJson, autoReactionJson) => {
 
 }
 
+// 通常反応リプライ
 const normalAutoReply = async (relay, ev, funcJson, autoReactionJson) => {
     try {
         // フィードのポストの中にjsonで設定した値が存在するなら真

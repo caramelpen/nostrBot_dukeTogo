@@ -246,8 +246,10 @@ module.exports = {
     currDateTime
     ,currUnixtime
     // ,getCliArg
-    ,asyncJsonOpen, jsonOpen, jsonSetandOpen
-    ,asyncWriteJsonFile, writeJsonFile
+    //,asyncJsonOpen
+    , jsonOpen, jsonSetandOpen
+    //,asyncWriteJsonFile
+    , writeJsonFile
     ,asyncIsFileExists, isFileExists
     ,isSafeToReply
     ,random
