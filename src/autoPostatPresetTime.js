@@ -199,6 +199,20 @@ const composePost = (postChar) => {
 };
 
 
+// ディスパッチのオブジェクト
+const funcObj = {
+    subPresetPost           // 定刻ポスト
+    ,subSunriseSunset       // 日の出日の入ポスト
+}
+
+// ディスパッチの設定値
+const funcConfig = {
+    funcName: ["subPresetPost", "subSunriseSunset" ]        // useJsonFile の記述順と対応させる
+    ,useJsonFile: ["presetDate.json", "sunriseSunset.json"] // funcName の記述順と対応させる
+    ,operationCategory: [0, 1]                              // 1ならGitHubへプッシュコミット（useJsonFileやuncName の記述順と対応させる）
+}
+
+
 
 
 
@@ -232,26 +246,21 @@ const main = async () => {
         gitToken = process.env.GIT_TOKEN;
         gitBranch = process.env.GIT_BRANCH;
 
-        for (let i = 1; i <= 2; i++) {
+        for(let i = 0; i <= funcConfig.funcName.length - 1; i++) {            
             let postSubject = false;
             let connectedSw = 0;
+            let sunriseSunsetPath = "";
+            const jsonPathCommon = "../../config/"; // configの場所はここからみれば../config/だが、util関数の場所から見れば../../config/となる
 
             try {
+                // 処理の実行はディスパッチで行い、スリム化をはかる
+                postSubject = await funcObj[funcConfig.funcName[i]](jsonPathCommon + funcConfig.useJsonFile[i], nowDateTime);
 
-                let sunriseSunsetPath = "";
-                const jsonPathCommon = "../../config/"; // configの場所はここからみれば../config/だが、util関数の場所から見れば../../config/となる
-                if(i === 1) {
-
-                    // 定刻ポスト
-                    postSubject = subPresetPost(jsonPathCommon + "presetDate.json", nowDateTime);
-
-                } else {
-
-                    // 日の出日の入ポスト
-                    postSubject = subSunriseSunset(jsonPathCommon + "sunriseSunset.json", nowDateTime);
-
+                if(funcConfig.operationCategory[i] === 1) {
+                    // 日の出日の入りjsonファイルの場所の設定
+                    sunriseSunsetPath = jsonPath.join(__dirname, "../config/sunriseSunset.json");
                 }
-
+                
                 if(postSubject) {
 
                     // リレー
@@ -270,7 +279,7 @@ const main = async () => {
                     publishToRelay(relay, postEv);
 
                     // 日の出日の入りポストなら更新されたjsonファイルをGitHubへプッシュする
-                    if(i === 2) {
+                    if(funcConfig.operationCategory[i] === 1) {
                         // GitHubへプッシュする
                         if(sunriseSunsetJson.gitHubPush === 1) {
                             const fileNamewk = sunriseSunsetPath.split("/").pop();
