@@ -1,3 +1,6 @@
+## ver.240301
+- `functionalPosting.json`を追加し`autoReply.js`に機能リプライ機能の追加
+
 ## ver.240225
 - `exchangeRate.json`を追加し`autoReply.js`に通貨為替レート機能の追加
 
