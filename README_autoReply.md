@@ -9,13 +9,15 @@
 
 - 3-2-1. functionalPosting
   - フィードを購読し、`functionalPosting.json`の`orgPost`プロパティに設定してある値を発見し、その前方に`autoReaction.json`の`nativeWords`プロパティに設定してある語句があれば、  `functionalPosting.json`の`replyPostChar`プロパティの値をリプライします
+  - 処理が終わったら3-2-2.へ進みます
   
-- 3-2-2.フィードを購読し、配列で設定してある`exchangeRate.json`の`orgPost`プロパティに設定された語句をフィードに「発見」した場合、  
+- 3-2-2. exchangeRate
+  - フィードを購読し、配列で設定してある`exchangeRate.json`の`orgPost`プロパティに設定された語句をフィードに「発見」した場合、  
 `sw`プロパティの値が1なら`orgPost`プロパティで発見した語句を挟んだ通貨単位を使って為替レートをポストし、  
 `sw`プロパティの値が1以外なら全通貨のリストをポストします(0.で`axios`をインストールしているのはこのためです)
-- `open exchange rates`にユーザ登録することで得られるAPIキーを`.env`ファイルの`OPEN_EXCHANGE_RATES_API`に設定します
-- フィードを購読し、配列で設定してある`exchangeRate.json`の`orgPost`プロパティに設定された語句をフィードに「発見できなかった」場合は、3-2-2.へ進みます
-- もし`open exchange rates`のAPIキーを取得していない場合は`.env`ファイルの`OPEN_EXCHANGE_RATES_API`を未設定にしておけば、この機能は行わず3-2-2.へ進みます
+  - `open exchange rates`にユーザ登録することで得られるAPIキーを`.env`ファイルの`OPEN_EXCHANGE_RATES_API`に設定します
+  - フィードを購読し、配列で設定してある`exchangeRate.json`の`orgPost`プロパティに設定された語句をフィードに「発見できなかった」場合は、3-2-3.へ進みます
+  - もし`open exchange rates`のAPIキーを取得していない場合は`.env`ファイルの`OPEN_EXCHANGE_RATES_API`を未設定にしておけば、この機能は行わず3-2-2.へ進みます
 
 - 3-2-3.フィードを購読し、配列で設定してある`autoReply.json`の`orgPost`プロパティに設定された語句をフィードに発見した場合、以下の動作をします
 
