@@ -19,6 +19,7 @@ let postEv;
 let relayUrl = "";
 
 let sunriseorSunset = "";
+let sunriseSunsetJsonPath = "";
 
 let gitUserName = "";
 let gitRepoName = "";
@@ -169,7 +170,7 @@ const subSunriseSunset = (sunriseSunsetPath, nowDateTime) => {
             postEv = composePost(postChrConst + sunriseSunsetJson[sunriseorSunsetPost][postIdx]);
 
             // 今回の投稿が日の出なら次の日の出、日の入りなら次の日の入りの時刻を json ファイルの sunRise(sunSet) プロパティへ書き込む
-            writeJsonFile(sunriseSunsetPath, sunriseorSunset, nextSunriseorSunset, -1);
+            writeJsonFile(sunriseSunsetJsonPath, sunriseorSunset, nextSunriseorSunset, -1);
             console.log("write json(" + sunriseorSunset + "):" + nextSunriseorSunset);
             return true;
         } else {
@@ -252,18 +253,19 @@ const main = async () => {
         for(let i = 0; i <= funcConfig.funcName.length - 1; i++) {            
             let postSubject = false;
             let connectedSw = 0;
-            let sunriseSunsetPath = "";
+            sunriseSunsetJsonPath = "";
             const jsonPathCommon = "../../config/"; // configの場所はここからみれば../config/だが、util関数の場所から見れば../../config/となる
 
             try {
+                
+                if(funcConfig.operationCategory[i] === 1) {
+                    // 日の出日の入りjsonファイルの場所の設定
+                    sunriseSunsetJsonPath = jsonPath.join(__dirname, "../config/sunriseSunset.json");
+                }
+
                 // 処理の実行はディスパッチで行い、スリム化をはかる
                 postSubject = await funcObj[funcConfig.funcName[i]](jsonPathCommon + funcConfig.useJsonFile[i], nowDateTime);
 
-                if(funcConfig.operationCategory[i] === 1) {
-                    // 日の出日の入りjsonファイルの場所の設定
-                    sunriseSunsetPath = jsonPath.join(__dirname, "../config/sunriseSunset.json");
-                }
-                
                 if(postSubject) {
 
                     // リレー
@@ -285,9 +287,9 @@ const main = async () => {
                     if(funcConfig.operationCategory[i] === 1) {
                         // GitHubへプッシュする
                         if(sunriseSunsetJson.gitHubPush === 1) {
-                            const fileNamewk = sunriseSunsetPath.split("/").pop();
+                            const fileNamewk = sunriseSunsetJsonPath.split("/").pop();
                             const sunriseSunsetPathSingle = `config/${fileNamewk}`; // "../config/sunriseSunset.json" を "config/sunriseSunset.json" の形にする
-                            await toGitHubPush(gitRepoName, sunriseSunsetPath, sunriseSunsetPathSingle, gitUserName, gitToken, "[auto](" + sunriseorSunset + ")daily update", gitBranch);
+                            await toGitHubPush(gitRepoName, sunriseSunsetJsonPath, sunriseSunsetPathSingle, gitUserName, gitToken, "[auto](" + sunriseorSunset + ")daily update", gitBranch);
                             console.log("sunriseSunset.json is commit/push");
                         }
                     }
