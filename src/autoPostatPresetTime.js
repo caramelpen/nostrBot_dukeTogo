@@ -246,6 +246,9 @@ const main = async () => {
         gitToken = process.env.GIT_TOKEN;
         gitBranch = process.env.GIT_BRANCH;
 
+        // jsonの場所を割り出すために
+        const jsonPath = require("path");
+
         for(let i = 0; i <= funcConfig.funcName.length - 1; i++) {            
             let postSubject = false;
             let connectedSw = 0;
