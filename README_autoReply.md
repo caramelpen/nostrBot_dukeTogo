@@ -4,16 +4,20 @@
 
 ### 詳細
 
-- 3-2-0. `autoReplyPriorityOrder.json`の`funcName`プロパティに設定してある関数の順に処理を行います(各関数で使用するjsonファイルは`useJsonFile`プロパティに対応する順で設定します)
+- 3-2-0. 現状の機能として、このbotの機能を答える`functionalPosting`、通貨の為替を答える`exchangeRate`、通常リプライである`normalAutoReply`に対応しています
+  - `functionalPosting`、`exchangeRate`、`normalAutoReply`の優先順で機能し、`exchangeRate`が該当してポストを行った場合は、`normalAutoReply`は実行しません
+
+- 3-2-1. functionalPosting
+  - フィードを購読し、`functionalPosting.json`の`orgPost`プロパティに設定してある値を発見し、その前方に`autoReaction.json`の`nativeWords`プロパティに設定してある語句があれば、  `functionalPosting.json`の`replyPostChar`プロパティの値をリプライします
   
-- 3-2-1.フィードを購読し、配列で設定してある`exchangeRate.json`の`orgPost`プロパティに設定された語句をフィードに「発見」した場合、  
+- 3-2-2.フィードを購読し、配列で設定してある`exchangeRate.json`の`orgPost`プロパティに設定された語句をフィードに「発見」した場合、  
 `sw`プロパティの値が1なら`orgPost`プロパティで発見した語句を挟んだ通貨単位を使って為替レートをポストし、  
 `sw`プロパティの値が1以外なら全通貨のリストをポストします(0.で`axios`をインストールしているのはこのためです)
 - `open exchange rates`にユーザ登録することで得られるAPIキーを`.env`ファイルの`OPEN_EXCHANGE_RATES_API`に設定します
 - フィードを購読し、配列で設定してある`exchangeRate.json`の`orgPost`プロパティに設定された語句をフィードに「発見できなかった」場合は、3-2-2.へ進みます
 - もし`open exchange rates`のAPIキーを取得していない場合は`.env`ファイルの`OPEN_EXCHANGE_RATES_API`を未設定にしておけば、この機能は行わず3-2-2.へ進みます
 
-- 3-2-2.フィードを購読し、配列で設定してある`exchangeRate.json`の`orgPost`プロパティに設定された語句をフィードに発見した場合、以下の動作をします
+- 3-2-3.フィードを購読し、配列で設定してある`autoReply.json`の`orgPost`プロパティに設定された語句をフィードに発見した場合、以下の動作をします
 
 | No. | 反応語句 | 反応元投稿者 | 投稿内に固有設定値 | 作動確率 | 作動内容 |
 |:-:|:-:|:-:|:-:|:-:|:-:|
@@ -30,7 +34,7 @@
 (※D)全反応語句に設定されたリプライ語句全てからランダム  
 (※E)リアクションカスタム絵文字の設定からランダムで取得したカスタム絵文字が規定絵文字なら規定絵文字を使用したリアクションのみ、カスタム絵文字ならその絵文字でリアクションとリプライ
 
-- 3-2-3.フィードを購読し、配列で設定してある`autoReply.json`の`orgPost`プロパティに設定された語句をフィードに「発見」(No.1～3)  
+- 3-2-4.フィードを購読し、配列で設定してある`autoReply.json`の`orgPost`プロパティに設定された語句をフィードに「発見」(No.1～3)  
   - 1.`.env`ファイルの`admin_HEX_PUBKEY`(HEX値で設定してください) に設定した管理者の公開鍵のポストに対する反応なら、`autoReaction.json`の`nativeWords`プロパティに設定してある語句の有無に関係なく、`autoReply.json`の `replyPostChar`プロパティからランダム(※1)でリプライ語句を決定しリプライします
 
   - 2.管理者以外のポストに対する反応の場合、反応語句の前方に`autoReaction.json`の`nativeWords`プロパティの設定値を発見すると、`autoReply.json`の`replyPostChar`プロパティからランダム(※1)でリプライ語句を決定しリプライします
@@ -39,7 +43,7 @@
   - 3.において確率を満たせなかった場合は、その確率の倍で再度判定を行い、満たせば配列で設定してある`autoReaction.json`の`contentReaction`プロパティからランダム(※1)でリアクションするカスタム絵文字を取得し、その取得した要素番目に対応する`autoReaction.json`の`reactionImgURL`が設定してあるならその`reactionImgURL`でリアクションします（`reactionImgURL`に値が設定されているか100回繰り返し、設定された`reactionImgURL`を取得できた時点で繰り返しを終了します　100回繰り返しても`reactionImgURL`を取得できなければリアクションは行いません）
 
 
-- 3-2-4.フィードを購読し、配列で設定してある`autoReply.json`の`orgPost`プロパティに設定された語句をフィードから「未発見」(No.4～6)
+- 3-2-5.フィードを購読し、配列で設定してある`autoReply.json`の`orgPost`プロパティに設定された語句をフィードから「未発見」(No.4～6)
   - 4.`.env`ファイルの`admin_HEX_PUBKEY`(HEX値で設定してください) に設定した管理者の公開鍵のポストであり、`autoReaction.json`の`nativeWords`プロパティに設定してある語句を含むポストなら、`autoReply.json`の全`replyPostChar`からランダム(※1)でリプライ語句を決定しリプライします
 
   - 5.`.env`ファイルの`admin_HEX_PUBKEY`(HEX値で設定してください) に設定した管理者の公開鍵のポストであり、`autoReaction.json`の`nativeWords`プロパティに設定してある語句そのもののポストなら、配列で設定してある`autoReaction.json`の`contentReaction`プロパティからランダム(※1)でリアクションするカスタム絵文字を取得し、その取得した要素番目に対応する`autoReaction.json`の`reactionImgURL`プロパティでリアクションし、さらに`autoReaction.json`の`reactionImgURL`プロパティを使用してリプライも行います  
