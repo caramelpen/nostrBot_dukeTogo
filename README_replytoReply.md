@@ -1,6 +1,11 @@
 ### 3-4.replytoReply.js
-- 本botへのリプライに対し、受けたリプライ文字列の中に`autoReply.json`の`orgPost`プロパティに設定してある反応語句が含まれていたら、その反応語句に対応する`replyPostChar`プロパティ内からランダム(※1)でリプライ語句を選んでリプライします
-- 本botへのリプライに対し、受けたリプライ文字列の中に`autoReply.json`の`orgPost`プロパティに設定してある反応語句が含まれていないのなら、`autoReply.json`の全`replyPostChar`プロパティからランダム(※1)でリプライ語句を決定しリプライ投稿者へそのリプライ語句をリプライします(つまり受けたリプライの内容に即さない語句を使用してのリプライになります)
+- 3-4-1. functionalPosting
+  - フィードを購読し、`functionalPosting.json`の`orgPost`プロパティに設定してある値を発見し、その前方に`autoReaction.json`の`nativeWords`プロパティに設定してある語句があれば、  `functionalPosting.json`の`replyPostChar`プロパティの値をリプライします
+  - 処理が終わったら3-4-2.へ進みます
+
+- 3-4-2. 
+  - 本botへのリプライに対し、受けたリプライ文字列の中に`autoReply.json`の`orgPost`プロパティに設定してある反応語句が含まれていたら、その反応語句に対応する`replyPostChar`プロパティ内からランダム(※1)でリプライ語句を選んでリプライします
+  - 本botへのリプライに対し、受けたリプライ文字列の中に`autoReply.json`の`orgPost`プロパティに設定してある反応語句が含まれていないのなら、`autoReply.json`の全`replyPostChar`プロパティからランダム(※1)でリプライ語句を決定しリプライ投稿者へそのリプライ語句をリプライします(つまり受けたリプライの内容に即さない語句を使用してのリプライになります)
 
 
 
