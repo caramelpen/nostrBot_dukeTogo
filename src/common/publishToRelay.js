@@ -25,5 +25,5 @@ relay.publish(ev).then(()=>{
  */
 module.exports = {
     publishToRelay
-  };
+};
   
