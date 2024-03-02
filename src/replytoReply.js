@@ -5,7 +5,7 @@
  */
 require("websocket-polyfill");
 const { relayInit, getPublicKey, finishEvent, nip19 } = require("nostr-tools");
-const { currUnixtime, random, jsonOpen, jsonSetandOpen, isSafeToReply } = require("./common/utils.js");
+const { currUnixtime, random, jsonSetandOpen, isSafeToReply } = require("./common/utils.js");
 const { publishToRelay } = require("./common/publishToRelay.js");
 
 let relayUrl = "";
@@ -14,15 +14,10 @@ let pubkey = "";
 
 const replytoReply = async (relay)=>{
 
-    // // jsonの場所を割り出すために
-    // const jsonPath = require("path");
-    // // リプライ語句入りjsonファイルの場所の設定（自動リプライ時に使用しているjsonの反応語句をそのまま利用する）
-    // const replyChrJsonPath = jsonPath.join(__dirname, "../config/autoReply.json");
-    // 反応語句の格納されたjsonを取得
-    // const replyChrJson = jsonOpen(replyChrJsonPath);
-
-    // jsonの場所を割り出しとリプライ語句入りjsonファイルの場所の設定（自動リプライ時に使用しているjsonの反応語句をそのまま利用する）
-    const replyChrJson = await jsonSetandOpen("../../config/autoReply.json");  // configの場所はここからみれば../config/だが、util関数の場所から見れば../../config/となる
+    // jsonの場所の割り出しとリプライ語句入りjsonファイルの場所の設定（自動リプライ時に使用しているjsonの反応語句をそのまま利用する）
+    const commonPath = "../../config/"  // configの場所はここからみれば../config/だが、util関数の場所から見れば../../config/となる
+    const functionalPostingJson = await jsonSetandOpen(commonPath + "functionalPosting.json");
+    const replyChrJson = await jsonSetandOpen(commonPath + "autoReply.json");
     if(replyChrJson === null){
         console.error("replytoReply:json file is not get");
         return false;
@@ -47,8 +42,20 @@ const replytoReply = async (relay)=>{
                 if (isSafeToReply(ev)) {
                     // 作動区分
                     let postKb = 0;
-                    // フィードのポストの中にjsonで設定した値が存在するなら真
-                    const target = replyChrJson.find(item => item.orgPost.some(post => ev.content.includes(post)));
+                    let jsonTarget = functionalPostingJson !== null? functionalPostingJson: replyChrJson; // 機能ポストを優先させる
+                    let isfunctionalPostingJson = true;
+
+                    let target = null;
+                    for(let i = 1; i <= 2; i++) {
+                        // フィードのポストの中にjsonで設定した値が存在するなら真
+                        target = jsonTarget.find(item => item.orgPost.some(post => ev.content.includes(post)));
+                        if(!target) {
+                            jsonTarget = replyChrJson;
+                            isfunctionalPostingJson = false;
+                        } else {
+                            break;
+                        }
+                    }
                     // 反応語句を見つけたならそれに対応するリプライ語句を使ってリプライを返す
                     if(target) {
 
@@ -57,6 +64,9 @@ const replytoReply = async (relay)=>{
                         // 反応語句は存在するはずだが、もし何らかの理由で見つからなかったら
                         if(orgPostIdx === -1) {
                             postKb = 1; // 全リプライ語句からのランダムリプライ
+                            if(isfunctionalPostingJson == true) {
+                                postKb = 0; // ありえないと思うが、起こったら何も行わない
+                            }
                         } else {
                             postKb = 2; //反応語句に対応するリプライ語句を使ってリプライを返す
                         }
@@ -70,17 +80,25 @@ const replytoReply = async (relay)=>{
                         let replyChr = "";
                         if(postKb === 1){
                             // 反応語句配列の数の範囲からランダム値を取得し、それを配列要素とする
-                            const replyChrPresetIdx = random(0, replyChrJson.length - 1);
+                            const replyChrPresetIdx = random(0, jsonTarget.length - 1);
                             // 配列要素を決めたら、その配列に設定されている反応語句の設定配列の範囲からさらにランダム値を取得
-                            const replyChrIdx = random(0, replyChrJson[replyChrPresetIdx].replyPostChar.length - 1);
+                            const replyChrIdx = random(0, jsonTarget[replyChrPresetIdx].replyPostChar.length - 1);
                             // リプライ語句決定
-                            replyChr = replyChrJson[replyChrPresetIdx].replyPostChar[replyChrIdx];
+                            replyChr = jsonTarget[replyChrPresetIdx].replyPostChar[replyChrIdx];
                         } else {
                             if(postKb === 2) {
-                                // jsonに設定されている対応するリプライの数を利用してランダムでリプライ語句を決める
-                                const randomIdx = random(0, target.replyPostChar.length - 1);
-                                // リプライ語句決定
-                                replyChr = target.replyPostChar[randomIdx];
+                                // 機能ポスト
+                                if(isfunctionalPostingJson == true) {
+                                    for(let i = 0; i <= target.replyPostChar.length - 1; i++) {
+                                        replyChr += target.replyPostChar[i];
+                                    }
+                                } else {
+
+                                    // jsonに設定されている対応するリプライの数を利用してランダムでリプライ語句を決める
+                                    const randomIdx = random(0, target.replyPostChar.length - 1);
+                                    // リプライ語句決定
+                                    replyChr = target.replyPostChar[randomIdx];
+                                }
                             }
                         }
                         if(replyChr.length > 0) {   //念のため

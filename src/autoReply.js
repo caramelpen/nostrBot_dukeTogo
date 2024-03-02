@@ -13,7 +13,6 @@ let relayUrl = "";
 let BOT_PRIVATE_KEY_HEX = "";
 let pubkey = "";
 let adminPubkey = "";
-let apiKey = "";
 // 作動区分
 let postCategory = 0;
 let replyChr = "";
@@ -108,7 +107,7 @@ const exchangeRate = async (relay, ev, exchangeRate, autoReactionJson) => {
         replyChr = "";
 
         // 通貨反応語句が存在し、フィードのポストがjsonの nativeWords プロパティそのものではなくて、 nativeWords を含んでいる（APIキーが取得できていて当然）
-        if(apiKey.length > 0 && priorityTarget && isIncludeWord) {
+        if(priorityTarget && isIncludeWord) {
             let arrayRet = [];
 
             // 投稿者が管理者
@@ -152,7 +151,7 @@ const exchangeRate = async (relay, ev, exchangeRate, autoReactionJson) => {
                                 replyChr = priorityTarget.nonGet[0];
                                 postCategory = 1;    // 通貨単位は無効であることをポストするので有効とする
                             } else {
-                                replyChr = "1 " + preceding + " は " + arrayRet[0] + " " + following + " " + priorityTarget.replyPostChar[0];
+                                replyChr = "1 " + preceding + " は " + parseFloat(arrayRet[0]).toLocaleString() + " " + following + " " + priorityTarget.replyPostChar[0];
                             }
                         }
                     // 通貨一覧
@@ -441,38 +440,44 @@ const  getAvailableCurrencies = async (baseCurrency, targetCurrency, funcSw ) =>
         }
     }
 
-    // Open Exchange Rates のエンドポイント
-    const API_URL_LATEST = "https://openexchangerates.org/api/latest.json";
-
     try {
 
-        const allCurrencies = await axios.get(API_URL_LATEST, {
-            headers: {"Authorization": `Token ${apiKey}`}
-        });
-
+        const API_URL_Asset = "https://api.kraken.com/0/public/AssetPairs";
+        const responseAsset = await axios.get(API_URL_Asset);
+        const dataAsset = responseAsset.data;
+        const assetPairs = dataAsset.result;
+        const baseCurrencies = Object.values(assetPairs).map(pairData => pairData.wsname);
         // 通貨リストを収める
-        const currencies = allCurrencies.data.rates;
-        for (const currency in currencies) {
+        currencyList = [];
+        for (let i = 0; i <= baseCurrencies.length - 1; i++) {
+            let wkcu = [];
+            // 「/」を分割
+            wkcu = baseCurrencies[i].split("/");
             // push() メソッドを使用して値を追加
-            currencyList.push(currency);
+            currencyList.push(wkcu[0]);
+            currencyList.push(wkcu[1]);
         }
-        
+        // 重複を除去
+        const uniquecurrencyList = [...new Set(currencyList)];
+        const API_URL = "https://api.kraken.com/0/public/Ticker";
+        const pair = baseCurrency + targetCurrency;
+
         // 為替レート
         if(funcSw === 1) {
-            // 引数の通貨は存在しているか
-            if(currencyList.includes(baseCurrency) && currencyList.includes(targetCurrency)) {
-                const API_URL = "https://open.er-api.com/v6/latest/" + baseCurrency;
-                const bases = await axios.get(API_URL, {
-                    headers: {"Authorization": `Token ${apiKey}`}
-                });
-                const exchangeRate = bases.data.rates[targetCurrency];
-                arrayRet.push(exchangeRate);    // 通貨リストの返りは配列なので、こっちも配列にして揃える
+            const response = await axios.get(`${API_URL}?pair=${pair}`);
+            const data = response.data;
+            if (data.error && data.error.length) {
+                // 取得できない場合はなにもしない
+            } else {
+                const pairInfo = data.result[Object.keys(data.result)[0]]; // レスポンス内の最初のペアを取得
+                const lastTrade = pairInfo.c[0]; // 最終取引価格
+                arrayRet.push(lastTrade);
             }
             return arrayRet;
 
         } else {
             // 通貨リストをそのまま返す
-            return currencyList;
+            return uniquecurrencyList;
         }
 
     } catch (err) {
@@ -561,8 +566,6 @@ const main = async () => {
     pubkey = getPublicKey(BOT_PRIVATE_KEY_HEX);               // 秘密鍵から公開鍵の取得
     adminPubkey = process.env.admin_HEX_PUBKEY;               // bot管理者の公開鍵の取得
     relayUrl = process.env.RELAY_URL;                         // リレーURL
-    apiKey = process.env.OPEN_EXCHANGE_RATES_API;             // open exchange rates のAPI
-
 
     // リレー
     const relay = await relayInit(relayUrl);
