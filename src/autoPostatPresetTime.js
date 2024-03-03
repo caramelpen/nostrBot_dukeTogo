@@ -289,7 +289,7 @@ const main = async () => {
                         if(sunriseSunsetJson.gitHubPush === 1) {
                             const fileNamewk = sunriseSunsetJsonPath.split("/").pop();
                             const sunriseSunsetPathSingle = `config/${fileNamewk}`; // "../config/sunriseSunset.json" を "config/sunriseSunset.json" の形にする
-                            await toGitHubPush(gitRepoName, sunriseSunsetJsonPath, sunriseSunsetPathSingle, gitUserName, gitToken, "[auto](" + sunriseorSunset + ")daily update", gitBranch);
+                            await toGitHubPush(gitRepoName, sunriseSunsetJsonPath, sunriseSunsetPathSingle, gitUserName, gitToken, "[auto/" + sunriseorSunset + "] daily update", gitBranch);
                             console.log("sunriseSunset.json is commit/push");
                         }
                     }
