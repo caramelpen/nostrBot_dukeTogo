@@ -17,10 +17,12 @@ let adminPubkey = "";
 let postCategory = 0;
 let replyChr = "";
 // let isFromReplytoReply = false;
+// global.retPostCategory = 0;
 
 
 // 機能投稿
 const functionalPosting = async (relay, ev, functionalPostingJson, autoReactionJson) => {
+    // global.retPostCategory = 0;
     try {
         // フィードのポストの中にjsonで設定した値が存在するなら真
         const target = functionalPostingJson.find(item => item.orgPost.some(post => ev.content.includes(post)));
@@ -28,6 +30,7 @@ const functionalPosting = async (relay, ev, functionalPostingJson, autoReactionJ
         const isNativeWords = autoReactionJson.nativeWords.length > 0 && autoReactionJson.nativeWords.some(name => name === ev.content) ? true : false;
         // フィードのポストがjsonの nativeWords プロパティそのものではなくて、 nativeWords を含んでいるなら真
         const isIncludeWord = !isNativeWords && autoReactionJson.nativeWords.some(element => (ev.content).includes(element)) ? true : false;
+        // let isIncludeWord = !isNativeWords && autoReactionJson.nativeWords.some(element => (ev.content).includes(element)) ? true : false;
         // if(isFromReplytoReply) {
         //     isIncludeWord = true;
         // }
@@ -79,17 +82,18 @@ const functionalPosting = async (relay, ev, functionalPostingJson, autoReactionJ
                     postCategory = 1;
                 }
 
+                // global.retPostCategory = postCategory;
                 // 作動対象だ
                 if(postCategory > 0) {
                     // リプライやリアクションしても安全なら、リプライイベントやリアクションイベントを組み立てて送信する
                     if (isSafeToReply(ev)) {
                         // リプライ
+                        const replyPost = composeReply(replyChr, ev);
                         // let replyPost = null;
                         // if(isFromReplytoReply) {
                         //     replyPost = composeReplytoReply(replyChr, ev);
                         // } else {
-                            const replyPost = composeReply(replyChr, ev);
-                            //replyPost = composeReply(replyChr, ev);
+                        //     replyPost = composeReply(replyChr, ev);
                         // }
                         publishToRelay(relay, replyPost);
                     }
@@ -105,6 +109,7 @@ const functionalPosting = async (relay, ev, functionalPostingJson, autoReactionJ
 
 // 為替
 const exchangeRate = async (relay, ev, exchangeRate, autoReactionJson) => {
+    //global.retPostCategory = 0;
     try {
         // フィードのポストの中にjsonで設定した値が存在するなら真
         const priorityTarget = exchangeRate.find(item => item.orgPost.some(post => ev.content.includes(post)));
@@ -112,6 +117,7 @@ const exchangeRate = async (relay, ev, exchangeRate, autoReactionJson) => {
         const isNativeWords = autoReactionJson.nativeWords.length > 0 && autoReactionJson.nativeWords.some(name => name === ev.content) ? true : false;
         // フィードのポストがjsonの nativeWords プロパティそのものではなくて、 nativeWords を含んでいるなら真
         const isIncludeWord = !isNativeWords && autoReactionJson.nativeWords.some(element => (ev.content).includes(element)) ? true : false;
+        // let isIncludeWord = !isNativeWords && autoReactionJson.nativeWords.some(element => (ev.content).includes(element)) ? true : false;
         // if(isFromReplytoReply) {
         //     isIncludeWord = true;
         // }
@@ -197,17 +203,18 @@ const exchangeRate = async (relay, ev, exchangeRate, autoReactionJson) => {
                 }
             }
         }
+        // global.retPostCategory = postCategory;
         // 作動対象だ
         if(postCategory > 0) {
             // リプライやリアクションしても安全なら、リプライイベントやリアクションイベントを組み立てて送信する
             if (isSafeToReply(ev)) {
                 // リプライ
+                const replyPostorreactionPost = composeReply(replyChr, ev);
                 // let replyPostorreactionPost = null;
                 // if(isFromReplytoReply) {
                 //     replyPostorreactionPost = composeReplytoReply(replyChr, ev);
                 // } else {
-                    const replyPostorreactionPost = composeReply(replyChr, ev);
-                    //replyPostorreactionPost = composeReply(replyChr, ev);
+                //     replyPostorreactionPost = composeReply(replyChr, ev);
                 // }
                 publishToRelay(relay, replyPostorreactionPost);
             }
@@ -223,6 +230,7 @@ const exchangeRate = async (relay, ev, exchangeRate, autoReactionJson) => {
 
 // 通常反応リプライ
 const normalAutoReply = async (relay, ev, autoReplyJson, autoReactionJson) => {
+    //global.retPostCategory = 0;
     try {
         // フィードのポストの中にjsonで設定した値が存在するなら真
         const target = autoReplyJson.find(item => item.orgPost.some(post => ev.content.includes(post)));
@@ -230,6 +238,7 @@ const normalAutoReply = async (relay, ev, autoReplyJson, autoReactionJson) => {
         const isNativeWords = autoReactionJson.nativeWords.length > 0 && autoReactionJson.nativeWords.some(name => name === ev.content) ? true : false;
         // フィードのポストがjsonの nativeWords プロパティそのものではなくて、 nativeWords を含んでいるなら真
         const isIncludeWord = !isNativeWords && autoReactionJson.nativeWords.some(element => (ev.content).includes(element)) ? true : false; 
+        // let isIncludeWord = !isNativeWords && autoReactionJson.nativeWords.some(element => (ev.content).includes(element)) ? true : false; 
         // if(isFromReplytoReply) {
         //     isIncludeWord = true;
         // }
@@ -316,6 +325,7 @@ const normalAutoReply = async (relay, ev, autoReplyJson, autoReactionJson) => {
 
         }
 
+        // global.retPostCategory = postCategory;
         // 作動対象だ
         if(postCategory > 0) {
             replyChr = "";
@@ -396,6 +406,11 @@ const normalAutoReply = async (relay, ev, autoReplyJson, autoReactionJson) => {
     }
 }
 
+// const setFromReplytoReply = () => {
+//     isFromReplytoReply = true;
+// };
+
+
 
 // ディスパッチのオブジェクト
 const funcObj = {
@@ -418,25 +433,11 @@ const autoReply = async (relay) => {
             { kinds: [1] }
         ]
     );
-    // let sub = null;
-    // if(isFromReplytoReply) {
-    //     sub = relay.sub(
-    //         [
-    //             { "kinds": [1], "#p":[pubkey] }
-    //         ]
-    //     );
-    // } else {
-    //     sub = relay.sub(
-    //         [
-    //             { kinds: [1] }
-    //         ]
-    //     );
-    // }
+
     sub.on("event", async (ev) => {
         try {
             // 有効とするのはtagが空のもののみ
             if(ev.tags.length <= 0) {
-            //if( (!isFromReplytoReply && ev.tags.length <= 0) || (isFromReplytoReply && ev.tags.length > 0)) {
                 const jsonCommonPath = "../../config/";    // configの場所はここからみれば../config/だが、util関数の場所から見れば../../config/となる
                 // jsonの場所の割り出しと設定
                 const autoReactionJson = await jsonSetandOpen(jsonCommonPath + "autoReaction.json");    
@@ -467,13 +468,7 @@ const autoReply = async (relay) => {
     });
 }
 
-// const autoReplyfromReplytoReply = (orgRelay, orgPbKey, orgPubkey) => {
-//     relay = orgRelay;
-//     BOT_PRIVATE_KEY_HEX = orgPbKey;
-//     pubkey = orgPubkey;
-//     isFromReplytoReply = true;
-//     autoReply(relay);
-// }
+
 
 // 投稿者の公開キー evPubkey のフォローの中に自分の公開キー pubkey がいるなら真
 const chkMyFollower = (relay, evPubkey) => {
@@ -562,21 +557,21 @@ const  getAvailableCurrencies = async (baseCurrency, targetCurrency, funcSw ) =>
 }
 
 
-// テキスト投稿イベント(リプライ)を組み立てる
-const composeReplytoReply = (content, targetEvent) => {
-    const ev = {
-        kind: 1,
-        content,
-        tags: [ 
-            ["p", targetEvent.pubkey, ""],
-            ["e", targetEvent.id, ""] 
-        ],
-        created_at: currUnixtime()
-    };
+// // テキスト投稿イベント(リプライ)を組み立てる
+// const composeReplytoReply = (content, targetEvent) => {
+//     const ev = {
+//         kind: 1,
+//         content,
+//         tags: [ 
+//             ["p", targetEvent.pubkey, ""],
+//             ["e", targetEvent.id, ""] 
+//         ],
+//         created_at: currUnixtime()
+//     };
 
-    // イベントID(ハッシュ値)計算・署名
-    return finishEvent(ev, BOT_PRIVATE_KEY_HEX);
-};
+//     // イベントID(ハッシュ値)計算・署名
+//     return finishEvent(ev, BOT_PRIVATE_KEY_HEX);
+// };
 
 
 // リプライイベントを組み立てる
@@ -685,5 +680,9 @@ main();
 //  * module.exports
 //  */
 // module.exports = {
-//     autoReplyfromReplytoReply
+//     functionalPosting   // 機能ポスト
+//     ,exchangeRate       // 為替ポスト
+//     ,normalAutoReply    // 通常リプライ
+//     ,setFromReplytoReply
 // };
+  

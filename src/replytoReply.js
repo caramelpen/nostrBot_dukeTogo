@@ -7,7 +7,6 @@ require("websocket-polyfill");
 const { relayInit, getPublicKey, finishEvent, nip19 } = require("nostr-tools");
 const { currUnixtime, random, jsonSetandOpen, isSafeToReply } = require("./common/utils.js");
 const { publishToRelay } = require("./common/publishToRelay.js");
-//const { autoReplyfromReplytoReply } = require("./autoReply.js");
 
 let relayUrl = "";
 let BOT_PRIVATE_KEY_HEX = "";
@@ -112,7 +111,7 @@ const replytoReply = async (relay)=>{
 
             }
         } catch (err) {
-            console.error(err);
+            throw err;
         }
     });
 
@@ -181,7 +180,6 @@ const main = async () => {
             受けたリプライに対してjsonに設定された語句でランダムでリプライする
         */
         replytoReply(relay);
-        //autoReplyfromReplytoReply(relay, BOT_PRIVATE_KEY_HEX, pubkey);
 
     } catch(err) {
         console.error(err);
