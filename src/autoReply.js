@@ -436,8 +436,8 @@ const autoReply = async (relay) => {
 
     sub.on("event", async (ev) => {
         try {
-            // 有効とするのはtagが空のもののみ
-            if(ev.tags.length <= 0) {
+            // 有効とするのは自分の投稿以外でかつtagが空のもの
+            if(ev.pubkey !== pubkey && ev.tags.length <= 0) {
                 const jsonCommonPath = "../../config/";    // configの場所はここからみれば../config/だが、util関数の場所から見れば../../config/となる
                 // jsonの場所の割り出しと設定
                 const autoReactionJson = await jsonSetandOpen(jsonCommonPath + "autoReaction.json");    

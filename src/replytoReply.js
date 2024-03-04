@@ -35,8 +35,10 @@ const replytoReply = async (relay)=>{
     sub.on("event", (ev) => {
         try {
 
-            // (一応明示)リプライなので有効とするのはtagに値があるもののみ
-            if(ev.tags.length > 0) {
+            //(一応明示)有効とするのはリプライなのでtagに値があるもののみ
+            //if(ev.tags.length > 0) {
+            //有効とするのは自分以外の投稿と、(一応明示)リプライなのでtagに値があるもののみ
+            if(ev.pubkey !== pubkey && ev.tags.length > 0) {
 
                 // リプライしても安全なら、リプライイベントを組み立てて送信する
                 if (isSafeToReply(ev)) {
