@@ -146,13 +146,13 @@ const isFileExists = (targetFilePath) => {
 
 // 引数のイベントにリプライしても安全か?
 // 対象の発行時刻が古すぎる場合・最後にリプライを返した時点からクールタイム分の時間が経過していない場合、安全でない
-const isSafeToReply = ({ pubkey, created_at }) => {
+const isSafeToReply = ({ pubkey, created_at }, lastReplyTimePerPubkey) => {
     /* 暴走・無限リプライループ対策 */
     // リプライクールタイム
     const COOL_TIME_DUR_SEC = 60;
 
     // 公開鍵ごとに、最後にリプライを返した時刻(unixtime)を保持するMap
-    const lastReplyTimePerPubkey = new Map();
+    //const lastReplyTimePerPubkey = new Map();
 
     const now = currUnixtime();
 

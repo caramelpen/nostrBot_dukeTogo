@@ -8,6 +8,7 @@ const axios = require("axios");
 const { relayInit, getPublicKey, finishEvent, nip19 } = require("nostr-tools");
 const { currUnixtime, jsonSetandOpen, isSafeToReply, random, probabilityDetermination } = require("./common/utils.js");
 const { publishToRelay } = require("./common/publishToRelay.js");
+const lastReplyTimePerPubkey = new Map();   // 公開鍵ごとに、最後にリプライを返した時刻(unixtime)を保持するMap
 //let relay = null;
 let relayUrl = "";
 let BOT_PRIVATE_KEY_HEX = "";
@@ -86,7 +87,7 @@ const functionalPosting = async (relay, ev, functionalPostingJson, autoReactionJ
                 // 作動対象だ
                 if(postCategory > 0) {
                     // リプライやリアクションしても安全なら、リプライイベントやリアクションイベントを組み立てて送信する
-                    if (isSafeToReply(ev)) {
+                    if (isSafeToReply(ev, lastReplyTimePerPubkey)) {
                         // リプライ
                         const replyPost = composeReply(replyChr, ev);
                         // let replyPost = null;
@@ -207,7 +208,7 @@ const exchangeRate = async (relay, ev, exchangeRate, autoReactionJson) => {
         // 作動対象だ
         if(postCategory > 0) {
             // リプライやリアクションしても安全なら、リプライイベントやリアクションイベントを組み立てて送信する
-            if (isSafeToReply(ev)) {
+            if (isSafeToReply(ev, lastReplyTimePerPubkey)) {
                 // リプライ
                 const replyPostorreactionPost = composeReply(replyChr, ev);
                 // let replyPostorreactionPost = null;
@@ -331,7 +332,7 @@ const normalAutoReply = async (relay, ev, autoReplyJson, autoReactionJson) => {
             replyChr = "";
 
             // リプライやリアクションしても安全なら、リプライイベントやリアクションイベントを組み立てて送信する
-            if (isSafeToReply(ev)) {
+            if (isSafeToReply(ev, lastReplyTimePerPubkey)) {
                 let replyPostorreactionPost;
                 let randomReactionIdx;
                 if(postCategory === 1) {
