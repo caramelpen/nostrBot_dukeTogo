@@ -8,8 +8,6 @@ const { relayInit, getPublicKey, finishEvent, nip19 } = require("nostr-tools");
 const { currUnixtime, random, jsonSetandOpen, isSafeToReply } = require("./common/utils.js");
 const { publishToRelay } = require("./common/publishToRelay.js");
 
-const lastReplyTimePerPubkey = new Map();   // 公開鍵ごとに、最後にリプライを返した時刻(unixtime)を保持するMap
-
 let relayUrl = "";
 let BOT_PRIVATE_KEY_HEX = "";
 let pubkey = "";
@@ -43,7 +41,7 @@ const replytoReply = async (relay)=>{
             if(ev.pubkey !== pubkey && ev.tags.length > 0) {
 
                 // リプライしても安全なら、リプライイベントを組み立てて送信する
-                if (isSafeToReply(ev, lastReplyTimePerPubkey)) {
+                if (isSafeToReply(ev)) {
                     // 作動区分
                     let postKb = 0;
                     let jsonTarget = functionalPostingJson !== null? functionalPostingJson: replyChrJson; // 機能ポストを優先させる
