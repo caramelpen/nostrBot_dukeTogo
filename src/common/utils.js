@@ -1,5 +1,5 @@
 const crypto = require("crypto");
-const { lastReplyTimePerPubkey } = require("./common/lastReplyTimePerPubkey.js");   // 公開鍵ごとに、最後にリプライを返した時刻(unixtime)を保持するMap
+const { lastReplyTimePerPubkey } = require("./lastReplyTimePerPubkey.js");   // 公開鍵ごとに、最後にリプライを返した時刻(unixtime)を保持するMap
 
 // 現在の日本時間を取得
 const currDateTime = () => new Date();
@@ -174,8 +174,41 @@ const updateLastReplyTime = (pubkey, time) =>{
     lastReplyTimePerPubkey.set(pubkey, time);
 }
 
+// 第2引数の公開鍵が現在から1分前以内に10個以上投稿があったら偽を返す
+const retrievePostsInPeriod = (relay, pubKey) => {
+    const currUnixtime_60 = currUnixtime - 60;
 
+    return new Promise((resolve, reject) => {
+        try {
+            const sub = relay.sub([
+                { 
+                    "kinds": [1]
+                    , "authors": [pubKey]
+                    , "since": currUnixtime_60
+                }
+            ]);
+            let cnt = 0;
 
+            const eventListener = (ev) => {
+                cnt ++;
+
+                if (cnt >= 10) {
+                    sub.off("event", eventListener); // リスナーを削除
+                    resolve(false);
+                }
+            };
+
+            sub.on("event", eventListener);
+            sub.on("eose", () => {
+                console.log(cnt);
+                sub.off("event", eventListener); // リスナーを削除
+                resolve(true);
+            });
+        } catch (error) {
+            reject(false);
+        }
+    });
+}
 
 
 /**
@@ -256,7 +289,7 @@ module.exports = {
     //,asyncWriteJsonFile
     , writeJsonFile
     ,asyncIsFileExists, isFileExists
-    ,isSafeToReply, updateLastReplyTime
+    ,isSafeToReply, updateLastReplyTime, retrievePostsInPeriod
     ,random
     ,formattedDateTime
     ,probabilityDetermination

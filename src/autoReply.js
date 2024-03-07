@@ -6,7 +6,7 @@
 require("websocket-polyfill");
 const axios = require("axios");
 const { relayInit, getPublicKey, finishEvent, nip19 } = require("nostr-tools");
-const { currUnixtime, jsonSetandOpen, isSafeToReply, random, probabilityDetermination } = require("./common/utils.js");
+const { currUnixtime, jsonSetandOpen, isSafeToReply, random, probabilityDetermination, retrievePostsInPeriod } = require("./common/utils.js");
 const { publishToRelay } = require("./common/publishToRelay.js");
 
 //let relay = null;
@@ -87,7 +87,7 @@ const functionalPosting = async (relay, ev, functionalPostingJson, autoReactionJ
                 // 作動対象だ
                 if(postCategory > 0) {
                     // リプライやリアクションしても安全なら、リプライイベントやリアクションイベントを組み立てて送信する
-                    if (isSafeToReply(ev)) {
+                    if (isSafeToReply(ev) && retrievePostsInPeriod(relay, pubkey)) {
                         // リプライ
                         const replyPost = composeReply(replyChr, ev);
                         // let replyPost = null;
@@ -96,7 +96,7 @@ const functionalPosting = async (relay, ev, functionalPostingJson, autoReactionJ
                         // } else {
                         //     replyPost = composeReply(replyChr, ev);
                         // }
-                        publishToRelay(relay, replyPost);
+                        publishToRelay(relay, replyPost, pubkey);
                     }
                 }
             }
@@ -207,8 +207,8 @@ const exchangeRate = async (relay, ev, exchangeRate, autoReactionJson) => {
         // global.retPostCategory = postCategory;
         // 作動対象だ
         if(postCategory > 0) {
-            // リプライやリアクションしても安全なら、リプライイベントやリアクションイベントを組み立てて送信する
-            if (isSafeToReply(ev)) {
+            // リプライしても安全なら、リプライイベントやリアクションイベントを組み立てて送信する
+            if (isSafeToReply(ev) && retrievePostsInPeriod(relay, pubkey)) {
                 // リプライ
                 const replyPostorreactionPost = composeReply(replyChr, ev);
                 // let replyPostorreactionPost = null;
@@ -217,7 +217,7 @@ const exchangeRate = async (relay, ev, exchangeRate, autoReactionJson) => {
                 // } else {
                 //     replyPostorreactionPost = composeReply(replyChr, ev);
                 // }
-                publishToRelay(relay, replyPostorreactionPost);
+                publishToRelay(relay, replyPostorreactionPost, pubkey, ev.content);
             }
         }
 
@@ -332,7 +332,7 @@ const normalAutoReply = async (relay, ev, autoReplyJson, autoReactionJson) => {
             replyChr = "";
 
             // リプライやリアクションしても安全なら、リプライイベントやリアクションイベントを組み立てて送信する
-            if (isSafeToReply(ev)) {
+            if (isSafeToReply(ev) && retrievePostsInPeriod(relay, pubkey)) {
                 let replyPostorreactionPost;
                 let randomReactionIdx;
                 if(postCategory === 1) {
@@ -392,12 +392,12 @@ const normalAutoReply = async (relay, ev, autoReplyJson, autoReactionJson) => {
                     return;
                 }
 
-                publishToRelay(relay, replyPostorreactionPost);
+                publishToRelay(relay, replyPostorreactionPost, pubkey, ev.content);
                 // リアクションとリアクション絵文字でのリプライを行う動作区分で、かつカスタム絵文字URLが設定されているならリアクション絵文字でリプライも行う
                 if(postCategory === 4) {
                     // リプライ
                     replyPostorreactionPost = composeReplyEmoji(ev, autoReactionJson, randomReactionIdx);
-                    publishToRelay(relay, replyPostorreactionPost);
+                    publishToRelay(relay, replyPostorreactionPost, pubkey, ev.content);
                 }
             }
         }

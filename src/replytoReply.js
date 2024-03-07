@@ -5,7 +5,7 @@
  */
 require("websocket-polyfill");
 const { relayInit, getPublicKey, finishEvent, nip19 } = require("nostr-tools");
-const { currUnixtime, random, jsonSetandOpen, isSafeToReply } = require("./common/utils.js");
+const { currUnixtime, random, jsonSetandOpen, isSafeToReply, retrievePostsInPeriod } = require("./common/utils.js");
 const { publishToRelay } = require("./common/publishToRelay.js");
 
 let relayUrl = "";
@@ -26,8 +26,9 @@ const replytoReply = async (relay)=>{
     // このBotの公開鍵へのリプライを絞り込むフィルタを設定して、イベントを購読する
     const sub = relay.sub(
         [
-            { "kinds": [1] 
-            ,"#p":[pubkey]
+            { 
+                "kinds": [1] 
+                , "#p":[pubkey]
             }
         ]
     );
@@ -41,7 +42,7 @@ const replytoReply = async (relay)=>{
             if(ev.pubkey !== pubkey && ev.tags.length > 0) {
 
                 // リプライしても安全なら、リプライイベントを組み立てて送信する
-                if (isSafeToReply(ev)) {
+                if (isSafeToReply(ev) && retrievePostsInPeriod(relay, pubkey)) {
                     // 作動区分
                     let postKb = 0;
                     let jsonTarget = functionalPostingJson !== null? functionalPostingJson: replyChrJson; // 機能ポストを優先させる
@@ -106,7 +107,7 @@ const replytoReply = async (relay)=>{
                         if(replyChr.length > 0) {   //念のため
                             // リプライ
                             const replyPost = composeReplyPost(replyChr, ev);
-                            publishToRelay(relay, replyPost);
+                            publishToRelay(relay, replyPost, pubkey, ev.content);
                         }
                     }
                 }
