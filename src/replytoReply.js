@@ -42,7 +42,8 @@ const replytoReply = async (relay)=>{
             if(ev.pubkey !== pubkey && ev.tags.length > 0) {
 
                 // リプライしても安全なら、リプライイベントを組み立てて送信する
-                if (isSafeToReply(ev) && retrievePostsInPeriod(relay, pubkey)) {
+                //if (isSafeToReply(ev) && retrievePostsInPeriod(relay, pubkey)) {
+                if (isSafeToReply(ev.created_at, pubkey) && retrievePostsInPeriod(relay, pubkey)) {                    
                     // 作動区分
                     let postKb = 0;
                     let jsonTarget = functionalPostingJson !== null? functionalPostingJson: replyChrJson; // 機能ポストを優先させる

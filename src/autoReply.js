@@ -87,7 +87,8 @@ const functionalPosting = async (relay, ev, functionalPostingJson, autoReactionJ
                 // 作動対象だ
                 if(postCategory > 0) {
                     // リプライやリアクションしても安全なら、リプライイベントやリアクションイベントを組み立てて送信する
-                    if (isSafeToReply(ev) && retrievePostsInPeriod(relay, pubkey)) {
+                    //if (isSafeToReply(ev) && retrievePostsInPeriod(relay, pubkey)) {
+                    if (isSafeToReply(ev.created_at, pubkey) && retrievePostsInPeriod(relay, pubkey)) {
                         // リプライ
                         const replyPost = composeReply(replyChr, ev);
                         // let replyPost = null;
@@ -208,7 +209,8 @@ const exchangeRate = async (relay, ev, exchangeRate, autoReactionJson) => {
         // 作動対象だ
         if(postCategory > 0) {
             // リプライしても安全なら、リプライイベントやリアクションイベントを組み立てて送信する
-            if (isSafeToReply(ev) && retrievePostsInPeriod(relay, pubkey)) {
+            //if (isSafeToReply(ev, pubkey) && retrievePostsInPeriod(relay, pubkey)) {
+            if (isSafeToReply(ev.created_at, pubkey) && retrievePostsInPeriod(relay, pubkey)) {
                 // リプライ
                 const replyPostorreactionPost = composeReply(replyChr, ev);
                 // let replyPostorreactionPost = null;
@@ -332,7 +334,8 @@ const normalAutoReply = async (relay, ev, autoReplyJson, autoReactionJson) => {
             replyChr = "";
 
             // リプライやリアクションしても安全なら、リプライイベントやリアクションイベントを組み立てて送信する
-            if (isSafeToReply(ev) && retrievePostsInPeriod(relay, pubkey)) {
+            //if (isSafeToReply(ev) && retrievePostsInPeriod(relay, pubkey)) {
+            if (isSafeToReply(ev.created_at, pubkey) && retrievePostsInPeriod(relay, pubkey)) {
                 let replyPostorreactionPost;
                 let randomReactionIdx;
                 if(postCategory === 1) {
