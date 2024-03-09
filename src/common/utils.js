@@ -175,9 +175,10 @@ const updateLastReplyTime = (pubkey, time) =>{
     lastReplyTimePerPubkey.set(pubkey, time);
 }
 
-// 第2引数の公開鍵が現在から1分前以内に10個以上投稿があったら偽を返す
+// 第2引数の公開鍵が現在から10秒前以内に10個以上投稿があったら偽を返す
 const retrievePostsInPeriod = (relay, pubKey) => {
-    const currUnixtime_60 = currUnixtime - 60;
+    const baseSeconds = 10; 
+    const currUnixtime_60 = currUnixtime - baseSeconds;
 
     return new Promise((resolve, reject) => {
         try {
