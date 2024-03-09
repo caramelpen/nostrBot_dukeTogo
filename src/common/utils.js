@@ -160,12 +160,12 @@ const isSafeToReply = ({ pubkey, created_at }) => {
         return false;
     }
 
-    // 公開鍵に対応する最後の返信時間を取得
-    const lastReplyTime = lastReplyTimePerPubkey.get(pubkey);
-    // 最後の返信時間が定義されていて、かつ現在時間から最後の返信時間を引いた値がクールタイム未満であれば、返信は安全ではないと判断し、falseを返す
-    if (lastReplyTime !== undefined && now - lastReplyTime < COOL_TIME_DUR_SEC) {
-        return false;
-    }
+    // // 公開鍵に対応する最後の返信時間を取得
+    // const lastReplyTime = lastReplyTimePerPubkey.get(pubkey);
+    // // 最後の返信時間が定義されていて、かつ現在時間から最後の返信時間を引いた値がクールタイム未満（つまり最近すぎる）であれば、返信は安全ではないと判断し、falseを返す
+    // if (lastReplyTime !== undefined && now - lastReplyTime < COOL_TIME_DUR_SEC) {
+    //     return false;
+    // }
     // 返信が安全であると判断し、真を返す
     return true;
 }
