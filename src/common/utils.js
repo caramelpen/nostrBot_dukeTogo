@@ -147,14 +147,10 @@ const isFileExists = (targetFilePath) => {
 
 // 引数のイベントにリプライしても安全か?
 // 対象の発行時刻が古すぎる場合・最後にリプライを返した時点からクールタイム分の時間が経過していない場合、安全でない
-//const isSafeToReply = ({ pubkey, created_at }, myPubkey) => {
- const isSafeToReply = ( created_at, pubkey) => {
+const isSafeToReply = ({ pubkey, created_at }) => {
     /* 暴走・無限リプライループ対策 */
     // リプライクールタイム
     const COOL_TIME_DUR_SEC = 60;
-
-    // 公開鍵ごとに、最後にリプライを返した時刻(unixtime)を保持するMap
-    //const lastReplyTimePerPubkey = new Map();
 
     // 現在のUNIX時間を取得
     const now = currUnixtime();
@@ -170,7 +166,6 @@ const isFileExists = (targetFilePath) => {
     if (lastReplyTime !== undefined && now - lastReplyTime < COOL_TIME_DUR_SEC) {
         return false;
     }
-    //lastReplyTimePerPubkey.set(pubkey, now);
     // 返信が安全であると判断し、真を返す
     return true;
 }
@@ -181,41 +176,6 @@ const updateLastReplyTime = (pubkey, time) =>{
 }
 
 // 第2引数の公開鍵が現在から1分前以内に10個以上投稿があったら偽を返す
-// const retrievePostsInPeriod = (relay, pubKey) => {
-//     const currUnixtime_60 = currUnixtime - 60;
-
-//     return new Promise((resolve, reject) => {
-//         try {
-//             const sub = relay.sub([
-//                 { 
-//                     "kinds": [1]
-//                     , "authors": [pubKey]
-//                     , "since": currUnixtime_60
-//                 }
-//             ]);
-//             let cnt = 0;
-
-//             const eventListener = (ev) => {
-//                 cnt ++;
-
-//                 if (cnt >= 10) {
-//                     sub.off("event", eventListener); // リスナーを削除
-//                     resolve(false);
-//                 }
-//             };
-
-//             sub.on("event", eventListener);
-//             sub.on("eose", () => {
-//                 console.log(cnt);
-//                 sub.off("event", eventListener); // リスナーを削除
-//                 resolve(true);
-//             });
-//         } catch (error) {
-//             reject(false);
-//         }
-//     });
-// }
-
 const retrievePostsInPeriod = (relay, pubKey) => {
     const currUnixtime_60 = currUnixtime - 60;
 

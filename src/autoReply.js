@@ -8,6 +8,7 @@ const axios = require("axios");
 const { relayInit, getPublicKey, finishEvent, nip19 } = require("nostr-tools");
 const { currUnixtime, jsonSetandOpen, isSafeToReply, random, probabilityDetermination, retrievePostsInPeriod } = require("./common/utils.js");
 const { publishToRelay } = require("./common/publishToRelay.js");
+//const { functionalPosting, exchangeRate, normalAutoReply } = require("./eachPostingFunctions.js");
 
 //let relay = null;
 let relayUrl = "";
@@ -17,8 +18,6 @@ let adminPubkey = "";
 // 作動区分
 let postCategory = 0;
 let replyChr = "";
-// let isFromReplytoReply = false;
-// global.retPostCategory = 0;
 
 
 // 機能投稿
@@ -87,17 +86,16 @@ const functionalPosting = async (relay, ev, functionalPostingJson, autoReactionJ
                 // 作動対象だ
                 if(postCategory > 0) {
                     // リプライやリアクションしても安全なら、リプライイベントやリアクションイベントを組み立てて送信する
-                    //if (isSafeToReply(ev) && retrievePostsInPeriod(relay, pubkey)) {
-                    if (isSafeToReply(ev.created_at, pubkey) && retrievePostsInPeriod(relay, pubkey)) {
+                    if (isSafeToReply(ev) && retrievePostsInPeriod(relay, pubkey)) {
                         // リプライ
-                        const replyPost = composeReply(replyChr, ev);
-                        // let replyPost = null;
+                        const replyPostEv = composeReply(replyChr, ev);
+                        // let replyPostEv = null;
                         // if(isFromReplytoReply) {
-                        //     replyPost = composeReplytoReply(replyChr, ev);
+                        //     replyPostEv = composeReplytoReply(replyChr, ev);
                         // } else {
-                        //     replyPost = composeReply(replyChr, ev);
+                        //     replyPostEv = composeReply(replyChr, ev);
                         // }
-                        publishToRelay(relay, replyPost, pubkey);
+                        publishToRelay(relay, replyPostEv, ev.pubkey);
                     }
                 }
             }
@@ -209,17 +207,16 @@ const exchangeRate = async (relay, ev, exchangeRate, autoReactionJson) => {
         // 作動対象だ
         if(postCategory > 0) {
             // リプライしても安全なら、リプライイベントやリアクションイベントを組み立てて送信する
-            //if (isSafeToReply(ev, pubkey) && retrievePostsInPeriod(relay, pubkey)) {
-            if (isSafeToReply(ev.created_at, pubkey) && retrievePostsInPeriod(relay, pubkey)) {
+            if (isSafeToReply(ev) && retrievePostsInPeriod(relay, pubkey)) {
                 // リプライ
-                const replyPostorreactionPost = composeReply(replyChr, ev);
-                // let replyPostorreactionPost = null;
+                const replyPostorreactionPostEv = composeReply(replyChr, ev);
+                // let replyPostorreactionPostEv = null;
                 // if(isFromReplytoReply) {
-                //     replyPostorreactionPost = composeReplytoReply(replyChr, ev);
+                //     replyPostorreactionPostEv = composeReplytoReply(replyChr, ev);
                 // } else {
-                //     replyPostorreactionPost = composeReply(replyChr, ev);
+                //     replyPostorreactionPostEv = composeReply(replyChr, ev);
                 // }
-                publishToRelay(relay, replyPostorreactionPost, pubkey, ev.content);
+                publishToRelay(relay, replyPostorreactionPostEv, ev.pubkey, ev.content);
             }
         }
 
@@ -334,18 +331,18 @@ const normalAutoReply = async (relay, ev, autoReplyJson, autoReactionJson) => {
             replyChr = "";
 
             // リプライやリアクションしても安全なら、リプライイベントやリアクションイベントを組み立てて送信する
-            //if (isSafeToReply(ev) && retrievePostsInPeriod(relay, pubkey)) {
-            if (isSafeToReply(ev.created_at, pubkey) && retrievePostsInPeriod(relay, pubkey)) {
-                let replyPostorreactionPost;
+            if (isSafeToReply(ev) && retrievePostsInPeriod(relay, pubkey)) {
+                //let replyPostorreactionPost;
+                let replyPostorreactionPostEv;
                 let randomReactionIdx;
                 if(postCategory === 1) {
                     // jsonに設定されている対応するリプライ語句の数を利用してランダムでリプライ語句を決める
                     const randomIdx = random(0, target.replyPostChar.length - 1);
                     // リプライ
                     // if(isFromReplytoReply) {
-                    //     replyPostorreactionPost = composeReplytoReply(target.replyPostChar[randomIdx], ev);
+                    //     replyPostorreactionPostEv = composeReplytoReply(target.replyPostChar[randomIdx], ev);
                     // } else {
-                        replyPostorreactionPost = composeReply(target.replyPostChar[randomIdx], ev);
+                        replyPostorreactionPostEv = composeReply(target.replyPostChar[randomIdx], ev);
                     // }
 
                 } else if(postCategory === 2) {
@@ -357,9 +354,9 @@ const normalAutoReply = async (relay, ev, autoReplyJson, autoReactionJson) => {
                     replyChr = autoReplyJson[replyChrPresetIdx].replyPostChar[replyChrIdx];
                     // リプライ
                     // if(isFromReplytoReply) {
-                    //     replyPostorreactionPost = composeReplytoReply(replyChr, ev);
+                    //     replyPostorreactionPostEv = composeReplytoReply(replyChr, ev);
                     // } else {
-                        replyPostorreactionPost = composeReply(replyChr, ev);
+                        replyPostorreactionPostEv = composeReply(replyChr, ev);
                     // }
 
                 } else if(postCategory === 3) {
@@ -369,14 +366,14 @@ const normalAutoReply = async (relay, ev, autoReplyJson, autoReactionJson) => {
                     if(autoReactionJson.reactionImgURL[randomReactionIdx].length > 0) {
                         postCategory = 4;
                         // リアクション
-                        replyPostorreactionPost = composeReaction(ev, autoReactionJson, randomReactionIdx);
+                        replyPostorreactionPostEv = composeReaction(ev, autoReactionJson, randomReactionIdx);
                     // カスタム絵文字URLが未設定ならそれはカスタム絵文字ではないので、リアクションせず、既存絵文字でリプライする
                     } else {
                         // リプライ
                         // if(isFromReplytoReply) {
-                        //     replyPostorreactionPost = composeReplytoReply(autoReactionJson.contentReaction[randomReactionIdx], ev);
+                        //     replyPostorreactionPostEv = composeReplytoReply(autoReactionJson.contentReaction[randomReactionIdx], ev);
                         // } else {
-                            replyPostorreactionPost = composeReply(autoReactionJson.contentReaction[randomReactionIdx], ev);
+                            replyPostorreactionPostEv = composeReply(autoReactionJson.contentReaction[randomReactionIdx], ev);
                         // }
                     }
 
@@ -387,7 +384,7 @@ const normalAutoReply = async (relay, ev, autoReplyJson, autoReactionJson) => {
                         // randomReactionIdx 番目のカスタム絵文字URLが設定されているならリアクション
                         if(autoReactionJson.reactionImgURL[randomReactionIdx].length > 0) {
                             // リアクション
-                            replyPostorreactionPost = composeReaction(ev, autoReactionJson, randomReactionIdx);
+                            replyPostorreactionPostEv = composeReaction(ev, autoReactionJson, randomReactionIdx);
                             break;
                         }
                     }
@@ -395,12 +392,12 @@ const normalAutoReply = async (relay, ev, autoReplyJson, autoReactionJson) => {
                     return;
                 }
 
-                publishToRelay(relay, replyPostorreactionPost, pubkey, ev.content);
+                publishToRelay(relay, replyPostorreactionPostEv, pubkey, ev.content);
                 // リアクションとリアクション絵文字でのリプライを行う動作区分で、かつカスタム絵文字URLが設定されているならリアクション絵文字でリプライも行う
                 if(postCategory === 4) {
                     // リプライ
-                    replyPostorreactionPost = composeReplyEmoji(ev, autoReactionJson, randomReactionIdx);
-                    publishToRelay(relay, replyPostorreactionPost, pubkey, ev.content);
+                    replyPostorreactionPostEv = composeReplyEmoji(ev, autoReactionJson, randomReactionIdx);
+                    publishToRelay(relay, replyPostorreactionPostEv, ev.pubkey, ev.content);
                 }
             }
         }
@@ -409,11 +406,6 @@ const normalAutoReply = async (relay, ev, autoReplyJson, autoReactionJson) => {
         throw err;
     }
 }
-
-// const setFromReplytoReply = () => {
-//     isFromReplytoReply = true;
-// };
-
 
 
 // ディスパッチのオブジェクト
@@ -559,23 +551,6 @@ const  getAvailableCurrencies = async (baseCurrency, targetCurrency, funcSw ) =>
         throw err;
     }
 }
-
-
-// // テキスト投稿イベント(リプライ)を組み立てる
-// const composeReplytoReply = (content, targetEvent) => {
-//     const ev = {
-//         kind: 1,
-//         content,
-//         tags: [ 
-//             ["p", targetEvent.pubkey, ""],
-//             ["e", targetEvent.id, ""] 
-//         ],
-//         created_at: currUnixtime()
-//     };
-
-//     // イベントID(ハッシュ値)計算・署名
-//     return finishEvent(ev, BOT_PRIVATE_KEY_HEX);
-// };
 
 
 // リプライイベントを組み立てる

@@ -42,8 +42,7 @@ const replytoReply = async (relay)=>{
             if(ev.pubkey !== pubkey && ev.tags.length > 0) {
 
                 // リプライしても安全なら、リプライイベントを組み立てて送信する
-                //if (isSafeToReply(ev) && retrievePostsInPeriod(relay, pubkey)) {
-                if (isSafeToReply(ev.created_at, pubkey) && retrievePostsInPeriod(relay, pubkey)) {                    
+                if (isSafeToReply(ev) && retrievePostsInPeriod(relay, pubkey)) {
                     // 作動区分
                     let postKb = 0;
                     let jsonTarget = functionalPostingJson !== null? functionalPostingJson: replyChrJson; // 機能ポストを優先させる
@@ -107,8 +106,8 @@ const replytoReply = async (relay)=>{
                         }
                         if(replyChr.length > 0) {   //念のため
                             // リプライ
-                            const replyPost = composeReplyPost(replyChr, ev);
-                            publishToRelay(relay, replyPost, pubkey, ev.content);
+                            const replyPostEv = composeReplyPost(replyChr, ev);
+                            publishToRelay(relay, replyPostEv, ev.pubkey, ev.content);
                         }
                     }
                 }
