@@ -11,11 +11,8 @@ const { publishToRelay } = require("./common/publishToRelay.js");
 let relayUrl = "";
 let BOT_PRIVATE_KEY_HEX = "";
 let pubkey = "";
-let relay;
-let relayConnect = false;
 
-//const replytoReply = async (relay)=>{
-const replytoReply = async () => {
+const replytoReply = async (relay)=>{
 
     // jsonの場所の割り出しとリプライ語句入りjsonファイルの場所の設定（自動リプライ時に使用しているjsonの反応語句をそのまま利用する）
     const commonPath = "../../config/"  // configの場所はここからみれば../config/だが、util関数の場所から見れば../../config/となる
@@ -170,27 +167,23 @@ const main = async () => {
     pubkey = getPublicKey(BOT_PRIVATE_KEY_HEX); // 秘密鍵から公開鍵の取得
 
     // リレー
-    if(!relayConnect || (relayConnect && relay === undefined) ) {
-        relayUrl = process.env.RELAY_URL;    // リレーURL
-        relay = await relayInit(relayUrl);
-        relay.on("error", () => {
-            console.error("replytoReply:failed to connect");
-            relay.close();
-            return;
-        });
+    relayUrl = process.env.RELAY_URL;    // リレーURL
+    const relay = await relayInit(relayUrl);
+    relay.on("error", () => {
+        console.error("replytoReply:failed to connect");
+        relay.close();
+        return;
+    });
 
-        await relay.connect();
-        relayConnect = true;
-        console.log("replytoReply:connected to relay");        
-    }
+    await relay.connect();
+    console.log("replytoReply:connected to relay");        
 
 
     try {
         /*
             受けたリプライに対してjsonに設定された語句でランダムでリプライする
         */
-        //replytoReply(relay);
-        replytoReply();
+        replytoReply(relay);
 
     } catch(err) {
         console.error(err);

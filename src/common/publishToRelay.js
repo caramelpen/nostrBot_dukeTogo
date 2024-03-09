@@ -13,7 +13,7 @@ const publishToRelay = (relay, ev, originallyPubKey, replyingtoaPost = "") => {
     });
     */
     relay.publish(ev).then(() => {
-        console.log("publishToRelay:success!" + ":" + (replyingtoaPost.length > 0 ? "find:" + replyingtoaPost + "\n ⇒ " :"") + ev.content);
+        console.log("publishToRelay:success!" + ":" + (replyingtoaPost.length > 0 ? "find:" + originallyPubKey + ":" + replyingtoaPost + "\n ⇒ " :"") + ev.content);
         // 最終更新日時を保存
         updateLastReplyTime(originallyPubKey, currUnixtime());
     }).catch((err) => {
