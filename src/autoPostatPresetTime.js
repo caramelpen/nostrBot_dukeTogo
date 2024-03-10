@@ -27,6 +27,34 @@ let gitToken = "";
 let gitBranch = "";
 
 
+// // 0:00になったら実行する関数
+// const executeAtMidnight = (presetDatePath, nowDateTime) => {    //各引数はほかの関数と合わせるためのもので、ここでは使用しない
+//     const nowDate = currDateTime();
+//     if (nowDate.getHours() === 0 && nowDate.getMinutes() === 0) {   // 0:00 なら
+//         // 年末の日付を作成
+//         const endOfYear = new Date(nowDate.getFullYear(), 11, 31); // 月は0から始まるため、11 は12月を表す
+
+//         // 今日から年末までの残りの時間を計算
+//         const millisecondsPerDay = 24 * 60 * 60 * 1000; // 1日のミリ秒数
+//         const remainingDays = Math.round((endOfYear - nowDate) / millisecondsPerDay);
+
+//         // 残りの日数が10の倍数の場合、または12月であるなら
+//         const remainingDaysMod10 = remainingDays % 10;
+//         if (remainingDaysMod10 === 0 || nowDate.getMonth() === 11) {
+//             if (nowDate.getMonth() === 11 && nowDate.getDate() === 31) {
+//                 console.log(`今日は大みそかです！新しい年まであと${remainingDays}日です。`);
+//             } else {
+//                 if(nowDate.getMonth() === 11) {
+//                     console.log(`今年も残すところあと${remainingDays}日です。`);
+//                 } else {
+//                     console.log(`今日から年末まで、残り${remainingDays}日です。`);
+//                 }
+//             }
+//         }
+//     }
+// }
+
+
 // 定刻ポスト
 const subPresetPost = (presetDatePath, nowDateTime) => {
     try {
@@ -204,13 +232,18 @@ const composePost = (postChar) => {
 const funcObj = {
     subPresetPost           // 定刻ポスト
     ,subSunriseSunset       // 日の出日の入ポスト
+    // ,executeAtMidnight      // 年末残日数ポスト
 }
 
 // ディスパッチの設定値
 const funcConfig = {
-    funcName: ["subPresetPost", "subSunriseSunset" ]        // useJsonFile の記述順と対応させる
-    ,useJsonFile: ["presetDate.json", "sunriseSunset.json"] // funcName の記述順と対応させる
-    ,operationCategory: [0, 1]                              // 1ならGitHubへプッシュコミット（useJsonFileやuncName の記述順と対応させる）
+    // funcName: ["executeAtMidnight", "subPresetPost", "subSunriseSunset" ]   // useJsonFile の記述順と対応させる
+    // ,useJsonFile: ["","presetDate.json", "sunriseSunset.json"]              // funcName の記述順と対応させる（jsonを使用しないなら""としておく）
+    // ,operationCategory: [0, 0, 1]                                           // 1ならGitHubへプッシュコミット（useJsonFileやuncName の記述順と対応させる）
+
+    funcName: ["subPresetPost", "subSunriseSunset" ]   // useJsonFile の記述順と対応させる
+    ,useJsonFile: ["presetDate.json", "sunriseSunset.json"]              // funcName の記述順と対応させる（jsonを使用しないなら""としておく）
+    ,operationCategory: [0, 1]                                           // 1ならGitHubへプッシュコミット（useJsonFileやuncName の記述順と対応させる）
 }
 
 
