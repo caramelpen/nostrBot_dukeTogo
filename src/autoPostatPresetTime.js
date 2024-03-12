@@ -27,80 +27,135 @@ let gitToken = "";
 let gitBranch = "";
 
 
-// // 0:00になったら実行する関数
-// const executeAtMidnight = (presetDatePath, nowDateTime) => {    //各引数はほかの関数と合わせるためのもので、ここでは使用しない
-//     const nowDate = currDateTime();
-//     if (nowDate.getHours() === 0 && nowDate.getMinutes() === 0) {   // 0:00 なら
-//         // 年末の日付を作成
-//         const endOfYear = new Date(nowDate.getFullYear(), 11, 31); // 月は0から始まるため、11 は12月を表す
-
-//         // 今日から年末までの残りの時間を計算
-//         const millisecondsPerDay = 24 * 60 * 60 * 1000; // 1日のミリ秒数
-//         const remainingDays = Math.round((endOfYear - nowDate) / millisecondsPerDay);
-
-//         // 残りの日数が10の倍数の場合、または12月であるなら
-//         const remainingDaysMod10 = remainingDays % 10;
-//         if (remainingDaysMod10 === 0 || nowDate.getMonth() === 11) {
-//             if (nowDate.getMonth() === 11 && nowDate.getDate() === 31) {
-//                 console.log(`今日は大みそかです！新しい年まであと${remainingDays}日です。`);
-//             } else {
-//                 if(nowDate.getMonth() === 11) {
-//                     console.log(`今年も残すところあと${remainingDays}日です。`);
-//                 } else {
-//                     console.log(`今日から年末まで、残り${remainingDays}日です。`);
-//                 }
-//             }
-//         }
-//     }
-// }
-
 
 // 定刻ポスト
-const subPresetPost = (presetDatePath, nowDateTime) => {
-    try {
-        const nowDateTime12 = nowDateTime.substring(0 ,12);     // 秒をカット   YYYYMMDDHHMM
-        const nowDateTimeYMD = nowDateTime12.substring(0 ,8);   // 年月日部分
-        const nowDateTimeY = nowDateTime12.substring(0 ,4);     // 年部分
-        const nowDateTimeMMDD = nowDateTime12.substring(4 ,8);  // 月日部分
-        const nowDateTimeHHMM = nowDateTime12.substring(8 ,12); // 時刻部分
+const subPresetPost = (presetDatePath, nowDate) => {
 
+    try {
+        
+        const hours = nowDate.getHours();
+        const minutes = nowDate.getMinutes();
         const presetDateJson = jsonSetandOpen(presetDatePath);
-        if(presetDateJson === null){
+        if(presetDateJson === null || presetDateJson === undefined){
             console.error("subPresetPost:json file is not get");
             return false;
         }
 
-        // ポストに至るまでの確認は5回
-        for (let i = 1; i <= 5; i++) {
-            let targetDateTime;
-                    
-            if(i===1) {
-                targetDateTime = nowDateTime12;                     // フル設定
-            } else if(i===2) {
-                targetDateTime = nowDateTimeYMD + "9999";           // 年月日部分のみ設定
-            } else if(i===3) {
-                targetDateTime = nowDateTimeY + "99999999";         // 年部分のみ設定
-            } else if(i===4) {
-                targetDateTime = "9999" + nowDateTimeMMDD + "9999"; // 月日部分のみ設定
-            } else if(i===5) {
-                targetDateTime = "99999999" + nowDateTimeHHMM;      // 時刻部分のみ設定
-            }
+        // 0:00
+        if (hours === 0 && minutes === 0) {
+            // jsonの親プロパティ midnightConditions を取得
+            const midnightConditions = presetDateJson.midnightConditions;
+            const endOfYear = new Date(nowDate.getFullYear(), 11, 31);
+            const remainingDays = Math.floor((endOfYear - nowDate) / (1000 * 60 * 60 * 24));
+        
+            // 各条件をチェック
+            for (let condition of midnightConditions) {
+                let message = "";
+                let subMessage = "";
+                let postSubject = false;
+                let idx = 0;
+                // 投稿の優先順位は 指定日 指定月 指定日 残10日単位 で行う
+                // 指定月日
+                if (condition.type === "specificDate") {
+                    for (let value of condition.value) {
+                        if(value.date.length > 0) {
+                            const [month, date] = value.date.split("/");
+                            if (nowDate.getMonth() + 1 === Number(month) && nowDate.getDate() === Number(date)) {
+                                postSubject = true;
+                                break;
+                            }
+                        }
+                        idx ++;
+                    }
 
-            // jsonに設定された年月日時分か調べる
-            const target = presetDateJson.find((element) => element.presetDateTime === targetDateTime);
-            if (target) {
-                // ポスト語句は複数設定されており、設定数の範囲でランダムに取得
-                const postIdx = random(0,target.postChar.length - 1);
-                postEv = composePost(target.postChar[postIdx]);
-                return true;
+                // 指定月
+                } else if (condition.type === "specificMonth") {
+                    for (let value of condition.value) {
+                        if(value.month.length > 0) {
+                            if (nowDate.getMonth() + 1 === Number(value.month)) {
+                                message = remainingDays;
+                                postSubject = true;
+                                break;
+                            }
+                        }
+                        idx ++;
+                    }
+
+                // 指定日
+                } else if (condition.type === "specificDay") {
+                    for (let value of condition.value) {
+                        if(value.day.length > 0) {
+                            const day = value.day;
+                            if (nowDate.getDate() === Number(value.day)) {
+                                postSubject = true;
+                                break;
+                            }
+                        }
+                        idx ++;
+                    }
+
+                // 今年の残日数が10日単位
+                } else if (condition.type === "everyNDays") {
+                    for (let value of condition.value) {
+                        if(value.number.length > 0) {
+                            if (remainingDays % value.number === 0) {
+                                message = remainingDays;
+                                postSubject = true;
+                                break;
+                            }
+                        }
+                        idx ++;
+                    }
+            
+                }
+
+                if(postSubject) {
+                    // ポスト語句は複数設定されており、設定数の範囲でランダムに取得
+                    const postIdx = random(0,condition.value[idx].messages.length - 1);
+                    message = condition.value[idx].messages[postIdx] + message;
+                    if(condition.value[idx].subMessages.length > 0){
+                        const subPostIdx = random(0,condition.value[idx].subMessages.length - 1);
+                        subMessage = condition.value[idx].subMessages[subPostIdx];
+                    }
+                    postEv = composePost(message + subMessage);
+                    return true;
+                }
+
             }
+            return false;
+        
+        } else {
+            // jsonの親プロパティ minuteConditions を取得
+            const minuteConditions = presetDateJson.minuteConditions;
+            // HH:MM
+            const currentTime = String(hours).padStart(2, "0") + ":" + String(minutes).padStart(2, "0");
+
+            // 各条件をチェック
+            for (let condition of minuteConditions) {
+                if (condition.type === "everyMinutes") {
+                    for (let value of condition.value) {
+                        if (currentTime === value.minutes) {
+                            // ポスト語句は複数設定されており、設定数の範囲でランダムに取得
+                            const postIdx = random(0,value.messages.length - 1);
+                            let subMessage = "";
+                            if(value.subMessages.length > 0){
+                                const subPostIdx = random(0,value.subMessages.length - 1);
+                                subMessage = value.subMessages[subPostIdx];
+                            }
+                            postEv = composePost(value.messages[postIdx] + subMessage);
+                            return true;
+                        }
+                    }
+                }
+            }
+            return false;
+
         }
-        return false;
-    } catch(err) {
+    } catch (err) {
         console.error("subPresetPost:" + err);
         return false;
     }
-  }
+}
 
 
 
@@ -108,7 +163,8 @@ const subPresetPost = (presetDatePath, nowDateTime) => {
 
 
 // 日の出日の入ポスト
-const subSunriseSunset = (sunriseSunsetPath, nowDateTime) => {
+const subSunriseSunset = (sunriseSunsetPath, nowDate) => {
+    const nowDateTime = formattedDateTime(new Date(nowDate));
     try {
         let isPostSunrise = false;
         let isPostSunset = false;
@@ -116,7 +172,7 @@ const subSunriseSunset = (sunriseSunsetPath, nowDateTime) => {
         // 日の出と日没の格納されたjsonを取得
         sunriseSunsetJson = null;
         sunriseSunsetJson = jsonSetandOpen(sunriseSunsetPath);
-        if(sunriseSunsetJson === null){
+        if(sunriseSunsetJson === null || sunriseSunsetJson === undefined ){
             console.error("subSunriseSunset:json file is not get");
             return false;
         }
@@ -232,18 +288,13 @@ const composePost = (postChar) => {
 const funcObj = {
     subPresetPost           // 定刻ポスト
     ,subSunriseSunset       // 日の出日の入ポスト
-    // ,executeAtMidnight      // 年末残日数ポスト
 }
 
 // ディスパッチの設定値
 const funcConfig = {
-    // funcName: ["executeAtMidnight", "subPresetPost", "subSunriseSunset" ]   // useJsonFile の記述順と対応させる
-    // ,useJsonFile: ["","presetDate.json", "sunriseSunset.json"]              // funcName の記述順と対応させる（jsonを使用しないなら""としておく）
-    // ,operationCategory: [0, 0, 1]                                           // 1ならGitHubへプッシュコミット（useJsonFileやuncName の記述順と対応させる）
-
-    funcName: ["subPresetPost", "subSunriseSunset" ]   // useJsonFile の記述順と対応させる
-    ,useJsonFile: ["presetDate.json", "sunriseSunset.json"]              // funcName の記述順と対応させる（jsonを使用しないなら""としておく）
-    ,operationCategory: [0, 1]                                           // 1ならGitHubへプッシュコミット（useJsonFileやuncName の記述順と対応させる）
+    funcName: ["subPresetPost", "subSunriseSunset" ]            // useJsonFile の記述順と対応させる
+    ,useJsonFile: ["presetDate.json", "sunriseSunset.json"]     // funcName の記述順と対応させる（jsonを使用しないなら""としておく）
+    ,operationCategory: [0, 1]                                  // 1ならGitHubへプッシュコミット（useJsonFileやuncName の記述順と対応させる）
 }
 
 
@@ -258,7 +309,7 @@ const main = async () => {
 
         // 現在日時
         const nowDate = currDateTime();
-        const nowDateTime = formattedDateTime(new Date(nowDate));
+        //const nowDateTime = formattedDateTime(new Date(nowDate));
 
         // 秘密鍵
         require("dotenv").config();
@@ -297,7 +348,7 @@ const main = async () => {
                 }
 
                 // 処理の実行はディスパッチで行い、スリム化をはかる
-                postSubject = await funcObj[funcConfig.funcName[i]](jsonPathCommon + funcConfig.useJsonFile[i], nowDateTime);
+                postSubject = await funcObj[funcConfig.funcName[i]](jsonPathCommon + funcConfig.useJsonFile[i], nowDate);
 
                 if(postSubject) {
 

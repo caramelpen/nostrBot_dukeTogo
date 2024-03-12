@@ -95,7 +95,7 @@ const functionalPosting = async (relay, ev, functionalPostingJson, autoReactionJ
                         // } else {
                         //     replyPostEv = composeReply(replyChr, ev);
                         // }
-                        publishToRelay(relay, replyPostEv, ev.pubkey);
+                        publishToRelay(relay, replyPostEv, true, ev.pubkey, ev.content);
                     }
                 }
             }
@@ -203,7 +203,7 @@ const exchangeRate = async (relay, ev, exchangeRate, autoReactionJson) => {
                 }
             }
         }
-        // global.retPostCategory = postCategory;
+
         // 作動対象だ
         if(postCategory > 0) {
             // リプライしても安全なら、リプライイベントやリアクションイベントを組み立てて送信する
@@ -216,7 +216,7 @@ const exchangeRate = async (relay, ev, exchangeRate, autoReactionJson) => {
                 // } else {
                 //     replyPostorreactionPostEv = composeReply(replyChr, ev);
                 // }
-                publishToRelay(relay, replyPostorreactionPostEv, ev.pubkey, ev.content);
+                publishToRelay(relay, replyPostorreactionPostEv, true, ev.pubkey, ev.content);
             }
         }
 
@@ -395,12 +395,12 @@ const normalAutoReply = async (relay, ev, autoReplyJson, autoReactionJson) => {
                     return;
                 }
 
-                publishToRelay(relay, replyPostorreactionPostEv, pubkey, ev.content);
+                publishToRelay(relay, replyPostorreactionPostEv, true, ev.pubkey, ev.content);
                 // リアクションとリアクション絵文字でのリプライを行う動作区分で、かつカスタム絵文字URLが設定されているならリアクション絵文字でリプライも行う
                 if(postCategory === 4) {
                     // リプライ
                     replyPostorreactionPostEv = composeReplyEmoji(ev, autoReactionJson, randomReactionIdx);
-                    publishToRelay(relay, replyPostorreactionPostEv, ev.pubkey, ev.content);
+                    publishToRelay(relay, replyPostorreactionPostEv, true, ev.pubkey, ev.content);
                 }
             }
         }

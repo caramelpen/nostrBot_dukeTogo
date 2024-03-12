@@ -107,7 +107,7 @@ const replytoReply = async (relay)=>{
                         if(replyChr.length > 0) {   //念のため
                             // リプライ
                             const replyPostEv = composeReplyPost(replyChr, ev);
-                            publishToRelay(relay, replyPostEv, ev.pubkey, ev.content);
+                            publishToRelay(relay, replyPostEv, false, ev.pubkey, ev.content);
                         }
                     }
                 }
