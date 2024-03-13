@@ -8,9 +8,7 @@ const axios = require("axios");
 const { relayInit, getPublicKey, finishEvent, nip19 } = require("nostr-tools");
 const { currUnixtime, jsonSetandOpen, isSafeToReply, random, probabilityDetermination, retrievePostsInPeriod } = require("./common/utils.js");
 const { publishToRelay } = require("./common/publishToRelay.js");
-//const { functionalPosting, exchangeRate, normalAutoReply } = require("./eachPostingFunctions.js");
 
-//let relay = null;
 let relayUrl = "";
 let BOT_PRIVATE_KEY_HEX = "";
 let pubkey = "";
