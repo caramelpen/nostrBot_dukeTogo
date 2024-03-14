@@ -5,14 +5,15 @@
  */
 require("websocket-polyfill");
 const axios = require("axios");
-const { relayInit, getPublicKey, finishEvent, nip19 } = require("nostr-tools");
+const { relayInit, finishEvent } = require("nostr-tools");
 const { currUnixtime, jsonSetandOpen, isSafeToReply, random, probabilityDetermination, retrievePostsInPeriod } = require("./common/utils.js");
+const { BOT_PRIVATE_KEY_HEX, pubkey, adminPubkey, RELAY_URL } = require("./common/env.js");
 const { publishToRelay } = require("./common/publishToRelay.js");
 
-let relayUrl = "";
-let BOT_PRIVATE_KEY_HEX = "";
-let pubkey = "";
-let adminPubkey = "";
+//let relayUrl = "";
+// let BOT_PRIVATE_KEY_HEX = "";
+// let pubkey = "";
+// let adminPubkey = "";
 // 作動区分
 let postCategory = 0;
 let replyChr = "";
@@ -612,26 +613,25 @@ const composeReaction = (targetEvent,autoReactionJson,randomReactionIdx) => {
  ***************/
 const main = async () => {
 
-    // 秘密鍵
+    // // 秘密鍵
     require("dotenv").config();
-    const nsec = process.env.BOT_PRIVATE_KEY;
-    if (nsec === undefined) {
-        console.error("nsec is not found");
-        return;
-    }
-    const dr = nip19.decode(nsec);
-    if (dr.type !== "nsec") {
-        console.error("NOSTR PRIVATE KEY is not nsec");
-        return;
-    }
-    BOT_PRIVATE_KEY_HEX = dr.data;
-    pubkey = getPublicKey(BOT_PRIVATE_KEY_HEX);               // 秘密鍵から公開鍵の取得
-    adminPubkey = process.env.admin_HEX_PUBKEY;               // bot管理者の公開鍵の取得
-    relayUrl = process.env.RELAY_URL;                         // リレーURL
+    // const nsec = process.env.BOT_PRIVATE_KEY;
+    // if (nsec === undefined) {
+    //     console.error("nsec is not found");
+    //     return;
+    // }
+    // const dr = nip19.decode(nsec);
+    // if (dr.type !== "nsec") {
+    //     console.error("NOSTR PRIVATE KEY is not nsec");
+    //     return;
+    // }
+    // BOT_PRIVATE_KEY_HEX = dr.data;
+    // pubkey = getPublicKey(BOT_PRIVATE_KEY_HEX);               // 秘密鍵から公開鍵の取得
+    // adminPubkey = process.env.admin_HEX_PUBKEY;               // bot管理者の公開鍵の取得
+    // relayUrl = process.env.RELAY_URL;                         // リレーURL
 
     // リレー
-    const relay = await relayInit(relayUrl);
-    //relay = await relayInit(relayUrl);
+    const relay = await relayInit(RELAY_URL);
     relay.on("error", () => {
         relay.close();
         console.error("autoReply:failed to connect");
@@ -644,7 +644,6 @@ const main = async () => {
         /*
         フィードを購読し、リプライ対象となるポストがないか調べ、存在するならリプライする
         */
-        // isFromReplytoReply=false;
         autoReply(relay);
 
     } catch(err) {

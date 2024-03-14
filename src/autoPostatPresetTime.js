@@ -5,26 +5,27 @@
  */
 require("websocket-polyfill");
 const cron = require("node-cron");
-const { relayInit, getPublicKey, finishEvent, nip19 } = require("nostr-tools");
+const { relayInit, finishEvent, nip19 } = require("nostr-tools");
 
 const sunCalc = require("suncalc");
 const { currDateTime, currUnixtime, random, jsonSetandOpen, writeJsonFile, formattedDateTime } = require("./common/utils.js");
+const { BOT_PRIVATE_KEY_HEX, pubkey, RELAY_URL, GIT_USER_NAME, GIT_REPO, GIT_TOKEN, GIT_BRANCH} = require("./common/env.js");
 const { publishToRelay } = require("./common/publishToRelay.js");
 const { toGitHubPush } = require("./common/gitHubCooperation.js");
 
 let sunriseSunsetJson = null;
-let BOT_PRIVATE_KEY_HEX = "";
-let pubkey = "";
+//let BOT_PRIVATE_KEY_HEX = "";
+//let pubkey = "";
 let postEv;
-let relayUrl = "";
+//let relayUrl = "";
 
 let sunriseorSunset = "";
 let sunriseSunsetJsonPath = "";
 
-let gitUserName = "";
-let gitRepoName = "";
-let gitToken = "";
-let gitBranch = "";
+// let gitUserName = "";
+// let gitRepoName = "";
+// let gitToken = "";
+// let gitBranch = "";
 
 
 
@@ -309,27 +310,26 @@ const main = async () => {
 
         // 現在日時
         const nowDate = currDateTime();
-        //const nowDateTime = formattedDateTime(new Date(nowDate));
 
-        // 秘密鍵
-        require("dotenv").config();
-        const nsec = process.env.BOT_PRIVATE_KEY;
-        if (nsec === undefined) {
-            console.error("nsec is not found");
-            return;
-        }
-        const dr = nip19.decode(nsec);
-        if (dr.type !== "nsec") {
-            console.error("NOSTR PRIVATE KEY is not nsec");
-            return;
-        }
-        BOT_PRIVATE_KEY_HEX = dr.data;
-        pubkey = getPublicKey(BOT_PRIVATE_KEY_HEX); // 秘密鍵から公開鍵の取得
+        // // 秘密鍵
+        // require("dotenv").config();
+        // const nsec = process.env.BOT_PRIVATE_KEY;
+        // if (nsec === undefined) {
+        //     console.error("nsec is not found");
+        //     return;
+        // }
+        // const dr = nip19.decode(nsec);
+        // if (dr.type !== "nsec") {
+        //     console.error("NOSTR PRIVATE KEY is not nsec");
+        //     return;
+        // }
+        // BOT_PRIVATE_KEY_HEX = dr.data;
+        // pubkey = getPublicKey(BOT_PRIVATE_KEY_HEX); // 秘密鍵から公開鍵の取得
 
-        gitUserName = process.env.GIT_USER_NAME;
-        gitRepoName = process.env.GIT_REPO;
-        gitToken = process.env.GIT_TOKEN;
-        gitBranch = process.env.GIT_BRANCH;
+        // gitUserName = process.env.GIT_USER_NAME;
+        // gitRepoName = process.env.GIT_REPO;
+        // gitToken = process.env.GIT_TOKEN;
+        // gitBranch = process.env.GIT_BRANCH;
 
         // jsonの場所を割り出すために
         const jsonPath = require("path");
@@ -353,8 +353,8 @@ const main = async () => {
                 if(postSubject) {
 
                     // リレー
-                    relayUrl = process.env.RELAY_URL;    // リレーURL
-                    const relay = await relayInit(relayUrl);
+                    //relayUrl = process.env.RELAY_URL;    // リレーURL
+                    const relay = await relayInit(RELAY_URL);
                     relay.on("error", () => {
                         console.error("autoPostatPresetTime:failed to connect");
                         relay.close();
@@ -373,7 +373,7 @@ const main = async () => {
                         if(sunriseSunsetJson.gitHubPush === 1) {
                             const fileNamewk = sunriseSunsetJsonPath.split("/").pop();
                             const sunriseSunsetPathSingle = `config/${fileNamewk}`; // "../config/sunriseSunset.json" を "config/sunriseSunset.json" の形にする
-                            await toGitHubPush(gitRepoName, sunriseSunsetJsonPath, sunriseSunsetPathSingle, gitUserName, gitToken, "[auto/" + sunriseorSunset + "] daily update", gitBranch);
+                            await toGitHubPush(GIT_REPO, sunriseSunsetJsonPath, sunriseSunsetPathSingle, GIT_USER_NAME, GIT_TOKEN, "[auto/" + sunriseorSunset + "] daily update", GIT_BRANCH);
                             console.log("sunriseSunset.json is commit/push");
                         }
                     }

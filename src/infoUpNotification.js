@@ -6,19 +6,20 @@
 require("websocket-polyfill");
 const { relayInit, getPublicKey, finishEvent, nip19 } = require("nostr-tools");
 const { currUnixtime, jsonOpen, random, writeJsonFile } = require("./common/utils.js");
+const { BOT_PRIVATE_KEY_HEX, pubkey, RELAY_URL, GIT_USER_NAME, GIT_REPO, GIT_TOKEN, GIT_BRANCH} = require("./common/env.js");
 const { publishToRelay } = require("./common/publishToRelay.js");
 const { toGitHubPush } = require("./common/gitHubCooperation.js");
 const cron = require("node-cron");
 const parser = require("rss-parser");
 
-let relayUrl = "";
-let BOT_PRIVATE_KEY_HEX = "";
-let pubkey = "";
+//let relayUrl = "";
+// let BOT_PRIVATE_KEY_HEX = "";
+// let pubkey = "";
 let postEv;
-let gitUserName = "";
-let gitRepoName = "";
-let gitToken = "";
-let gitBranch = "";
+// let gitUserName = "";
+// let gitRepoName = "";
+// let gitToken = "";
+// let gitBranch = "";
 
 const infoUpNotification = async (rssJsonPath, rssJson, i) => {
     let connectedSw = 0;
@@ -40,8 +41,8 @@ const infoUpNotification = async (rssJsonPath, rssJson, i) => {
             postEv = composePost(postChr);
 
             // リレー
-            relayUrl = process.env.RELAY_URL;    // リレーURL
-            relay = await relayInit(relayUrl);
+            //relayUrl = process.env.RELAY_URL;    // リレーURL
+            relay = await relayInit(RELAY_URL);
             relay.on("error", () => {
                 console.error("infoUpNotification:failed to connect");
                 relay.close();
@@ -62,7 +63,7 @@ const infoUpNotification = async (rssJsonPath, rssJson, i) => {
             if(rssJson[i].gitHubPush === 1) {
                 const fileNamewk = rssJsonPath.split("/").pop();
                 const rssJsonPathSingle = `config/${fileNamewk}`;   // "../config/infoUpNotification.json" を "config/infoUpNotification.json" の形にする
-                await toGitHubPush(gitRepoName, rssJsonPath, rssJsonPathSingle, gitUserName, gitToken, "[auto]"+ rssJson[i].nickName + " RSS info update", gitBranch);
+                await toGitHubPush(GIT_REPO, rssJsonPath, rssJsonPathSingle, GIT_USER_NAME, GIT_TOKEN, "[auto]"+ rssJson[i].nickName + " RSS info update", GIT_BRANCH);
                 console.log("infoUpNotification.json is commit/push");
             }
         }
@@ -119,25 +120,25 @@ const main = async () => {
             return;
         }           
 
-        // 秘密鍵
-        require("dotenv").config();
-        const nsec = process.env.BOT_PRIVATE_KEY;
-        if (nsec === undefined) {
-            console.error("nsec is not found");
-            return;
-        }
-        const dr = nip19.decode(nsec);
-        if (dr.type !== "nsec") {
-            console.error("NOSTR PRIVATE KEY is not nsec");
-            return;
-        }
-        BOT_PRIVATE_KEY_HEX = dr.data;
-        pubkey = getPublicKey(BOT_PRIVATE_KEY_HEX); // 秘密鍵から公開鍵の取得
+        // // 秘密鍵
+        // require("dotenv").config();
+        // const nsec = process.env.BOT_PRIVATE_KEY;
+        // if (nsec === undefined) {
+        //     console.error("nsec is not found");
+        //     return;
+        // }
+        // const dr = nip19.decode(nsec);
+        // if (dr.type !== "nsec") {
+        //     console.error("NOSTR PRIVATE KEY is not nsec");
+        //     return;
+        // }
+        // BOT_PRIVATE_KEY_HEX = dr.data;
+        // pubkey = getPublicKey(BOT_PRIVATE_KEY_HEX); // 秘密鍵から公開鍵の取得
 
-        gitUserName = process.env.GIT_USER_NAME;
-        gitRepoName = process.env.GIT_REPO;
-        gitToken = process.env.GIT_TOKEN;
-        gitBranch = process.env.GIT_BRANCH;
+        // gitUserName = process.env.GIT_USER_NAME;
+        // gitRepoName = process.env.GIT_REPO;
+        // gitToken = process.env.GIT_TOKEN;
+        // gitBranch = process.env.GIT_BRANCH;
 
         // jsonの rss プロパティの数だけ回る
         const len = rssJson.length;

@@ -4,13 +4,10 @@
  * 受けたリプライに対してjsonに設定された語句でランダムでリプライする
  */
 require("websocket-polyfill");
-const { relayInit, getPublicKey, finishEvent, nip19 } = require("nostr-tools");
+const { relayInit, finishEvent } = require("nostr-tools");
 const { currUnixtime, random, jsonSetandOpen, isSafeToReply, retrievePostsInPeriod } = require("./common/utils.js");
+const { BOT_PRIVATE_KEY_HEX, pubkey, RELAY_URL } = require("./common/env.js");
 const { publishToRelay } = require("./common/publishToRelay.js");
-
-let relayUrl = "";
-let BOT_PRIVATE_KEY_HEX = "";
-let pubkey = "";
 
 const replytoReply = async (relay)=>{
 
@@ -151,24 +148,24 @@ const composeReplyPost = (content, targetEvent) => {
  ***************/
 const main = async () => {
 
-    // 秘密鍵
-    require("dotenv").config();
-    const nsec = process.env.BOT_PRIVATE_KEY;
-    if (nsec === undefined) {
-        console.error("nsec is not found");
-        return;
-    }
-    const dr = nip19.decode(nsec);
-    if (dr.type !== "nsec") {
-        console.error("NOSTR PRIVATE KEY is not nsec");
-        return;
-    }
-    BOT_PRIVATE_KEY_HEX = dr.data;
-    pubkey = getPublicKey(BOT_PRIVATE_KEY_HEX); // 秘密鍵から公開鍵の取得
+    // // 秘密鍵
+    // require("dotenv").config();
+    // const nsec = process.env.BOT_PRIVATE_KEY;
+    // if (nsec === undefined) {
+    //     console.error("nsec is not found");
+    //     return;
+    // }
+    // const dr = nip19.decode(nsec);
+    // if (dr.type !== "nsec") {
+    //     console.error("NOSTR PRIVATE KEY is not nsec");
+    //     return;
+    // }
+    // BOT_PRIVATE_KEY_HEX = dr.data;
+    // pubkey = getPublicKey(BOT_PRIVATE_KEY_HEX); // 秘密鍵から公開鍵の取得
 
     // リレー
-    relayUrl = process.env.RELAY_URL;    // リレーURL
-    const relay = await relayInit(relayUrl);
+    //relayUrl = process.env.RELAY_URL;    // リレーURL
+    const relay = await relayInit(RELAY_URL);
     relay.on("error", () => {
         console.error("replytoReply:failed to connect");
         relay.close();
