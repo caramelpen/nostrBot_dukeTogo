@@ -4,7 +4,7 @@
  * jsonファイルに記載されたURLの更新情報をRSSフィードを用いてポストする
  */
 require("websocket-polyfill");
-const { relayInit, getPublicKey, finishEvent, nip19 } = require("nostr-tools");
+const { relayInit, finishEvent } = require("nostr-tools");
 const { currUnixtime, jsonOpen, random, writeJsonFile } = require("./common/utils.js");
 const { BOT_PRIVATE_KEY_HEX, pubkey, RELAY_URL, GIT_USER_NAME, GIT_REPO, GIT_TOKEN, GIT_BRANCH} = require("./common/env.js");
 const { publishToRelay } = require("./common/publishToRelay.js");
