@@ -4,21 +4,46 @@
  * 受けたリプライに対してjsonに設定された語句でランダムでリプライする
  */
 require("websocket-polyfill");
-const { relayInit, finishEvent } = require("nostr-tools");
-const { currUnixtime, random, jsonSetandOpen, isSafeToReply, retrievePostsInPeriod } = require("./common/utils.js");
-const { BOT_PRIVATE_KEY_HEX, pubkey, RELAY_URL } = require("./common/env.js");
-const { publishToRelay } = require("./common/publishToRelay.js");
+const { relayInit } = require("nostr-tools");
+const { jsonSetandOpen } = require("./common/utils.js");
+const { BOT_PRIVATE_KEY_HEX, pubkey, RELAY_URL, adminPubkey } = require("./common/env.js");
+const { initial, functionalPosting, exchangeRate, normalAutoReply } = require("./replyFunction.js");
+
+// envファイルのかたまり
+const keys = {
+    BOT_PRIVATE_KEY_HEX: BOT_PRIVATE_KEY_HEX
+    , pubKey: pubkey
+    , adminPubkey: adminPubkey
+};
+const envKeys = Object.freeze(keys);    // 変更不可のかたまりにしてしまう
+
+// 作動区分
+const postCategory = 0;
+// 参照渡しできるようにオブジェクト化する
+const postInfo = {
+    postCategory: postCategory
+}
+
+// replyFunction へ各キーを代入する
+initial(envKeys);
+
+// ディスパッチのオブジェクト
+const funcObj = {
+    functionalPosting   // 機能ポスト
+    ,exchangeRate       // 為替ポスト
+    ,normalAutoReply    // 通常リプライ
+}
+
+
+// ディスパッチの設定値
+const funcConfig = {
+    funcName: ["functionalPosting", "exchangeRate", "normalAutoReply"]                  // useJsonFile の記述順と対応させる
+    ,useJsonFile: ["functionalPosting.json", "exchangeRate.json", "autoReply.json"]     // funcName の記述順と対応させる
+    ,operationCategory: [1, 1, 1]                                                       // 1ならポストできたら次へ進めない（useJsonFileやuncName の記述順と対応させる）
+}
+
 
 const replytoReply = async (relay)=>{
-
-    // jsonの場所の割り出しとリプライ語句入りjsonファイルの場所の設定（自動リプライ時に使用しているjsonの反応語句をそのまま利用する）
-    const commonPath = "../../config/"  // configの場所はここからみれば../config/だが、util関数の場所から見れば../../config/となる
-    const functionalPostingJson = await jsonSetandOpen(commonPath + "functionalPosting.json");
-    const replyChrJson = await jsonSetandOpen(commonPath + "autoReply.json");
-    if(replyChrJson === null){
-        console.error("replytoReply:json file is not get");
-        return false;
-    }
 
     // このBotの公開鍵へのリプライを絞り込むフィルタを設定して、イベントを購読する
     const sub = relay.sub(
@@ -30,117 +55,42 @@ const replytoReply = async (relay)=>{
         ]
     );
 
-    sub.on("event", (ev) => {
+    sub.on("event", async (ev) => {
         try {
 
-            //(一応明示)有効とするのはリプライなのでtagに値があるもののみ
-            //if(ev.tags.length > 0) {
             //有効とするのは自分以外の投稿と、(一応明示)リプライなのでtagに値があるもののみ
             if(ev.pubkey !== pubkey && ev.tags.length > 0) {
 
-                // リプライしても安全なら、リプライイベントを組み立てて送信する
-                if (isSafeToReply(ev) && retrievePostsInPeriod(relay, pubkey)) {
-                    // 作動区分
-                    let postKb = 0;
-                    let jsonTarget = functionalPostingJson !== null? functionalPostingJson: replyChrJson; // 機能ポストを優先させる
-                    let isfunctionalPostingJson = true;
+                // jsonの場所の割り出しとリプライ語句入りjsonファイルの場所の設定（自動リプライ時に使用しているjsonの反応語句をそのまま利用する）
+                const jsonCommonPath = "../../config/";    // configの場所はここからみれば../config/だが、util関数の場所から見れば../../config/となる
+                // jsonの場所の割り出しと設定
+                const autoReactionJson = await jsonSetandOpen(jsonCommonPath + "autoReaction.json");    
 
-                    let target = null;
-                    for(let i = 1; i <= 2; i++) {
-                        // フィードのポストの中にjsonで設定した値が存在するなら真
-                        target = jsonTarget.find(item => item.orgPost.some(post => ev.content.includes(post)));
-                        if(!target) {
-                            jsonTarget = replyChrJson;
-                            isfunctionalPostingJson = false;
-                        } else {
-                            break;
-                        }
-                    }
-                    // 反応語句を見つけたならそれに対応するリプライ語句を使ってリプライを返す
-                    if(target) {
-
-                        // 反応語句はjsonの何番目にいるか取得
-                        const orgPostIdx = target.orgPost.findIndex(element => ev.content.includes(element));
-                        // 反応語句は存在するはずだが、もし何らかの理由で見つからなかったら
-                        if(orgPostIdx === -1) {
-                            postKb = 1; // 全リプライ語句からのランダムリプライ
-                            if(isfunctionalPostingJson == true) {
-                                postKb = 0; // ありえないと思うが、起こったら何も行わない
-                            }
-                        } else {
-                            postKb = 2; //反応語句に対応するリプライ語句を使ってリプライを返す
-                        }
-
-                    } else {
-                        postKb = 1; // 全リプライ語句からのランダムリプライ
-                    }
-
-                    // 作動対象だ
-                    if(postKb > 0) {
-                        let replyChr = "";
-                        if(postKb === 1){
-                            // 反応語句配列の数の範囲からランダム値を取得し、それを配列要素とする
-                            const replyChrPresetIdx = random(0, jsonTarget.length - 1);
-                            // 配列要素を決めたら、その配列に設定されている反応語句の設定配列の範囲からさらにランダム値を取得
-                            const replyChrIdx = random(0, jsonTarget[replyChrPresetIdx].replyPostChar.length - 1);
-                            // リプライ語句決定
-                            replyChr = jsonTarget[replyChrPresetIdx].replyPostChar[replyChrIdx];
-                        } else {
-                            if(postKb === 2) {
-                                // 機能ポスト
-                                if(isfunctionalPostingJson == true) {
-                                    for(let i = 0; i <= target.replyPostChar.length - 1; i++) {
-                                        replyChr += target.replyPostChar[i];
-                                    }
-                                } else {
-
-                                    // jsonに設定されている対応するリプライの数を利用してランダムでリプライ語句を決める
-                                    const randomIdx = random(0, target.replyPostChar.length - 1);
-                                    // リプライ語句決定
-                                    replyChr = target.replyPostChar[randomIdx];
-                                }
-                            }
-                        }
-                        if(replyChr.length > 0) {   //念のため
-                            // リプライ
-                            const replyPostEv = composeReplyPost(replyChr, ev);
-                            publishToRelay(relay, replyPostEv, false, ev.pubkey, ev.content);
-                        }
-                    }
+                if(autoReactionJson === null) {
+                    console.log("json file is not get");
+                    return;
                 }
 
+                for(let i = 0; i <= funcConfig.funcName.length - 1; i++) {
+                    postInfo.postCategory = 0;
+                    let funcJson = await jsonSetandOpen(jsonCommonPath + funcConfig.useJsonFile[i]); // configの場所はここからみれば../config/だが、util関数の場所から見れば../../config/となる
+                    if(funcJson === null) {
+                        console.log("json file is not get");
+                        return;
+                    }
+                    // 処理の実行はディスパッチで行い、最適化をはかる
+                    await funcObj[funcConfig.funcName[i]](relay, ev, funcJson, autoReactionJson, postInfo, true);
+                    // ポストできていて、次へ進めない区分なら
+                    if(postInfo.postCategory >= 1 && funcConfig.operationCategory[i] === 1) {
+                        break;
+                    }
+                }
             }
         } catch (err) {
             throw err;
         }
     });
-
 }
-
-
-
-// テキスト投稿イベント(リプライ)を組み立てる
-const composeReplyPost = (content, targetEvent) => {
-    const ev = {
-        kind: 1,
-        content,
-        tags: [ 
-        ["p",targetEvent.pubkey,""],
-        ["e",targetEvent.id,""] 
-        ],
-        created_at: currUnixtime(),
-    };
-
-    // イベントID(ハッシュ値)計算・署名
-    return finishEvent(ev, BOT_PRIVATE_KEY_HEX);
-};
-
-
-
-
-
-
-
 
 
 /****************
@@ -148,23 +98,7 @@ const composeReplyPost = (content, targetEvent) => {
  ***************/
 const main = async () => {
 
-    // // 秘密鍵
-    // require("dotenv").config();
-    // const nsec = process.env.BOT_PRIVATE_KEY;
-    // if (nsec === undefined) {
-    //     console.error("nsec is not found");
-    //     return;
-    // }
-    // const dr = nip19.decode(nsec);
-    // if (dr.type !== "nsec") {
-    //     console.error("NOSTR PRIVATE KEY is not nsec");
-    //     return;
-    // }
-    // BOT_PRIVATE_KEY_HEX = dr.data;
-    // pubkey = getPublicKey(BOT_PRIVATE_KEY_HEX); // 秘密鍵から公開鍵の取得
-
     // リレー
-    //relayUrl = process.env.RELAY_URL;    // リレーURL
     const relay = await relayInit(RELAY_URL);
     relay.on("error", () => {
         console.error("replytoReply:failed to connect");
@@ -174,7 +108,6 @@ const main = async () => {
 
     await relay.connect();
     console.log("replytoReply:connected to relay");        
-
 
     try {
         /*

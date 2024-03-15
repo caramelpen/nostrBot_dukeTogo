@@ -7,13 +7,11 @@ pm2config.json
 package.json
 /.log
 /_tst
-new_replytoReply.js
-bk_replytoReply.js
+_old_replytoReply.js
 _dev_presetDate.json
 _old_presetDate.json
 _dev_autoPostatPresetTime.js
 _old_autoPostatPresetTime.js
-replyFunction.js
 _dev_autoReply.js
-env.js
+_old_autoReply.js
 _dev_replytoReply.js
