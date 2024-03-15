@@ -5,7 +5,7 @@
  */
 require("websocket-polyfill");
 const cron = require("node-cron");
-const { relayInit, finishEvent, nip19 } = require("nostr-tools");
+const { relayInit, finishEvent } = require("nostr-tools");
 
 const sunCalc = require("suncalc");
 const { currDateTime, currUnixtime, random, jsonSetandOpen, writeJsonFile, formattedDateTime } = require("./common/utils.js");
@@ -14,20 +14,10 @@ const { publishToRelay } = require("./common/publishToRelay.js");
 const { toGitHubPush } = require("./common/gitHubCooperation.js");
 
 let sunriseSunsetJson = null;
-//let BOT_PRIVATE_KEY_HEX = "";
-//let pubkey = "";
 let postEv;
-//let relayUrl = "";
 
 let sunriseorSunset = "";
 let sunriseSunsetJsonPath = "";
-
-// let gitUserName = "";
-// let gitRepoName = "";
-// let gitToken = "";
-// let gitBranch = "";
-
-
 
 // 定刻ポスト
 const subPresetPost = (presetDatePath, nowDate) => {
@@ -311,26 +301,6 @@ const main = async () => {
         // 現在日時
         const nowDate = currDateTime();
 
-        // // 秘密鍵
-        // require("dotenv").config();
-        // const nsec = process.env.BOT_PRIVATE_KEY;
-        // if (nsec === undefined) {
-        //     console.error("nsec is not found");
-        //     return;
-        // }
-        // const dr = nip19.decode(nsec);
-        // if (dr.type !== "nsec") {
-        //     console.error("NOSTR PRIVATE KEY is not nsec");
-        //     return;
-        // }
-        // BOT_PRIVATE_KEY_HEX = dr.data;
-        // pubkey = getPublicKey(BOT_PRIVATE_KEY_HEX); // 秘密鍵から公開鍵の取得
-
-        // gitUserName = process.env.GIT_USER_NAME;
-        // gitRepoName = process.env.GIT_REPO;
-        // gitToken = process.env.GIT_TOKEN;
-        // gitBranch = process.env.GIT_BRANCH;
-
         // jsonの場所を割り出すために
         const jsonPath = require("path");
 
@@ -353,7 +323,6 @@ const main = async () => {
                 if(postSubject) {
 
                     // リレー
-                    //relayUrl = process.env.RELAY_URL;    // リレーURL
                     const relay = await relayInit(RELAY_URL);
                     relay.on("error", () => {
                         console.error("autoPostatPresetTime:failed to connect");
