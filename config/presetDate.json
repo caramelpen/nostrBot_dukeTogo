@@ -2,7 +2,7 @@
     "[description of midnightConditions]": [
         {
             "description": "midnightConditions は毎日0:00に稼働します"
-            ,"description2": "specificDate jpnHoliday specificMonth specificDay everyNDays dayName　の優先順に見ていき、どこかでポストしたら後のものは無視します"
+            ,"description2": "specificDate jpnHoliday specificMonth specificDay everyNDays dayName everyMinutes の優先順に見ていき、どこかでポストしたら後のものは無視します"
         }
     ]
     ,"midnightConditions": [
@@ -89,6 +89,22 @@
             ]
         }
 
+        ,{
+            "[description of everyMidnight]": "minutes だったら messages と subMessages を使用してポストします(minutes は HH:MM 形式で指定すること)"
+            ,"type": "everyMidnight"
+            ,"value": [
+                {
+                    "messages": [
+                                    "もういい…眠れ…"
+                                    ,"そろそろ眠ったらどうだ…？"
+                                    ,"けっこうだ……俺はどこででも眠れる……"
+                                    ,"眠れなくても目を閉じていろ…"
+                                    ,"睡眠の質は翌日の仕事に影響する…"
+                                ]
+                    ,"subMessages": []
+                }
+            ]
+        }
     ]
   
 
@@ -106,20 +122,7 @@
             "[description of everyMinutes]": "minutes だったら messages と subMessages を使用してポストします(minutes は HH:MM 形式で指定すること)"
             ,"type": "everyMinutes"
             ,"value": [
-
                 {
-                    "minutes": "00:00"
-                    ,"messages": [
-                                    "もういい…眠れ…"
-                                    ,"そろそろ眠ったらどうだ…？"
-                                    ,"けっこうだ……俺はどこででも眠れる……"
-                                    ,"眠れなくても目を閉じていろ…"
-                                    ,"睡眠の質は翌日の仕事に影響する…"
-                                ]
-                    ,"subMessages": []
-                }                
-
-                ,{
                     "minutes": "07:00"
                     ,"messages": [
                                     "…朝食の時間だ…"
@@ -130,6 +133,7 @@
                                 ]
                     ,"subMessages": []
                 }
+
                 ,{
                     "minutes": "19:15"
                     ,"messages": [

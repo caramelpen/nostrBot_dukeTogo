@@ -122,7 +122,14 @@ const subPresetPost = (presetDatePath, nowDate) => {
                         }
                         idx ++;
                     }
+
+                // 0:00 
+                } else if(condition.type === "everyMidnight") {
+                    postSubject = true;
+                    break;
                 }
+
+                
 
                 if(postSubject) {
                     // ポスト語句は複数設定されており、設定数の範囲でランダムに取得
