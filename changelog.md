@@ -1,3 +1,6 @@
+## ver.240316
+- 3/4 の暴走事案の修正と、各機能の見直しと追加
+
 ## ver.240301
 - `functionalPosting.json`を追加し`autoReply.js`に機能リプライ機能の追加
 
