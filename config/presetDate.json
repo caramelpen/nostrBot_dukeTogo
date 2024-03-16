@@ -1,7 +1,14 @@
 {
-    "midnightConditions": [
+    "[description of midnightConditions]": [
         {
-            "type": "specificDate"
+            "description": "midnightConditions は毎日0:00に稼働します"
+            ,"description2": "specificDate specificMonth specificDay everyNDays dayName　の優先順に見ていき、どこかでポストしたら後のものは無視します"
+        }
+    ]
+    ,"midnightConditions": [
+        {
+            "[description of specificDate]": "date になったら messages と subMessages を使用してポストします(date は MM/DD 形式で設定)"
+            ,"type": "specificDate"
             ,"value": [
                 {
                     "date": "12/31"
@@ -21,7 +28,8 @@
             ]
         }
         ,{
-            "type": "specificMonth"
+            "[description of specificMonth]": "month になったら messages と subMessages を使用してポストします"            
+            ,"type": "specificMonth"
             ,"value": [
                 {
                     "month": "12"
@@ -31,7 +39,8 @@
             ]
         }
         ,{
-            "type": "specificDay"
+            "[description of specificDay]": "day になったら messages と subMessages を使用してポストします(day は「1」「31」などの日付を設定すること)" 
+            ,"type": "specificDay"
             ,"value": [
                 {
                     "day": ""
@@ -41,7 +50,8 @@
             ]
         }
         ,{
-            "type": "everyNDays"
+            "[description of everyNDays]": "今年の残り日数が number で割り切れたら messages と subMessages を使用してポストします" 
+            ,"type": "everyNDays"
             ,"value": [
                 {
                     "number": 10
@@ -50,12 +60,34 @@
                 }
             ]
         }
+        ,{
+            "[description of dayName]": "曜日が dayName だったら messages と subMessages を使用してポストします（dayName の指定は「月」や「火」など「曜日」は含めないで指定すること）"
+            ,"type": "dayName"
+            ,"value": [
+                {
+                    "dayName": ""
+                    ,"messages": ["今日は"]
+                    ,"subMessages": ["曜だ…", "曜のようだ…"]
+                }
+            ]
+        }
 
     ]
   
+
+
+
+
+
+    ,"[description of minuteConditions]": [
+        {
+            "description": "minuteConditions は毎分稼働します"
+        }
+    ]
     ,"minuteConditions": [
         {
-            "type": "everyMinutes"
+            "[description of everyMinutes]": "minutes だったら messages と subMessages を使用してポストします(minutes は HH:MM 形式で指定すること)"
+            ,"type": "everyMinutes"
             ,"value": [
 
                 {

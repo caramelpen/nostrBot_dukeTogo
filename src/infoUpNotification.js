@@ -12,14 +12,7 @@ const { toGitHubPush } = require("./common/gitHubCooperation.js");
 const cron = require("node-cron");
 const parser = require("rss-parser");
 
-//let relayUrl = "";
-// let BOT_PRIVATE_KEY_HEX = "";
-// let pubkey = "";
 let postEv;
-// let gitUserName = "";
-// let gitRepoName = "";
-// let gitToken = "";
-// let gitBranch = "";
 
 const infoUpNotification = async (rssJsonPath, rssJson, i) => {
     let connectedSw = 0;
@@ -41,7 +34,6 @@ const infoUpNotification = async (rssJsonPath, rssJson, i) => {
             postEv = composePost(postChr);
 
             // リレー
-            //relayUrl = process.env.RELAY_URL;    // リレーURL
             relay = await relayInit(RELAY_URL);
             relay.on("error", () => {
                 console.error("infoUpNotification:failed to connect");
@@ -119,26 +111,6 @@ const main = async () => {
             console.log("json file is not get");
             return;
         }           
-
-        // // 秘密鍵
-        // require("dotenv").config();
-        // const nsec = process.env.BOT_PRIVATE_KEY;
-        // if (nsec === undefined) {
-        //     console.error("nsec is not found");
-        //     return;
-        // }
-        // const dr = nip19.decode(nsec);
-        // if (dr.type !== "nsec") {
-        //     console.error("NOSTR PRIVATE KEY is not nsec");
-        //     return;
-        // }
-        // BOT_PRIVATE_KEY_HEX = dr.data;
-        // pubkey = getPublicKey(BOT_PRIVATE_KEY_HEX); // 秘密鍵から公開鍵の取得
-
-        // gitUserName = process.env.GIT_USER_NAME;
-        // gitRepoName = process.env.GIT_REPO;
-        // gitToken = process.env.GIT_TOKEN;
-        // gitBranch = process.env.GIT_BRANCH;
 
         // jsonの rss プロパティの数だけ回る
         const len = rssJson.length;

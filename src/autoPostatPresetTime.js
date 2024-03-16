@@ -1,7 +1,7 @@
 /**
  * 狙撃屋13bot(@dukeTogo)
  * autoPostatPresetTime.js
- * jsonに設定された指定の時刻に対応する語句をポスト
+ * jsonに設定された指定の日時に対応する語句をポスト
  */
 require("websocket-polyfill");
 const cron = require("node-cron");
@@ -45,7 +45,7 @@ const subPresetPost = (presetDatePath, nowDate) => {
                 let subMessage = "";
                 let postSubject = false;
                 let idx = 0;
-                // 投稿の優先順位は 指定日 指定月 指定日 残10日単位 で行う
+                // 投稿の優先順位は 指定月日 指定月 指定日 残10日単位 曜日 で行う
                 // 指定月日
                 if (condition.type === "specificDate") {
                     for (let value of condition.value) {
@@ -85,7 +85,7 @@ const subPresetPost = (presetDatePath, nowDate) => {
                         idx ++;
                     }
 
-                // 今年の残日数が10日単位
+                // 今年の残日数がvalue.number日単位
                 } else if (condition.type === "everyNDays") {
                     for (let value of condition.value) {
                         if(value.number.length > 0) {
@@ -98,6 +98,20 @@ const subPresetPost = (presetDatePath, nowDate) => {
                         idx ++;
                     }
             
+                // 曜日
+                } else if(condition.type === "dayName") {
+                    for (let value of condition.value) {
+                        if(value.dayName.length > 0) {
+                            const options = { weekday: "narrow" };  //「月」「火」などの形式で得る（「曜日」もつけたい場合は「long」と指定）
+                            const dayOfWeek = new Intl.DateTimeFormat("ja-JP", options).format(nowDate);                            
+                            if(dayOfWeek === value.dayName) {
+                                message = dayOfWeek;
+                                postSubject = true;
+                                break;
+                            }
+                        }
+                        idx ++;
+                    }
                 }
 
                 if(postSubject) {
