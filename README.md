@@ -17,6 +17,7 @@
   - octokit (3.1.2) ...GitHubへのプッシュで使用しています
   - rss-parser (3.13.0) ...RSSフィードの購読を行います
   - axios (1.6.7) ...通貨の為替レートの取得のために使用しています
+  - @holiday-jp/holiday_jp@ (2.4.0) ...祝日取得のために使用しています
   - ほかに環境によってはPM2などの永続化に対応したモジュールを必要に応じて使用してください
 
 
@@ -25,7 +26,6 @@
 ├─config
 │      autoReaction.json
 │      autoReply.json
-│      autoReplyPriorityOrder.json
 │      exchangeRate.json
 │      functionalPosting.json
 │      infoUpNotification.json
@@ -36,12 +36,15 @@
     │  autoPostatPresetTime.js
     │  autoReply.js
     │  infoUpNotification.js
+    │  replyFunction.js
     │  replytoReply.js
     │
     └─common
-            gitHubCooperation.js 
-            publishToRelay.js
-            utils.js
+           │ env.js 
+           │ gitHubCooperation.js 
+           │ lastReplyTimePerPubkey.js
+           │ publishToRelay.js
+           │ utils.js
 </pre>
 
 ### 2.各ファイルの役割概要
@@ -53,20 +56,18 @@
 - 2-1-2.autoReply.json
   - `src\autoReply.js`、`replytoReply.js`で使用（後述）
   - 内容は随時更新していきます
-- 2-1-3.autoReplyPriorityOrder.json
+- 2-1-3.exchangeRate.json  
   - `src\autoReply.js`で使用（後述）
-- 2-1-4.exchangeRate.json  
-  - `src\autoReply.js`で使用（後述）
-- 2-1-5.functionalPosting.json
+- 2-1-4.functionalPosting.json
   - `src\autoReply.js`、`replytoReply.js`で使用（後述）
   - 内容は随時更新していきます 
-- 2-1-6.infoUpNotification.json
+- 2-1-5.infoUpNotification.json
   - `src\infoUpNotification.js`で使用（後述）
   - 内容は随時更新していきます
-- 2-1-7.presetDate.json
+- 2-1-6.presetDate.json
   - `src\autoPostatPresetTime.js`で使用（後述）
   - 内容は随時更新していきます
-- 2-1-8.sunriseSunset.json
+- 2-1-7.sunriseSunset.json
   - `src\autoPostatPresetTime.js`で使用（後述）
   - 内容は随時更新していきます
 
@@ -77,15 +78,21 @@
   - `autoReaction.json`、`exchangeRate.json`、`autoReply.json`に設定された語句を発見するとそれに対応する設定値をリアクションやリプライ
 - 2-2-3.infoUpNotification.js
   - `infoUpNotification.json`に設定されたRSSフィードを1時間おきに購読し、変更があればポスト
-- 2-2-4.replytoReply.js
+- 2-2-4.replyFunction.js
+  - `replytoReply`や`replytoReply`では共通のポスト仕様が適用されるため、その機能を集約したもの 
+- 2-2-5.replytoReply.js
   - リプライを受けると`autoReply.json`に設定された設定値でリプライ
 
 ### 2-3.src/common ディレクトリ
-- 2-3-1.gitHubCooperation.js
+- 2-3-1.env.js
+  - .envの設定値を納める
+- 2-3-2.gitHubCooperation.js
   - GitHubとの連携（現在はプッシュ）機能
-- 2-3-2.publishToRelay.js
+- 2-3-3.lastReplyTimePerPubkey.js
+  - `autoReply.js`が最後にリプライした日時を保管しておくマップ  
+- 2-3-4.publishToRelay.js
   - リレーにイベントを送信する
-- 2-3-3.utils.js
+- 2-3-5.utils.js
   - 共通関数
 
 
