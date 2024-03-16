@@ -126,7 +126,6 @@ const subPresetPost = (presetDatePath, nowDate) => {
                 // 0:00 
                 } else if(condition.type === "everyMidnight") {
                     postSubject = true;
-                    break;
                 }
 
                 
