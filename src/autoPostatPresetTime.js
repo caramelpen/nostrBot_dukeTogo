@@ -8,6 +8,7 @@ const cron = require("node-cron");
 const { relayInit, finishEvent } = require("nostr-tools");
 
 const sunCalc = require("suncalc");
+const jpnHolidays = require('@holiday-jp/holiday_jp');
 const { currDateTime, currUnixtime, random, jsonSetandOpen, writeJsonFile, formattedDateTime } = require("./common/utils.js");
 const { BOT_PRIVATE_KEY_HEX, pubkey, RELAY_URL, GIT_USER_NAME, GIT_REPO, GIT_TOKEN, GIT_BRANCH} = require("./common/env.js");
 const { publishToRelay } = require("./common/publishToRelay.js");
@@ -45,7 +46,7 @@ const subPresetPost = (presetDatePath, nowDate) => {
                 let subMessage = "";
                 let postSubject = false;
                 let idx = 0;
-                // 投稿の優先順位は 指定月日 指定月 指定日 残10日単位 曜日 で行う
+                // 投稿の優先順位は 指定月日 祝日 指定月 指定日 残10日単位 曜日 で行う
                 // 指定月日
                 if (condition.type === "specificDate") {
                     for (let value of condition.value) {
@@ -57,6 +58,15 @@ const subPresetPost = (presetDatePath, nowDate) => {
                             }
                         }
                         idx ++;
+                    }
+
+                // 祝日
+                } else if (condition.type === "jpnHoliday") {
+                    if (jpnHolidays.isHoliday(nowDate)) {   // 今日は祝日だ
+                        const holiday = jpnHolidays.between(nowDate, nowDate);  // 今日から今日までの祝日情報を取得(まわりくどい...)
+                        message = holiday[0].name;  // 今日のみの指定なので、0番目固定で祝日の名前を取得
+                        postSubject = true;
+                        break;
                     }
 
                 // 指定月
@@ -85,7 +95,7 @@ const subPresetPost = (presetDatePath, nowDate) => {
                         idx ++;
                     }
 
-                // 今年の残日数がvalue.number日単位
+                // 今年の残日数が value.number 日単位
                 } else if (condition.type === "everyNDays") {
                     for (let value of condition.value) {
                         if(value.number.length > 0) {

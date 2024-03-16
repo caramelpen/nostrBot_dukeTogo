@@ -2,7 +2,7 @@
     "[description of midnightConditions]": [
         {
             "description": "midnightConditions は毎日0:00に稼働します"
-            ,"description2": "specificDate specificMonth specificDay everyNDays dayName　の優先順に見ていき、どこかでポストしたら後のものは無視します"
+            ,"description2": "specificDate holidayJpn specificMonth specificDay everyNDays dayName　の優先順に見ていき、どこかでポストしたら後のものは無視します"
         }
     ]
     ,"midnightConditions": [
@@ -27,6 +27,20 @@
                 }
             ]
         }
+
+
+        ,{
+            "[description of jpnHoliday]": "今日が祝日なら messages と subMessages を使用してポストします"
+            ,"type": "jpnHoliday"
+            ,"value": [
+                {
+                    "messages": ["今日は「"]
+                    ,"subMessages": ["」だ…"]
+                }
+            ]
+        }
+
+
         ,{
             "[description of specificMonth]": "month になったら messages と subMessages を使用してポストします"            
             ,"type": "specificMonth"
@@ -38,6 +52,7 @@
                 }
             ]
         }
+
         ,{
             "[description of specificDay]": "day になったら messages と subMessages を使用してポストします(day は「1」「31」などの日付を設定すること)" 
             ,"type": "specificDay"
@@ -49,6 +64,7 @@
                 }
             ]
         }
+
         ,{
             "[description of everyNDays]": "今年の残り日数が number で割り切れたら messages と subMessages を使用してポストします" 
             ,"type": "everyNDays"
@@ -60,6 +76,7 @@
                 }
             ]
         }
+
         ,{
             "[description of dayName]": "曜日が dayName だったら messages と subMessages を使用してポストします（dayName の指定は「月」や「火」など「曜日」は含めないで指定すること）"
             ,"type": "dayName"
