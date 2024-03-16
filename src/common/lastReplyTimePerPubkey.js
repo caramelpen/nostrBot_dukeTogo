@@ -1,4 +1,5 @@
 /**
+ * lastReplyTimePerPubkey.js
  * 起動後、自動リプライした日時を保管しておくマップ
  */
 

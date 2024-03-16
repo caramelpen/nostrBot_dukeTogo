@@ -46,7 +46,7 @@ const subPresetPost = (presetDatePath, nowDate) => {
                 let subMessage = "";
                 let postSubject = false;
                 let idx = 0;
-                // 投稿の優先順位は 指定月日 祝日 指定月 指定日 残10日単位 曜日 で行う
+                // 投稿の優先順位は 指定月日 祝日 指定月 指定日 残10日単位 指定曜日 で行う
                 // 指定月日
                 if (condition.type === "specificDate") {
                     for (let value of condition.value) {
@@ -108,7 +108,7 @@ const subPresetPost = (presetDatePath, nowDate) => {
                         idx ++;
                     }
             
-                // 曜日
+                // 指定曜日
                 } else if(condition.type === "dayName") {
                     for (let value of condition.value) {
                         if(value.dayName.length > 0) {

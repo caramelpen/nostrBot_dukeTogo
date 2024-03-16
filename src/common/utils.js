@@ -1,3 +1,8 @@
+/**
+ * utils.js
+ * 共通関数
+ */
+
 const crypto = require("crypto");
 const { lastReplyTimePerPubkey } = require("./lastReplyTimePerPubkey.js");   // 公開鍵ごとに、最後にリプライを返した時刻(unixtime)を保持するMap
 
@@ -22,17 +27,6 @@ const getCliArg = (errMsg) => {
 /**
  * jsonを取得
  */
-// const asyncJsonOpen = async (jsonPath) => {
-//     const fs = require("fs").promises;
-//     try {
-//         const data = await fs.readFile(jsonPath, "utf8");
-//         const jsonData = JSON.parse(data);
-//         return jsonData;
-//     } catch (err)  {
-//         console.error("json Read Err:" + err);
-//         return null;
-//     }
-// }
 const jsonOpen = (jsonPath) => {
     const fs = require("fs");
     try {
@@ -62,30 +56,6 @@ const jsonSetandOpen = (filePath) => {
 /**
  * json の指定のプロパティへ値を書き込む
  */
-// const asyncWriteJsonFile = async (jsonPath, propertyName, writeValue, idx) => {
-//     let jsonData;
-//     const fs = require("fs").promises;
-//     try {
-//         const data = await fs.readFile(jsonPath, "utf8");
-//         jsonData = JSON.parse(data);
-//         if(idx < 0) {
-//             jsonData[propertyName] = writeValue;
-//         } else {
-//             jsonData[idx][propertyName] = writeValue;
-//         }
-
-//         // JSONデータを文字列に変換
-//         const jsonString = JSON.stringify(jsonData, null, 2);
-
-//         //jsonへ書き込み
-//         await fs.writeFile(jsonPath, jsonString, "utf8");
-//         console.log(`Property "${propertyName}" has been updated successfully.`);
-//         return true;
-//     } catch (err){
-//         console.error("json Read or Write Err:" + err);
-//         return false;
-//     }
-// }
 const writeJsonFile = (jsonPath, propertyName, writeValue, idx) => {
     let jsonData;
     const fs = require("fs");
@@ -295,10 +265,8 @@ module.exports = {
     currDateTime
     ,currUnixtime
     // ,getCliArg
-    //,asyncJsonOpen
-    , jsonOpen, jsonSetandOpen
-    //,asyncWriteJsonFile
-    , writeJsonFile
+    ,jsonOpen, jsonSetandOpen
+    ,writeJsonFile
     ,asyncIsFileExists, isFileExists
     ,isSafeToReply, updateLastReplyTime, retrievePostsInPeriod
     ,random

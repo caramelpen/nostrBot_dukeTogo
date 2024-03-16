@@ -1,5 +1,9 @@
-const { getPublicKey, nip19 } = require("nostr-tools");
+/**
+ * env.js
+ * .envファイルの取得
+ */
 
+const { getPublicKey, nip19 } = require("nostr-tools");
 
 require("dotenv").config();
 

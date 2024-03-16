@@ -31,7 +31,6 @@ const functionalPosting = async (relay, ev, functionalPostingJson, autoReactionJ
         // フィードのポストがjsonの nativeWords プロパティそのものなら真
         const isNativeWords = autoReactionJson.nativeWords.length > 0 && autoReactionJson.nativeWords.some(name => name === ev.content) ? true : false;
         // フィードのポストがjsonの nativeWords プロパティそのものではなくて、 nativeWords を含んでいるなら真
-        //const isIncludeWord = !isNativeWords && autoReactionJson.nativeWords.some(element => (ev.content).includes(element)) ? true : false;
         const isIncludeWord = !isFromReplytoReply ? (!isNativeWords && autoReactionJson.nativeWords.some(element => (ev.content).includes(element)) ? true : false) : true;
 
         // 投稿者が管理者なら真
@@ -52,7 +51,6 @@ const functionalPosting = async (relay, ev, functionalPostingJson, autoReactionJ
             // 投稿者が管理者以外
             } else {
                 // 公開キー ev.Pubkey のフォローの中に自分の公開キー pubkey がいるなら真
-                //isChkMyFollower = await chkMyFollower(relay, ev.pubkey);
                 isChkMyFollower = isFromReplytoReply ? true : await chkMyFollower(relay, ev.pubkey);
             }
             if(isChkMyFollower) {
@@ -83,7 +81,6 @@ const functionalPosting = async (relay, ev, functionalPostingJson, autoReactionJ
                     // リプライやリアクションしても安全なら、リプライイベントやリアクションイベントを組み立てて送信する
                     if (isSafeToReply(ev) && retrievePostsInPeriod(relay, pubKey)) {
                         // リプライ
-                        //const replyPostEv = composeReply(replyChr, ev);
                         const replyPostEv = !isFromReplytoReply ? composeReply(replyChr, ev) : composeReplytoReply(replyChr, ev);
 
                         publishToRelay(relay, replyPostEv, (isFromReplytoReply ? false : true), ev.pubkey, ev.content);
@@ -106,7 +103,6 @@ const exchangeRate = async (relay, ev, exchangeRate, autoReactionJson, postInfoO
         // フィードのポストがjsonの nativeWords プロパティそのものなら真
         const isNativeWords = autoReactionJson.nativeWords.length > 0 && autoReactionJson.nativeWords.some(name => name === ev.content) ? true : false;
         // フィードのポストがjsonの nativeWords プロパティそのものではなくて、 nativeWords を含んでいるなら真
-        //const isIncludeWord = !isNativeWords && autoReactionJson.nativeWords.some(element => (ev.content).includes(element)) ? true : false;
         const isIncludeWord = !isFromReplytoReply ? (!isNativeWords && autoReactionJson.nativeWords.some(element => (ev.content).includes(element)) ? true : false) : true;
 
         // 投稿者が管理者なら真
@@ -129,7 +125,6 @@ const exchangeRate = async (relay, ev, exchangeRate, autoReactionJson, postInfoO
             // 投稿者が管理者以外
             } else {
                 // 公開キー ev.Pubkey のフォローの中に自分の公開キー pubkey がいるなら真
-                //isChkMyFollower = await chkMyFollower(relay, ev.pubkey);
                 isChkMyFollower = isFromReplytoReply ? true : await chkMyFollower(relay, ev.pubkey);
             }
             if(isChkMyFollower) {
@@ -194,7 +189,6 @@ const exchangeRate = async (relay, ev, exchangeRate, autoReactionJson, postInfoO
             // リプライしても安全なら、リプライイベントやリアクションイベントを組み立てて送信する
             if (isSafeToReply(ev) && retrievePostsInPeriod(relay, pubKey)) {
                 // リプライ
-                //const replyPostorreactionPostEv = composeReply(replyChr, ev);
                 const replyPostorreactionPostEv = !isFromReplytoReply ? composeReply(replyChr, ev) : composeReplytoReply(replyChr, ev);
 
                 publishToRelay(relay, replyPostorreactionPostEv, (isFromReplytoReply ? false : true), ev.pubkey, ev.content);
@@ -217,7 +211,6 @@ const normalAutoReply = async (relay, ev, autoReplyJson, autoReactionJson, postI
         // フィードのポストがjsonの nativeWords プロパティそのものなら真
         const isNativeWords = autoReactionJson.nativeWords.length > 0 && autoReactionJson.nativeWords.some(name => name === ev.content) ? true : false;
         // フィードのポストがjsonの nativeWords プロパティそのものではなくて、 nativeWords を含んでいるなら真（isFromReplytoReply 経由ならいつでも真）
-        //const isIncludeWord = !isNativeWords && autoReactionJson.nativeWords.some(element => (ev.content).includes(element)) ? true : false; 
         const isIncludeWord = !isFromReplytoReply ? (!isNativeWords && autoReactionJson.nativeWords.some(element => (ev.content).includes(element)) ? true : false) : true; 
 
         // 投稿者が管理者なら真
@@ -236,7 +229,6 @@ const normalAutoReply = async (relay, ev, autoReplyJson, autoReactionJson, postI
             // 投稿者が管理者以外
             } else {
                 // 公開キー ev.Pubkey のフォローの中に自分の公開キー pubkey がいるなら真
-                //isChkMyFollower = await chkMyFollower(relay, ev.pubkey);
                 isChkMyFollower = isFromReplytoReply ? true : await chkMyFollower(relay, ev.pubkey);
 
                 if(isChkMyFollower) {
@@ -291,7 +283,6 @@ const normalAutoReply = async (relay, ev, autoReplyJson, autoReactionJson, postI
             } else {
                 // フィードのポストがjsonの nativeWords プロパティそのもので、かつ自分をフォローしている人なら
                 if(isNativeWords) {
-                    //isChkMyFollower = await chkMyFollower(relay, ev.pubkey);
                     isChkMyFollower = isFromReplytoReply ? true : await chkMyFollower(relay, ev.pubkey);
 
                     if(isChkMyFollower) {
@@ -314,7 +305,6 @@ const normalAutoReply = async (relay, ev, autoReplyJson, autoReactionJson, postI
                     // jsonに設定されている対応するリプライ語句の数を利用してランダムでリプライ語句を決める
                     const randomIdx = random(0, target.replyPostChar.length - 1);
                     // リプライ
-                    //replyPostorreactionPostEv = composeReply(target.replyPostChar[randomIdx], ev);
                     replyPostorreactionPostEv = !isFromReplytoReply ? composeReply(target.replyPostChar[randomIdx], ev) : composeReplytoReply(target.replyPostChar[randomIdx], ev);
 
                 } else if(postInfoObj.postCategory === 2) {
@@ -325,7 +315,6 @@ const normalAutoReply = async (relay, ev, autoReplyJson, autoReactionJson, postI
                     // リプライ語句決定
                     replyChr = autoReplyJson[replyChrPresetIdx].replyPostChar[replyChrIdx];
                     // リプライ
-                    //replyPostorreactionPostEv = composeReply(replyChr, ev);
                     replyPostorreactionPostEv = !isFromReplytoReply ? composeReply(replyChr, ev) : composeReplytoReply(replyChr, ev);
 
                 } else if(postInfoObj.postCategory === 3) {
@@ -339,7 +328,6 @@ const normalAutoReply = async (relay, ev, autoReplyJson, autoReactionJson, postI
                     // カスタム絵文字URLが未設定ならそれはカスタム絵文字ではないので、リアクションせず、既存絵文字でリプライする
                     } else {
                         // リプライ
-                        //replyPostorreactionPostEv = composeReply(autoReactionJson.contentReaction[randomReactionIdx], ev);
                         replyPostorreactionPostEv = !isFromReplytoReply ? composeReply(autoReactionJson.contentReaction[randomReactionIdx], ev) : composeReplytoReply(autoReactionJson.contentReaction[randomReactionIdx], ev);
 
                     }
