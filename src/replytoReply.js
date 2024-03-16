@@ -59,7 +59,7 @@ const replytoReply = async (relay)=>{
         try {
 
             //有効とするのは自分以外の投稿と、(一応明示)リプライなのでtagに値があるもののみ
-            if(ev.pubkey !== pubkey && ev.tags.length > 0) {
+            if(pubkey !== undefined && ev.pubkey !== pubkey && ev.tags.length > 0) {
 
                 // jsonの場所の割り出しとリプライ語句入りjsonファイルの場所の設定（自動リプライ時に使用しているjsonの反応語句をそのまま利用する）
                 const jsonCommonPath = "../../config/";    // configの場所はここからみれば../config/だが、util関数の場所から見れば../../config/となる
