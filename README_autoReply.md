@@ -6,6 +6,7 @@
 
 - 3-2-0. 現状の機能として、このbotの機能を答える`functionalPosting`、通貨の為替を答える`exchangeRate`、通常リプライである`normalAutoReply`に対応しています
   - `functionalPosting`、`exchangeRate`、`normalAutoReply`の優先順で機能し、`exchangeRate`が該当してポストを行った場合は、`normalAutoReply`は実行しません
+  - 上記機能は`replytoReply.js`と共通のため、`replyFunction.js`上でコーディングされています
 
 - 3-2-1. functionalPosting
   - フィードを購読し、`functionalPosting.json`の`orgPost`プロパティに設定してある値を発見し、その前方に`autoReaction.json`の`nativeWords`プロパティに設定してある語句があれば、  `functionalPosting.json`の`replyPostChar`プロパティの値をリプライします
