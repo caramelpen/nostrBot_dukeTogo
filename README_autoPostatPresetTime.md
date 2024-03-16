@@ -4,7 +4,7 @@
   - `presetDate.json`の設定値を使用します
   - 3-1-1-1.親プロパティ`midnightConditions`
     - `midnightConditions`は毎日0:00に起動します
-    - 子プロパティ`specificDate`、`jpnHoliday`、`specificMonth`、`specificDay`、`everyNDays`、`dayName`の順に作動し、どこかで作動すれば以降の動作は行いません
+    - 子プロパティ`specificDate`、`jpnHoliday`、`specificMonth`、`specificDay`、`everyNDays`、`dayName`、`everyMidnight`の順に作動し、どこかで作動すれば以降の動作は行いません
       - 3-1-1-1-1.`specificDate`
         - `date`プロパティの日付なら、`messages`と`subMessages`を使用してポストします(※1)
       - 3-1-1-1-2.`jpnHoliday`
@@ -17,6 +17,8 @@
         - 今日が今年の残り日数`number`で割り切れれば`messages`と`subMessages`を使用してポストします(※1)
       - 3-1-1-1-6.`dayName`
         - 今日が`dayName`曜日なら`messages`と`subMessages`を使用してポストします(※1)
+      - 3-1-1-1-7.`everyMidnight`
+        - 上記すべてに該当しなければ`messages`と`subMessages`を使用してポストします(※1)
   
   - 3-1-1-2.親プロパティ`minuteConditions`
     - `minuteConditions`は毎分起動します
