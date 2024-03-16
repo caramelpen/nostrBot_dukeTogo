@@ -25,6 +25,7 @@ const postInfo = {
     postCategory: postCategory
 }
 
+// replyFunction へ各キーを代入する
 initial(envKeys);
 
 // ディスパッチのオブジェクト
