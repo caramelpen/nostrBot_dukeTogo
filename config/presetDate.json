@@ -2,7 +2,7 @@
     "[description of midnightConditions]": [
         {
             "description": "midnightConditions は毎日0:00に稼働します"
-            ,"description2": "specificDate holidayJpn specificMonth specificDay everyNDays dayName　の優先順に見ていき、どこかでポストしたら後のものは無視します"
+            ,"description2": "specificDate jpnHoliday specificMonth specificDay everyNDays dayName　の優先順に見ていき、どこかでポストしたら後のものは無視します"
         }
     ]
     ,"midnightConditions": [
