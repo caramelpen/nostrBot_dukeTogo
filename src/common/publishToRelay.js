@@ -3,7 +3,7 @@
  * リレーにイベントを送信
  */
 
-const { currUnixtime, updateLastReplyTime } = require("./utils.js");
+const { currUnixtime, updateLastReplyTime, userDisplayName } = require("./utils.js");
 
 // リレーにイベントを送信
 const publishToRelay = (relay, ev, isAutoReply = false, originallyPubKey = "", replyingtoaPost = "") => {
@@ -17,8 +17,12 @@ const publishToRelay = (relay, ev, isAutoReply = false, originallyPubKey = "", r
         console.error("failed to send event");
     });
     */
+    let displayName = "";
+    if(originallyPubKey.length > 0){
+        displayName = userDisplayName(relay, originallyPubKey);
+    }
     relay.publish(ev).then(() => {
-        console.log("publishToRelay:success!" + ":" + (replyingtoaPost.length > 0 ? "find:" + originallyPubKey + ":" + replyingtoaPost + "\n => " :"") + ev.content);
+        console.log("publishToRelay:success!" + ":" + (replyingtoaPost.length > 0 ? "find:" + displayName + "_" + originallyPubKey + ":" + replyingtoaPost + "\n => " :"") + ev.content);
         // autoReply からやってきた
         if(isAutoReply && replyingtoaPost.length > 0) {
             // 最終更新日時を保存

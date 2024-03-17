@@ -186,8 +186,33 @@ const retrievePostsInPeriod = (relay, pubKey) => {
 }
 
 
+//第2引数の公開鍵からユーザ名を取得する
+const userDisplayName = (relay, pubKey) => {
+    return new Promise((resolve, reject) => {
+        try {
+            let display_name = "";
+            const sub = relay.sub([
+                { 
+                    kinds: [0]
+                    , authors: [pubKey]
+                }
+            ]);
+            sub.on("event", (ev) => {
+                const ev_content = ev.content;
 
+                // JSON文字列をJavaScriptオブジェクトに変換
+                const ev_obj = JSON.parse(ev_content);
+                
+                // display_nameの値を取得
+                display_name = ev_obj.display_name;
 
+                resolve(display_name);
+            });
+        } catch (error) {
+            reject(undefined);
+        }
+    });
+}
 
 
 
@@ -268,7 +293,7 @@ module.exports = {
     ,jsonOpen, jsonSetandOpen
     ,writeJsonFile
     ,asyncIsFileExists, isFileExists
-    ,isSafeToReply, updateLastReplyTime, retrievePostsInPeriod
+    ,isSafeToReply, updateLastReplyTime, retrievePostsInPeriod, userDisplayName
     ,random
     ,formattedDateTime
     ,probabilityDetermination
