@@ -190,7 +190,7 @@ const retrievePostsInPeriod = (relay, pubKey) => {
 const userDisplayName = (relay, pubKey) => {
     return new Promise((resolve, reject) => {
         try {
-            let display_name = "";
+            let displayName = "";
             const sub = relay.sub([
                 { 
                     kinds: [0]
@@ -198,15 +198,14 @@ const userDisplayName = (relay, pubKey) => {
                 }
             ]);
             sub.on("event", (ev) => {
-                const ev_content = ev.content;
 
                 // JSON文字列をJavaScriptオブジェクトに変換
-                const ev_obj = JSON.parse(ev_content);
+                const evObj = JSON.parse(ev.content);
                 
                 // display_nameの値を取得
-                display_name = ev_obj.display_name;
+                displayName = evObj.display_name;
 
-                resolve(display_name);
+                resolve(displayName);
             });
         } catch (error) {
             reject(undefined);
