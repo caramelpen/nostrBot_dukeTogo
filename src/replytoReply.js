@@ -50,7 +50,7 @@ const replytoReply = async (relay)=>{
         [
             { 
                 "kinds": [1] 
-                , "#p":[pubkey]
+                , "#p": [pubkey]
             }
         ]
     );
