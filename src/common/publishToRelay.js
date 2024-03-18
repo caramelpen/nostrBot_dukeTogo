@@ -22,7 +22,7 @@ const publishToRelay = async (relay, ev, isAutoReply = false, originallyPubKey =
         displayName = await userDisplayName(relay, originallyPubKey);
     }
     relay.publish(ev).then(() => {
-        console.log("publishToRelay:success!" + ":" + (replyingtoaPost.length > 0 ? "find:" + displayName + "_" + originallyPubKey + ":" + replyingtoaPost + "\n => " :"") + ev.content);
+        console.log("publishToRelay:success!" + ":" + (replyingtoaPost.length > 0 ? "find:" + displayName + "_" + originallyPubKey + ":" + replyingtoaPost + "\n=> " :"") + ev.content);
         // autoReply からやってきた
         if(isAutoReply && replyingtoaPost.length > 0) {
             // 最終更新日時を保存
