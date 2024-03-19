@@ -30,7 +30,7 @@ const functionalPosting = async (relay, ev, functionalPostingJson, autoReactionJ
         const target = functionalPostingJson.find(item => item.orgPost.some(post => ev.content.includes(post)));
         // フィードのポストがjsonの nativeWords プロパティそのものなら真
         const isNativeWords = autoReactionJson.nativeWords.length > 0 && autoReactionJson.nativeWords.some(name => name === ev.content) ? true : false;
-        // フィードのポストがjsonの nativeWords プロパティそのものではなくて、 nativeWords を含んでいるなら真
+        // フィードのポストがjsonの nativeWords プロパティそのものではなくて、 nativeWords を含んでいるなら真（isFromReplytoReply 経由ならいつでも真）
         const isIncludeWord = !isFromReplytoReply ? (!isNativeWords && autoReactionJson.nativeWords.some(element => (ev.content).includes(element)) ? true : false) : true;
 
         // 投稿者が管理者なら真
@@ -102,7 +102,7 @@ const exchangeRate = async (relay, ev, exchangeRate, autoReactionJson, postInfoO
         const priorityTarget = exchangeRate.find(item => item.orgPost.some(post => ev.content.includes(post)));
         // フィードのポストがjsonの nativeWords プロパティそのものなら真
         const isNativeWords = autoReactionJson.nativeWords.length > 0 && autoReactionJson.nativeWords.some(name => name === ev.content) ? true : false;
-        // フィードのポストがjsonの nativeWords プロパティそのものではなくて、 nativeWords を含んでいるなら真
+        // フィードのポストがjsonの nativeWords プロパティそのものではなくて、 nativeWords を含んでいるなら真（isFromReplytoReply 経由ならいつでも真）
         const isIncludeWord = !isFromReplytoReply ? (!isNativeWords && autoReactionJson.nativeWords.some(element => (ev.content).includes(element)) ? true : false) : true;
 
         // 投稿者が管理者なら真
@@ -114,7 +114,7 @@ const exchangeRate = async (relay, ev, exchangeRate, autoReactionJson, postInfoO
 
         replyChr = "";
 
-        // 通貨反応語句が存在し、フィードのポストがjsonの nativeWords プロパティそのものではなくて、 nativeWords を含んでいる（APIキーが取得できていて当然）
+        // 通貨反応語句が存在し、フィードのポストがjsonの nativeWords プロパティそのものではなくて、 nativeWords を含んでいる
         if(priorityTarget && isIncludeWord) {
             let arrayRet = [];
 
@@ -128,6 +128,8 @@ const exchangeRate = async (relay, ev, exchangeRate, autoReactionJson, postInfoO
                 isChkMyFollower = isFromReplytoReply ? true : await chkMyFollower(relay, ev.pubkey);
             }
             if(isChkMyFollower) {
+                let preceding = "";
+                let following = "";
 
                 // 反応語句はjsonの何番目にいるか取得
                 const orgPostIdx = priorityTarget.orgPost.findIndex(element => ev.content.includes(element));
@@ -136,35 +138,58 @@ const exchangeRate = async (relay, ev, exchangeRate, autoReactionJson, postInfoO
                     return;
                 }
 
+                // 反応語句
+                const compoundWord = priorityTarget.orgPost[orgPostIdx];
+
                 // 反応語句はポストの何文字目にいるか取得
-                const chridx = ev.content.indexOf(priorityTarget.orgPost[orgPostIdx]);
+                const chridx = ev.content.indexOf(compoundWord);
                 // 反応語句の前方を収める
                 const fowardSubstr = ev.content.substring(0, chridx);
                 // 反応語句の前方に配列で設定した nativeWords が含まれる
                 if(autoReactionJson.nativeWords.length > 0 && autoReactionJson.nativeWords.some(word => fowardSubstr.includes(word))) {
                     arrayRet = [];
+                    arrayRet = await getAvailableCurrencies("", ""); // 通貨リスト
                     // 通貨レート
                     if(priorityTarget.sw === 1) {
-                        // 正規表現パターンを構築
-                        const pattern = new RegExp(`(.{0,3})${priorityTarget.orgPost}(.{0,3})`);
 
-                        // 文字列を検索し、一致した部分を取得
-                        const match = ev.content.match(pattern);
+                        // 反応語句は通貨一覧に含まれているか
+                        const incCompoundWord = arrayRet.includes(compoundWord);
 
-                        if (match) {
-                            const preceding = match[1]; // 前の3文字
-                            const following = match[2]; // 後ろの3文字
-                            arrayRet = await getAvailableCurrencies(preceding, following, priorityTarget.sw);
-                            if(arrayRet.length <= 0) {
-                                replyChr = priorityTarget.nonGet[0];
-                                postInfoObj.postCategory = 1;    // 通貨単位は無効であることをポストするので有効とする
-                            } else {
-                                replyChr = "1 " + preceding + " は " + parseFloat(arrayRet[0]).toLocaleString() + " " + following + " " + priorityTarget.replyPostChar[0];
+                        // 反応語句が自動為替単位のどこにいるか
+                        const autoOrgCurrencyIdx = priorityTarget.autoOrgCurrency.findIndex(element => compoundWord.includes(element));
+
+                        // 反応語句がそのまま存在する通貨か、あるいは存在はしないがjsonに設定のある自動為替単位と合致する
+                        if(incCompoundWord || (!incCompoundWord && autoOrgCurrencyIdx >= 0) ) {
+                            preceding = compoundWord;
+                            following = priorityTarget.autoTargetCurrency;
+
+                        } else {
+                            // nativeWords はjsonの何番目か
+                            const nativeWordsIdx = autoReactionJson.nativeWords.findIndex(element => ev.content.includes(element));
+
+                            const idxOfNativeWordsBefore = fowardSubstr.lastIndexOf(autoReactionJson.nativeWords[nativeWordsIdx]); // nativeWords 直前の位置を取得
+
+                            if(idxOfNativeWordsBefore !== -1) {
+                                const nativeWordsAfter = ev.content.substring(idxOfNativeWordsBefore + autoReactionJson.nativeWords[nativeWordsIdx].length); // nativeWords の後ろの部分を取得
+                                const idxOfCompoundWord = nativeWordsAfter.indexOf(compoundWord); // 反応語句の位置を取得
+
+                                if (idxOfCompoundWord !== -1) {    
+                                    preceding = nativeWordsAfter.substring(0, idxOfCompoundWord); // 為替元通貨
+                                    following = nativeWordsAfter.substring(idxOfCompoundWord + compoundWord.length);    // 為替先通貨
+                                }
                             }
                         }
+
+                        arrayRet = await getAvailableCurrencies(preceding, following, priorityTarget.sw);
+                        if(arrayRet.length <= 0) {
+                            replyChr = priorityTarget.nonGet[0];
+                            postInfoObj.postCategory = 1;    // 通貨単位は無効であることをポストするので有効とする
+                        } else {
+                            replyChr = "1 " + preceding + " は " + parseFloat(arrayRet[0]).toLocaleString() + " " + following + " " + priorityTarget.replyPostChar[0];
+                        }
+
                     // 通貨一覧
                     } else {
-                        arrayRet = await getAvailableCurrencies("", "", priorityTarget.sw);
                         replyChr = "";
                         let j = 1;
                         for (let i = 0; i < arrayRet.length; i++) {
@@ -208,10 +233,10 @@ const normalAutoReply = async (relay, ev, autoReplyJson, autoReactionJson, postI
     try {
         // フィードのポストの中にjsonで設定した値が存在するなら真
         const target = autoReplyJson.find(item => item.orgPost.some(post => ev.content.includes(post)));
-        // フィードのポストがjsonの nativeWords プロパティそのものなら真
-        const isNativeWords = autoReactionJson.nativeWords.length > 0 && autoReactionJson.nativeWords.some(name => name === ev.content) ? true : false;
-        // フィードのポストがjsonの nativeWords プロパティそのものではなくて、 nativeWords を含んでいるなら真（isFromReplytoReply 経由ならいつでも真）
-        const isIncludeWord = !isFromReplytoReply ? (!isNativeWords && autoReactionJson.nativeWords.some(element => (ev.content).includes(element)) ? true : false) : true; 
+        // // フィードのポストがjsonの nativeWords プロパティそのものなら真
+        // const isNativeWords = autoReactionJson.nativeWords.length > 0 && autoReactionJson.nativeWords.some(name => name === ev.content) ? true : false;
+        // // フィードのポストがjsonの nativeWords プロパティそのものではなくて、 nativeWords を含んでいるなら真（isFromReplytoReply 経由ならいつでも真）
+        // const isIncludeWord = !isFromReplytoReply ? (!isNativeWords && autoReactionJson.nativeWords.some(element => (ev.content).includes(element)) ? true : false) : true; 
 
         // 投稿者が管理者なら真
         const isAdminPubkey = ev.pubkey === adminPubkey ? true : false;
@@ -228,7 +253,7 @@ const normalAutoReply = async (relay, ev, autoReplyJson, autoReactionJson, postI
                 postInfoObj.postCategory = 1;     // リプライ
             // 投稿者が管理者以外
             } else {
-                // 公開キー ev.Pubkey のフォローの中に自分の公開キー pubkey がいるなら真
+                // 公開キー ev.Pubkey のフォローの中に自分の公開キー pubkey がいるなら真（自分のフォロアだ）
                 isChkMyFollower = isFromReplytoReply ? true : await chkMyFollower(relay, ev.pubkey);
 
                 if(isChkMyFollower) {
@@ -246,6 +271,7 @@ const normalAutoReply = async (relay, ev, autoReplyJson, autoReactionJson, postI
                     if(autoReactionJson.nativeWords.length > 0 && autoReactionJson.nativeWords.some(word => fowardSubstr.includes(word))) {
                         postInfoObj.postCategory = 1;     // リプライ
                     } else {
+                        // replytoReply から来た
                         if(isFromReplytoReply) {
                             postInfoObj.postCategory = 1;     // リプライ
                         } else {
@@ -270,8 +296,14 @@ const normalAutoReply = async (relay, ev, autoReplyJson, autoReactionJson, postI
 
         // 反応語句未発見
         } else {
-            // 投稿者が管理者
-            if(isAdminPubkey) {
+
+            // フィードのポストがjsonの nativeWords プロパティそのものなら真
+            const isNativeWords = autoReactionJson.nativeWords.length > 0 && autoReactionJson.nativeWords.some(name => name === ev.content) ? true : false;
+            // フィードのポストがjsonの nativeWords プロパティそのものではなくて、 nativeWords を含んでいるなら真
+            const isIncludeWord =  !isNativeWords && autoReactionJson.nativeWords.some(element => (ev.content).includes(element)) ? true : false;
+
+            // 投稿者が管理者か replytoReply から来た
+            if(isAdminPubkey || isFromReplytoReply) {
                 // フィードのポストがjsonの nativeWords プロパティそのものではないが、ポスト内のどこかに nativeWords を含んでいる
                 if(isIncludeWord) {
                     postInfoObj.postCategory = 2;     // リプライ(全リプライ語句からのランダムリプライ)
@@ -279,7 +311,7 @@ const normalAutoReply = async (relay, ev, autoReplyJson, autoReactionJson, postI
                 } else if(isNativeWords) {
                     postInfoObj.postCategory = 3;     // リアクションとリアクション絵文字でのリプライ
                 }
-            // 投稿者が管理者以外
+            // 投稿者が管理者以外だし、replytoReply からも来ていない
             } else {
                 // フィードのポストがjsonの nativeWords プロパティそのもので、かつ自分をフォローしている人なら
                 if(isNativeWords) {
@@ -290,7 +322,6 @@ const normalAutoReply = async (relay, ev, autoReplyJson, autoReactionJson, postI
                     }
                 }
             }
-
         }
 
         // 作動対象だ
@@ -392,7 +423,7 @@ const chkMyFollower = (relay, evPubkey) => {
 
 
 // 利用可能な通貨の一覧を取得する関数
-const  getAvailableCurrencies = async (baseCurrency, targetCurrency, funcSw ) => {
+const  getAvailableCurrencies = async (baseCurrency, targetCurrency, funcSw = 0) => {
     let currencyList = [];
     let arrayRet = [];
 
