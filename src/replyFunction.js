@@ -233,10 +233,6 @@ const normalAutoReply = async (relay, ev, autoReplyJson, autoReactionJson, postI
     try {
         // フィードのポストの中にjsonで設定した値が存在するなら真
         const target = autoReplyJson.find(item => item.orgPost.some(post => ev.content.includes(post)));
-        // // フィードのポストがjsonの nativeWords プロパティそのものなら真
-        // const isNativeWords = autoReactionJson.nativeWords.length > 0 && autoReactionJson.nativeWords.some(name => name === ev.content) ? true : false;
-        // // フィードのポストがjsonの nativeWords プロパティそのものではなくて、 nativeWords を含んでいるなら真（isFromReplytoReply 経由ならいつでも真）
-        // const isIncludeWord = !isFromReplytoReply ? (!isNativeWords && autoReactionJson.nativeWords.some(element => (ev.content).includes(element)) ? true : false) : true; 
 
         // 投稿者が管理者なら真
         const isAdminPubkey = ev.pubkey === adminPubkey ? true : false;
@@ -299,17 +295,13 @@ const normalAutoReply = async (relay, ev, autoReplyJson, autoReactionJson, postI
 
             // フィードのポストがjsonの nativeWords プロパティそのものなら真
             const isNativeWords = autoReactionJson.nativeWords.length > 0 && autoReactionJson.nativeWords.some(name => name === ev.content) ? true : false;
-            // フィードのポストがjsonの nativeWords プロパティそのものではなくて、 nativeWords を含んでいるなら真
-            const isIncludeWord =  !isNativeWords && autoReactionJson.nativeWords.some(element => (ev.content).includes(element)) ? true : false;
 
             // 投稿者が管理者か replytoReply から来た
             if(isAdminPubkey || isFromReplytoReply) {
-                // フィードのポストがjsonの nativeWords プロパティそのものではないが、ポスト内のどこかに nativeWords を含んでいる
-                if(isIncludeWord) {
-                    postInfoObj.postCategory = 2;     // リプライ(全リプライ語句からのランダムリプライ)
-                // フィードのポストがjsonの nativeWords プロパティそのもの
-                } else if(isNativeWords) {
+                if(isNativeWords) {
                     postInfoObj.postCategory = 3;     // リアクションとリアクション絵文字でのリプライ
+                } else {
+                    postInfoObj.postCategory = 2;     // リプライ(全リプライ語句からのランダムリプライ)
                 }
             // 投稿者が管理者以外だし、replytoReply からも来ていない
             } else {
