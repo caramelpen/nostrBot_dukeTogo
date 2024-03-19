@@ -66,7 +66,6 @@ const subPresetPost = (presetDatePath, nowDate) => {
                         const holiday = jpnHolidays.between(nowDate, nowDate);  // 今日から今日までの祝日情報を取得(まわりくどい...)
                         message = holiday[0].name;  // 今日のみの指定なので、0番目固定で祝日の名前を取得
                         postSubject = true;
-                        break;
                     }
 
                 // 指定月
