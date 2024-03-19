@@ -301,7 +301,9 @@ const normalAutoReply = async (relay, ev, autoReplyJson, autoReactionJson, postI
                 if(isNativeWords) {
                     postInfoObj.postCategory = 3;     // リアクションとリアクション絵文字でのリプライ
                 } else {
-                    postInfoObj.postCategory = 2;     // リプライ(全リプライ語句からのランダムリプライ)
+                    if(isFromReplytoReply) {
+                        postInfoObj.postCategory = 2;     // リプライ(全リプライ語句からのランダムリプライ)
+                    }
                 }
             // 投稿者が管理者以外だし、replytoReply からも来ていない
             } else {
