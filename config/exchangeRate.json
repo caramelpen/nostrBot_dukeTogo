@@ -1,6 +1,6 @@
 [
     {
-        "orgPost": ["為替", "BTC", "USD", "EUR"]
+        "orgPost": ["為替", "BTC", "USD", "EUR", "ETH"]
         ,"sw": 1 
         ,"replyPostChar": ["だ…"]
         ,"nonGet": ["そのような通貨は存在しないようだ…\n「ゴルゴ、通貨リスト」とポストして得られる通貨を確かめるんだな…"]
