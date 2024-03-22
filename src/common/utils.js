@@ -112,6 +112,18 @@ const isFileExists = (targetFilePath) => {
 }
 
 
+/**
+ * フォルダの存在チェック
+ */
+const isFolderExists = (targetFolder) => {
+    const fs = require("fs");
+    if (fs.existsSync(targetFolder)) {
+        return true;
+    } else {
+        console.error("isFolderExists:folder is not exists");
+        return false;
+    }
+}
 
 
 
@@ -292,6 +304,7 @@ module.exports = {
     ,jsonOpen, jsonSetandOpen
     ,writeJsonFile
     ,asyncIsFileExists, isFileExists
+    ,isFolderExists
     ,isSafeToReply, updateLastReplyTime, retrievePostsInPeriod, userDisplayName
     ,random
     ,formattedDateTime
