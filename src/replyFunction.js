@@ -549,8 +549,7 @@ const createAndSaveChart = async (data) => {
 
         const path = require("path");
         const targetFolderPath = "img";
-        //const absoluteFolderPath = path.join(__dirname, targetFolderPath);
-        const absoluteFolderPath = path.join(__dirname, '..', targetFolderPath);
+        const absoluteFolderPath = path.join(__dirname, '..', targetFolderPath);    // 1つ上の階層
         // フォルダが未存在なら作る
         isFolderExists(absoluteFolderPath, true);
         const svgFile = "chart.svg";
