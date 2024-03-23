@@ -10,9 +10,23 @@ const { relayInit, finishEvent } = require("nostr-tools");
 const sunCalc = require("suncalc");
 const jpnHolidays = require('@holiday-jp/holiday_jp');
 const { currDateTime, currUnixtime, random, jsonSetandOpen, writeJsonFile, formattedDateTime } = require("./common/utils.js");
-const { BOT_PRIVATE_KEY_HEX, pubkey, RELAY_URL, GIT_USER_NAME, GIT_REPO, GIT_TOKEN, GIT_BRANCH} = require("./common/env.js");
+const { BOT_PRIVATE_KEY_HEX, pubkey, adminPubkey, RELAY_URL, GIT_USER_NAME, GIT_REPO, GIT_TOKEN, GIT_BRANCH} = require("./common/env.js");
 const { publishToRelay } = require("./common/publishToRelay.js");
 const { toGitHubPush } = require("./common/gitHubCooperation.js");
+
+const { initial, uploadBTCtoJPYChartImg } = require("./replyFunction.js");
+
+
+// envファイルのかたまり
+const keys = {
+    BOT_PRIVATE_KEY_HEX: BOT_PRIVATE_KEY_HEX
+    , pubKey: pubkey
+    , adminPubkey: adminPubkey
+};
+const envKeys = Object.freeze(keys);    // 変更不可のかたまりにしてしまう
+// replyFunction へ各キーを代入する
+initial(envKeys);
+
 
 let sunriseSunsetJson = null;
 let postEv;
@@ -308,15 +322,23 @@ const composePost = (postChar) => {
 const funcObj = {
     subPresetPost           // 定刻ポスト
     ,subSunriseSunset       // 日の出日の入ポスト
+    ,uploadBTCtoJPYChartImg // BTCチャート
 }
+// const funcObj2 = {
+//     uploadBTCtoJPYChartImg // BTCチャート
+// }
 
 // ディスパッチの設定値
 const funcConfig = {
-    funcName: ["subPresetPost", "subSunriseSunset" ]            // useJsonFile の記述順と対応させる
-    ,useJsonFile: ["presetDate.json", "sunriseSunset.json"]     // funcName の記述順と対応させる（jsonを使用しないなら""としておく）
-    ,operationCategory: [0, 1]                                  // 1ならGitHubへプッシュコミット（useJsonFileやuncName の記述順と対応させる）
+    funcName: ["subPresetPost", "subSunriseSunset", "uploadBTCtoJPYChartImg"]             // useJsonFile の記述順と対応させる
+    ,useJsonFile: ["presetDate.json", "sunriseSunset.json", "presetDate.json"]     // funcName の記述順と対応させる（jsonを使用しないなら""としておく）
+    ,operationCategory: [0, 1, 0]                                  // 1ならGitHubへプッシュコミット（useJsonFileやuncName の記述順と対応させる）
 }
-
+// const funcConfig2 = {
+//     funcName: ["uploadBTCtoJPYChartImg" ]   // useJsonFile の記述順と対応させる
+//     ,useJsonFile: [""]                      // funcName の記述順と対応させる（jsonを使用しないなら""としておく）
+//     ,operationCategory: [0]                 // 1ならGitHubへプッシュコミット（useJsonFileやuncName の記述順と対応させる）
+// }
 
 
 
@@ -384,9 +406,45 @@ const main = async () => {
             } finally {
                 if(connectedSw === 1) {
                     relay.close();
+                    connectedSw = 0;
                 }
             }
         }
+
+
+        // const currentHour = nowDate.getHours();
+        // const currentMinute = nowDate.getMinutes();
+        // const specifiedHours = [7, 12, 16, 21]; // 7、12、16、21時に処理を実行する
+
+        // if (specifiedHours.includes(currentHour) && currentMinute === 0) {
+        //     let connectedSw = 0;
+        //     try {
+        //         // リレー
+        //         const relay = await relayInit(RELAY_URL);
+        //         relay.on("error", () => {
+        //             console.error("autoPostatPresetTime:failed to connect");
+        //             relay.close();
+        //             return;
+        //         });
+
+        //         await relay.connect();
+        //         connectedSw = 1;
+
+        //         for(let i = 0; i <= funcConfig2.funcName.length - 1; i++) {
+        //             // 処理の実行はディスパッチで行い、スリム化をはかる
+        //             postSubject = await funcObj2[funcConfig2.funcName[i]](relay);
+        //         }
+        //     } catch(err) {
+        //         console.error(err);
+
+        //     } finally {
+        //         if(connectedSw === 1) {
+        //             relay.close();
+        //             connectedSw = 0;
+        //         }
+        //     }
+        // }
+
     });
 }
 

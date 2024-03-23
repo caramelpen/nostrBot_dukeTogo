@@ -131,7 +131,7 @@
                     "minutes": "07:00"
                     ,"messages": [
                                     "…朝食の時間だ…"
-                                    , "…朝食のメニューは…知らないほうがいい…"
+                                    ,"…朝食のメニューは…知らないほうがいい…"
                                     ,"仕事の精度は朝食のメニューで決まるものだ…"
                                     ,"…食事の時間だ…"
                                     ,"朝食をとらずに仕事ができると思っているのか…？ ずいぶんとなめられたものだな…"
@@ -154,6 +154,34 @@
         }
   
    ]
+
+
+
+
+   ,"[description of specifiedProcessatSpecifiedTime]": [
+        {
+            "description": "specifiedProcessatSpecifiedTime は指定の時刻に funcName プロパティを実行します"
+        }
+    ]
+    ,"specifiedProcessatSpecifiedTime": [
+        {
+            "[description of specifiedTime]": "minutes だったら messages と subMessages を使用してポストします(minutes は HH:MM 形式で指定すること)"
+            ,"type": "specifiedTime"
+            ,"value": [
+                {
+                    "minutes": ["07:00", "12:00", "16:00", "21:00"]
+                    ,"messages": [
+                                    "…現在のBTCのJPYチャートだ…"
+                                ]
+                    ,"subMessages": [
+                                    "…売るか買うかは… 俺の知ったことではない…"
+                                    ,""
+                                    ]
+                }
+            ]
+        }
+    ]
+
   
 }
   

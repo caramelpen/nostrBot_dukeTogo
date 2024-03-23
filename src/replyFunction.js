@@ -6,8 +6,14 @@
 require("websocket-polyfill");
 const axios = require("axios");
 const { finishEvent } = require("nostr-tools");
-const { currUnixtime, isSafeToReply, random, probabilityDetermination, retrievePostsInPeriod } = require("./common/utils.js");
+const { currUnixtime, isSafeToReply, random, probabilityDetermination, retrievePostsInPeriod, convertUnixTimeToJapanMonthAndDay, isFolderExists } = require("./common/utils.js");
 const { publishToRelay } = require("./common/publishToRelay.js");
+
+const vegaLite = require("vega-lite");
+const vega = require("vega");
+const sharp = require("sharp");
+const fs = require("fs");
+
 
 let BOT_PRIVATE_KEY_HEX = "";
 let pubKey = "";
@@ -475,6 +481,204 @@ const  getAvailableCurrencies = async (baseCurrency, targetCurrency, funcSw = 0)
     }
 }
 
+// BTCの日本円チャートを得る
+const getBTCtoJPYChart = async () => {
+    // CoinGecko APIのエンドポイント
+    const url = "https://api.coingecko.com/api/v3/coins/bitcoin/market_chart";
+
+    try {
+        // パラメーターを設定
+        const params = {
+            vs_currency: "jpy",   // 日本円で価格を取得
+            days: "30",           // 過去30日間のデータを取得
+            interval: "daily"     // 日次のデータを取得
+        };
+
+        // APIにリクエストを送信してデータを取得
+        const response = await axios.get(url, {params});
+        return response.data.prices; // データは価格の配列として返されます
+
+    } catch (err) {
+        console.error(err);
+
+    }
+}
+
+// チャートを作成して画像として保存する関数
+const createAndSaveChart = async (data) => {
+
+    try {
+
+        // unix時間を日付にして納めなおす
+        let decData = [];
+        for (let i = 0; i <= data.length-1; i++){
+            decData.push({
+                date: convertUnixTimeToJapanMonthAndDay(data[i][0] / 1000), // 1000で割っているのはミリまで取得しているので、それをカットする
+                price: data[i][1]
+            });
+        }
+
+        // Vega-Liteの仕様の作成
+        const spec = vegaLite.compile({
+            $schema: "https://vega.github.io/schema/vega-lite/v5.json",
+            description: "A simple line chart with embedded data.",
+            width: 600,   // グラフの幅を指定
+            height: 300,  // グラフの高さを指定        
+            data: {
+                values: decData
+            },
+
+            layer: [
+                {
+                    mark: "line",
+                    encoding: {
+                        x: {field: "date", type: "ordinal"},
+                        y: {field: "price", type: "quantitative"}
+                        ,color: {value: "black"} // グラフの色
+                    }
+                }
+                ,{
+                    mark: {type: "rule", color: "lightgray"}, // 罫線のマークを定義
+                    encoding: {
+                        y: {value: 0}, // y軸の値を0に固定して罫線を引く
+                        x: {field: "date", type: "ordinal"} // x軸の値に対して罫線を引く
+                    }
+                }                
+            ]
+        }).spec;
+
+        const path = require("path");
+        const targetFolderPath = "img";
+        //const absoluteFolderPath = path.join(__dirname, targetFolderPath);
+        const absoluteFolderPath = path.join(__dirname, '..', targetFolderPath);
+        // フォルダが未存在なら作る
+        isFolderExists(absoluteFolderPath, true);
+        const svgFile = "chart.svg";
+        const imgFile = "chart.png";
+        // Vegaのビューの作成とSVGの出力
+        const view = new vega.View(vega.parse(spec), {renderer: "none"});
+        const svg = await view.toSVG();
+        fs.writeFileSync(absoluteFolderPath + "/" + svgFile, svg);
+        // SVGをPNGに変換
+        try {
+            await sharp(absoluteFolderPath + "/" + svgFile).png().toFile(absoluteFolderPath + "/" + imgFile);
+            return absoluteFolderPath + "/" + imgFile;
+        } catch (err) {
+            console.error(err);
+            throw err; // SVGをPNGに変換する過程でエラーが発生した場合、エラーを再スローします
+        }
+
+    } catch(err) {
+        console.error(err);
+        throw err; // SVGをPNGに変換する過程でエラーが発生した場合、エラーを再スローします
+    }
+};
+
+// 画像アップロードして、そのURLを得る
+const uploadImg = async (imgPath) => {
+    const crypto = require("crypto");
+    // void.cat APIのエンドポイントURL
+    const uploadUrl = "https://void.cat/upload?cli=true";
+    
+    // 画像ファイルの読み込み
+    const imageData = fs.readFileSync(imgPath);
+    
+    try {
+
+        // ファイルのSHA256ハッシュを計算
+        const hash = crypto.createHash("sha256");
+        hash.update(imageData);
+        const fileHash = hash.digest("hex");
+
+
+        // ImgurへのHTTP POSTリクエストの設定
+        const response = await axios.post(uploadUrl, imageData, {
+            headers: {
+                "accept": "*/*"
+                ,"V-Content-Type": "image/png" // 画像のコンテンツタイプを指定
+                ,"V-Filename": imgPath 
+                ,"V-Full-Digest": fileHash 
+            }
+        });
+        
+        // console.log('Upload successful. Image link:', response.data + ".png");
+        return response.data + ".png";
+    } catch (error) {
+        console.error('Error uploading image:', error);
+    }
+}
+
+// ビットコインチャートをダウンロードして、画像保存してポストする
+const uploadBTCtoJPYChartImg = async (presetJsonPath, nowDate, relay = undefined) => {
+    const presetDateJson = jsonSetandOpen(presetJsonPath);
+    if(presetDateJson === null || presetDateJson === undefined){
+        console.error("uploadBTCtoJPYChartImg:json file is not get");
+        return false;
+    }
+
+    const hours = nowDate.getHours();
+    const minutes = nowDate.getMinutes();
+
+    // jsonの親プロパティ specifiedProcessatSpecifiedTime を取得
+    const specifiedProcessatSpecifiedTime = presetDateJson.specifiedProcessatSpecifiedTime;
+
+    // HH:MM
+    const currentTime = String(hours).padStart(2, "0") + ":" + String(minutes).padStart(2, "0");
+
+    // 各条件をチェック
+    for (let condition of specifiedProcessatSpecifiedTime) {
+        let message = "";
+        let subMessage = "";
+        let postSubject = false;
+        let idx = 0;
+        // 指定時刻
+        if (condition.type === "specifiedTime") {
+            if (currentTime === value.minutes) {
+
+                const chartData = await getBTCtoJPYChart();
+                const imgPath = await createAndSaveChart(chartData);
+                if(imgPath !== undefined) {
+                    const imgURL = await uploadImg(imgPath);
+                    if(imgURL !== undefined) {
+
+                        // ポスト語句は複数設定されており、設定数の範囲でランダムに取得
+                        const postIdx = random(0,value.messages.length - 1);
+                        let subMessage = "";
+                        if(value.subMessages.length > 0){
+                            const subPostIdx = random(0,value.subMessages.length - 1);
+                            subMessage = value.subMessages[subPostIdx];
+                        }
+
+                        // リプライ
+                        const postEv = composePost(value.messages[postIdx] + "\n" + imgURL + "\n" + subMessage);
+                        if(relay !== undefined) {
+                            publishToRelay(relay, postEv);            
+                        } else {
+                            return postEv;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+
+// 投稿イベントを組み立てる
+const composePost = (postChar) => {
+    const ev = {
+        pubkey: pubKey
+        ,kind: 1
+        ,content: postChar
+        ,tags: []
+        ,created_at: currUnixtime()
+    };
+
+    // イベントID(ハッシュ値)計算・署名
+    return finishEvent(ev, BOT_PRIVATE_KEY_HEX);
+};
+
 
 // リプライイベントを組み立てる
 const composeReply = (replyPostChar, targetEvent) => {
@@ -553,8 +757,9 @@ const composeReplytoReply = (content, targetEvent) => {
  */
 module.exports = {
     initial
-    ,functionalPosting   // 機能ポスト
-    ,exchangeRate       // 為替ポスト
-    ,normalAutoReply    // 通常リプライ
+    ,functionalPosting      // 機能ポスト
+    ,exchangeRate           // 為替ポスト
+    ,normalAutoReply        // 通常リプライ
+    ,uploadBTCtoJPYChartImg // BTCチャート画像ポスト
 };
   

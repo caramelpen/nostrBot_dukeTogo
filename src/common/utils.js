@@ -12,6 +12,21 @@ const currDateTime = () => new Date();
 // 現在の日本時間のUnixtime(秒単位)を取得
 const currUnixtime = () => Math.floor(currDateTime().getTime() / 1000);
 
+
+// UNIX時間から日本時間に変換し、月と日のみを取得する関数
+const convertUnixTimeToJapanMonthAndDay = (unixTimeInSeconds) => {
+    // UNIX時間をミリ秒に変換してDateオブジェクトを作成
+    const date = new Date(unixTimeInSeconds * 1000);
+
+    // 日本時間に変換し、月と日のみを取得 mm/dd
+    const japanMonthAndDay = date.toLocaleDateString("ja-JP", { timeZone: "Asia/Tokyo", month: "2-digit", day: "2-digit" });
+    return japanMonthAndDay;
+};
+
+
+
+
+
 /*
 // 1番目のコマンドライン引数を取得
 const getCliArg = (errMsg) => {
@@ -309,7 +324,7 @@ const probabilityDetermination = (probability) => {
  */
 module.exports = {
     currDateTime
-    ,currUnixtime
+    ,currUnixtime, convertUnixTimeToJapanMonthAndDay
     // ,getCliArg
     ,jsonOpen, jsonSetandOpen
     ,writeJsonFile
