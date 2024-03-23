@@ -113,14 +113,24 @@ const isFileExists = (targetFilePath) => {
 
 
 /**
- * フォルダの存在チェック
+ * フォルダの存在チェック（第2引数に真を設定すれば存在していないときにはフォルダを作る）
  */
-const isFolderExists = (targetFolder) => {
+const isFolderExists = (targetFolder, createFolder = false) => {
     const fs = require("fs");
-    if (fs.existsSync(targetFolder)) {
-        return true;
-    } else {
-        console.error("isFolderExists:folder is not exists");
+    try {
+        if (fs.existsSync(targetFolder)) {
+            return true;
+        } else {
+            if(createFolder) {
+                fs.mkdirSync(targetFolder, { recursive: true });
+                return true;
+            } else {
+                console.log("isFolderExists:folder is not exists");
+                return false;
+            }
+        }
+    } catch (err) {
+        console.error("isFolderExists:err:" + err);
         return false;
     }
 }
