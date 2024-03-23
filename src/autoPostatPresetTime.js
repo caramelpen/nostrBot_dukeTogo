@@ -35,7 +35,7 @@ let sunriseorSunset = "";
 let sunriseSunsetJsonPath = "";
 
 // 定刻ポスト
-const subPresetPost = (presetDatePath, nowDate) => {
+const subPresetPost = (presetDatePath, nowDate, retPostEv = undefined) => {
 
     try {
         
@@ -197,7 +197,7 @@ const subPresetPost = (presetDatePath, nowDate) => {
 
 
 // 日の出日の入ポスト
-const subSunriseSunset = (sunriseSunsetPath, nowDate) => {
+const subSunriseSunset = (sunriseSunsetPath, nowDate, retPostEv = undefined) => {
     const nowDateTime = formattedDateTime(new Date(nowDate));
     try {
         let isPostSunrise = false;
@@ -348,7 +348,7 @@ const funcConfig = {
  ***************/
 const main = async () => {
     cron.schedule("* * * * *", async () => {  // 分単位
-
+        let retPostEv = {};
         // 現在日時
         const nowDate = currDateTime();
 
@@ -369,7 +369,7 @@ const main = async () => {
                 }
 
                 // 処理の実行はディスパッチで行い、スリム化をはかる
-                postSubject = await funcObj[funcConfig.funcName[i]](jsonPathCommon + funcConfig.useJsonFile[i], nowDate);
+                postSubject = await funcObj[funcConfig.funcName[i]](jsonPathCommon + funcConfig.useJsonFile[i], nowDate, retPostEv);
 
                 if(postSubject) {
 
@@ -384,6 +384,9 @@ const main = async () => {
                     await relay.connect();
                     connectedSw = 1;
 
+                    if(retPostEv.postEv !== undefined) {
+                        postEv = retPostEv.postEv;
+                    }
                     // ポスト
                     publishToRelay(relay, postEv);
 

@@ -6,7 +6,7 @@
 require("websocket-polyfill");
 const axios = require("axios");
 const { finishEvent } = require("nostr-tools");
-const { currUnixtime, isSafeToReply, random, probabilityDetermination, retrievePostsInPeriod, convertUnixTimeToJapanMonthAndDay, isFolderExists } = require("./common/utils.js");
+const { currUnixtime, isSafeToReply, random, probabilityDetermination, retrievePostsInPeriod, convertUnixTimeToJapanMonthAndDay, isFolderExists, jsonSetandOpen } = require("./common/utils.js");
 const { publishToRelay } = require("./common/publishToRelay.js");
 
 const vegaLite = require("vega-lite");
@@ -609,7 +609,7 @@ const uploadImg = async (imgPath) => {
 }
 
 // ビットコインチャートをダウンロードして、画像保存してポストする
-const uploadBTCtoJPYChartImg = async (presetJsonPath, nowDate, relay = undefined) => {
+const uploadBTCtoJPYChartImg = async (presetJsonPath, nowDate, retPostEv, relay = undefined) => {
     const presetDateJson = jsonSetandOpen(presetJsonPath);
     if(presetDateJson === null || presetDateJson === undefined){
         console.error("uploadBTCtoJPYChartImg:json file is not get");
@@ -627,34 +627,33 @@ const uploadBTCtoJPYChartImg = async (presetJsonPath, nowDate, relay = undefined
 
     // 各条件をチェック
     for (let condition of specifiedProcessatSpecifiedTime) {
-        let message = "";
-        let subMessage = "";
-        let postSubject = false;
-        let idx = 0;
         // 指定時刻
         if (condition.type === "specifiedTime") {
-            if (currentTime === value.minutes) {
+            for (let value of condition.value) {
+                const hitMinutes = value.minutes.includes(currentTime);
+                if (hitMinutes) {
+                    const chartData = await getBTCtoJPYChart();
+                    const imgPath = await createAndSaveChart(chartData);
+                    if(imgPath !== undefined) {
+                        const imgURL = await uploadImg(imgPath);
+                        if(imgURL !== undefined) {
 
-                const chartData = await getBTCtoJPYChart();
-                const imgPath = await createAndSaveChart(chartData);
-                if(imgPath !== undefined) {
-                    const imgURL = await uploadImg(imgPath);
-                    if(imgURL !== undefined) {
+                            // ポスト語句は複数設定されており、設定数の範囲でランダムに取得
+                            const postIdx = random(0,value.messages.length - 1);
+                            let subMessage = "";
+                            if(value.subMessages.length > 0){
+                                const subPostIdx = random(0,value.subMessages.length - 1);
+                                subMessage = value.subMessages[subPostIdx];
+                            }
 
-                        // ポスト語句は複数設定されており、設定数の範囲でランダムに取得
-                        const postIdx = random(0,value.messages.length - 1);
-                        let subMessage = "";
-                        if(value.subMessages.length > 0){
-                            const subPostIdx = random(0,value.subMessages.length - 1);
-                            subMessage = value.subMessages[subPostIdx];
-                        }
-
-                        // リプライ
-                        const postEv = composePost(value.messages[postIdx] + "\n" + imgURL + "\n" + subMessage);
-                        if(relay !== undefined) {
-                            publishToRelay(relay, postEv);            
-                        } else {
-                            return postEv;
+                            // リプライ
+                            const postEv = composePost(value.messages[postIdx] + "\n" + imgURL + "\n" + subMessage);
+                            if(relay !== undefined) {
+                                publishToRelay(relay, postEv);            
+                            } else {
+                                retPostEv.postEv = postEv;
+                            }
+                            return true;                            
                         }
                     }
                 }
