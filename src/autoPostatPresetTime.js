@@ -405,41 +405,6 @@ const main = async () => {
                 }
             }
         }
-
-
-        // const currentHour = nowDate.getHours();
-        // const currentMinute = nowDate.getMinutes();
-        // const specifiedHours = [7, 12, 16, 21]; // 7、12、16、21時に処理を実行する
-
-        // if (specifiedHours.includes(currentHour) && currentMinute === 0) {
-        //     let connectedSw = 0;
-        //     try {
-        //         // リレー
-        //         const relay = await relayInit(RELAY_URL);
-        //         relay.on("error", () => {
-        //             console.error("autoPostatPresetTime:failed to connect");
-        //             relay.close();
-        //             return;
-        //         });
-
-        //         await relay.connect();
-        //         connectedSw = 1;
-
-        //         for(let i = 0; i <= funcConfig2.funcName.length - 1; i++) {
-        //             // 処理の実行はディスパッチで行い、スリム化をはかる
-        //             postSubject = await funcObj2[funcConfig2.funcName[i]](relay);
-        //         }
-        //     } catch(err) {
-        //         console.error(err);
-
-        //     } finally {
-        //         if(connectedSw === 1) {
-        //             relay.close();
-        //             connectedSw = 0;
-        //         }
-        //     }
-        // }
-
     });
 }
 
