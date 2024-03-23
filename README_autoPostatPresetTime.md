@@ -24,6 +24,9 @@
     - `minuteConditions`は毎分起動します
     - 3-1-1-2-1.`everyMinutes`
       - `minutes`の時刻になったら`messages`と`subMessages`を使用してポストします(※1)
+
+  - 3-1-1-3.親プロパティ`specifiedProcessatSpecifiedTime`
+    - `specifiedProcessatSpecifiedTime`は`minutes`プロパティに設定された時刻`mm:ss`になるとBTCのチャートをダウンロードし画像にしたものを、`messages`と`subMessages`の文言も併せてポストします
    
 
 - 3-1-2.`sunriseSunset.json`
