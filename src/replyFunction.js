@@ -3,17 +3,15 @@
  * eachPostingFunctions.js
  * autoReply や replytoReply では共通のポスト仕様が適用されるためここで1本化する
  */
-require("websocket-polyfill");
 const axios = require("axios");
-const { finishEvent } = require("nostr-tools");
-const { currUnixtime, isSafeToReply, random, probabilityDetermination, retrievePostsInPeriod, convertUnixTimeToJapanMonthAndDay, isFolderExists, jsonSetandOpen } = require("./common/utils.js");
-const { publishToRelay } = require("./common/publishToRelay.js");
-
 const vegaLite = require("vega-lite");
 const vega = require("vega");
 const sharp = require("sharp");
 const fs = require("fs");
-
+require("websocket-polyfill");
+const { finishEvent } = require("nostr-tools");
+const { currUnixtime, isSafeToReply, random, probabilityDetermination, retrievePostsInPeriod, convertUnixTimeToJapanMonthAndDay, isFolderExists, jsonSetandOpen } = require("./common/utils.js");
+const { publishToRelay } = require("./common/publishToRelay.js");
 
 let BOT_PRIVATE_KEY_HEX = "";
 let pubKey = "";
