@@ -324,9 +324,6 @@ const funcObj = {
     ,subSunriseSunset       // 日の出日の入ポスト
     ,uploadBTCtoJPYChartImg // BTCチャート
 }
-// const funcObj2 = {
-//     uploadBTCtoJPYChartImg // BTCチャート
-// }
 
 // ディスパッチの設定値
 const funcConfig = {
@@ -334,11 +331,6 @@ const funcConfig = {
     ,useJsonFile: ["presetDate.json", "sunriseSunset.json", "presetDate.json"]     // funcName の記述順と対応させる（jsonを使用しないなら""としておく）
     ,operationCategory: [0, 1, 0]                                  // 1ならGitHubへプッシュコミット（useJsonFileやuncName の記述順と対応させる）
 }
-// const funcConfig2 = {
-//     funcName: ["uploadBTCtoJPYChartImg" ]   // useJsonFile の記述順と対応させる
-//     ,useJsonFile: [""]                      // funcName の記述順と対応させる（jsonを使用しないなら""としておく）
-//     ,operationCategory: [0]                 // 1ならGitHubへプッシュコミット（useJsonFileやuncName の記述順と対応させる）
-// }
 
 
 
