@@ -525,7 +525,9 @@ const createAndSaveChart = async (data) => {
             data: {
                 values: decData
             },
-
+            config: {
+                background: "lightsteelblue"
+            },
             layer: [
                 {
                     mark: "line",
