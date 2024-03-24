@@ -588,7 +588,7 @@ const uploadImg = async (imgPath) => {
         const fileHash = hash.digest("hex");
 
 
-        // ImgurへのHTTP POSTリクエストの設定
+        // void.cat へのHTTP POSTリクエストの設定
         const response = await axios.post(uploadUrl, imageData, {
             headers: {
                 "accept": "*/*"
@@ -597,8 +597,6 @@ const uploadImg = async (imgPath) => {
                 ,"V-Full-Digest": fileHash 
             }
         });
-        
-        // console.log('Upload successful. Image link:', response.data + ".png");
         return response.data + ".png";
     } catch (error) {
         console.error('Error uploading image:', error);
