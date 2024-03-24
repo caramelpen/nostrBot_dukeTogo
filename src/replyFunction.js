@@ -630,27 +630,29 @@ const uploadBTCtoJPYChartImg = async (presetJsonPath, nowDate, retPostEv, relay 
                 const hitMinutes = value.minutes.includes(currentTime);
                 if (hitMinutes) {
                     const chartData = await getBTCtoJPYChart();
-                    const imgPath = await createAndSaveChart(chartData);
-                    if(imgPath !== undefined) {
-                        const imgURL = await uploadImg(imgPath);
-                        if(imgURL !== undefined) {
+                    if(chartData !== undefined) {
+                        const imgPath = await createAndSaveChart(chartData);
+                        if(imgPath !== undefined) {
+                            const imgURL = await uploadImg(imgPath);
+                            if(imgURL !== undefined) {
 
-                            // ポスト語句は複数設定されており、設定数の範囲でランダムに取得
-                            const postIdx = random(0,value.messages.length - 1);
-                            let subMessage = "";
-                            if(value.subMessages.length > 0){
-                                const subPostIdx = random(0,value.subMessages.length - 1);
-                                subMessage = value.subMessages[subPostIdx];
-                            }
+                                // ポスト語句は複数設定されており、設定数の範囲でランダムに取得
+                                const postIdx = random(0,value.messages.length - 1);
+                                let subMessage = "";
+                                if(value.subMessages.length > 0){
+                                    const subPostIdx = random(0,value.subMessages.length - 1);
+                                    subMessage = value.subMessages[subPostIdx];
+                                }
 
-                            // リプライ
-                            const postEv = composePost(value.messages[postIdx] + "\n" + imgURL + "\n" + subMessage);
-                            if(relay !== undefined) {
-                                publishToRelay(relay, postEv);            
-                            } else {
-                                retPostEv.postEv = postEv;
+                                // リプライ
+                                const postEv = composePost(value.messages[postIdx] + "\n" + imgURL + (subMessage.length > 0? "\n" + subMessage : ""));
+                                if(relay !== undefined) {
+                                    publishToRelay(relay, postEv);            
+                                } else {
+                                    retPostEv.postEv = postEv;
+                                }
+                                return true;                            
                             }
-                            return true;                            
                         }
                     }
                 }
