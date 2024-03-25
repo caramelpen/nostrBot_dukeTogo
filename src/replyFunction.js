@@ -526,7 +526,7 @@ const createAndSaveChart = async (data) => {
                 values: decData
             },
             config: {
-                background: "lightsteelblue"
+                background: "whitesmoke"
             },
             layer: [
                 {
