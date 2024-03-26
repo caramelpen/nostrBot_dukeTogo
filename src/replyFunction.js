@@ -4,7 +4,6 @@
  * autoReply や replytoReply では共通のポスト仕様が適用されるためここで1本化する
  */
 const axios = require("axios");
-const vegaLite = require("vega-lite");
 const vega = require("vega");
 const sharp = require("sharp");
 const fs = require("fs");
@@ -479,99 +478,232 @@ const  getAvailableCurrencies = async (baseCurrency, targetCurrency, funcSw = 0)
     }
 }
 
-// BTCの日本円チャートを得る
-const getBTCtoJPYChart = async () => {
-    // CoinGecko APIのエンドポイント
-    const url = "https://api.coingecko.com/api/v3/coins/bitcoin/market_chart";
 
+
+// UNIX時間から日本時間に変換し、ISOUTC形式にする
+const convertUnixTimeToJapanISOUTC = (unixTimeInSeconds) => {
+    // UNIX時間をミリ秒に変換してDateオブジェクトを作成
+    const date = new Date(unixTimeInSeconds * 1000);
+
+    let offset = 9; // 日本時間はUTC+9
+    let localDate = new Date(date.getTime() + (3600000 * offset));
+    let formattedDate = `${localDate.getUTCFullYear()}-${(localDate.getUTCMonth()+1).toString().padStart(2, '0')}-${localDate.getUTCDate().toString().padStart(2, '0')}T${localDate.getUTCHours().toString().padStart(2, '0')}:${localDate.getUTCMinutes().toString().padStart(2, '0')}:${localDate.getUTCSeconds().toString().padStart(2, '0')}`;
+    formattedDate=new Date(formattedDate).toISOString();
+    formattedDate=new Date(formattedDate);
+    return formattedDate
+};
+
+
+// BTCの日本円チャートを得る（第1引数がDなら日ごと、Hなら時間ごと）
+const getBTCtoJPYChart = async (dorh, APIEndPoint) => {
     try {
         // パラメーターを設定
-        const params = {
-            vs_currency: "jpy",   // 日本円で価格を取得
-            days: "30",           // 過去30日間のデータを取得
-            interval: "daily"     // 日次のデータを取得
-        };
+        let params;
+        if(dorh === "D") {
+            params = {
+                fsym: "BTC",
+                tsym: "JPY",
+                aggregate: 1,
+                limit: 29
+            };
+        } else {
+            params = {
+                fsym: "BTC",
+                tsym: "JPY",
+                aggregate: 1,
+                limit: 179
+            };
+        }
 
         // APIにリクエストを送信してデータを取得
-        const response = await axios.get(url, {params});
-        return response.data.prices; // データは価格の配列として返されます
-
+        const response = await axios.get(APIEndPoint, {params});
+        return response.data.Data.Data; // データは価格の配列として返されます
     } catch (err) {
         console.error(err);
-
     }
 }
 
-// チャートを作成して画像として保存する関数
-const createAndSaveChart = async (data) => {
 
-    try {
 
-        // unix時間を日付にして納めなおす
-        let decData = [];
-        for (let i = 0; i <= data.length-1; i++){
-            decData.push({
-                date: convertUnixTimeToJapanMonthAndDay(data[i][0] / 1000), // 1000で割っているのはミリまで取得しているので、それをカットする
-                price: data[i][1]
-            });
-        }
+// チャート作成（第1引数がDなら日ごと、Hなら時間ごと）して画像として保存する
+const createAndSaveChart = async (dorh, data, schema) => {
+    let decData = [];
+    for (let i = 0; i <= data.length-1; i++){
+        decData.push({
+            date: convertUnixTimeToJapanISOUTC(data[i].time),
+            price: data[i].close
+        });
+    }
+    // priceの値からなる配列を作成
+    const prices = decData.map(d => d.price);
 
-        // Vega-Liteの仕様の作成
-        const spec = vegaLite.compile({
-            $schema: "https://vega.github.io/schema/vega-lite/v5.json",
-            description: "A simple line chart with embedded data.",
-            width: 600,   // グラフの幅を指定
-            height: 300,  // グラフの高さを指定        
-            data: {
-                values: decData
-            },
-            config: {
-                background: "whitesmoke"
-            },
-            layer: [
+    // 最小値と最大値を取得
+    const minPrice = Math.min(...prices);
+    const maxPrice = Math.max(...prices);
+
+    // Vegaの仕様の作成
+    let spec;
+    if(dorh === "D") {
+        spec = {
+            $schema: schema
+            ,width: 600
+            ,height: 300
+            ,padding: 5
+            ,background: "whitesmoke"
+
+            ,data: [
                 {
-                    mark: "line",
-                    encoding: {
-                        x: {field: "date", type: "ordinal"},
-                        y: {field: "price", type: "quantitative"}
-                        ,color: {value: "black"} // グラフの色
-                    }
+                    name: "table"
+                    ,values: decData
+                }
+            ]
+
+            ,scales: [
+                {
+                    name: "x"
+                    ,type: "time"
+                    ,range: "width"
+                    ,nice: true
+                    ,domain: {data: "table", field: "date"}
                 }
                 ,{
-                    mark: {type: "rule", color: "lightgray"}, // 罫線のマークを定義
-                    encoding: {
-                        y: {value: 0}, // y軸の値を0に固定して罫線を引く
-                        x: {field: "date", type: "ordinal"} // x軸の値に対して罫線を引く
-                    }
-                }                
+                    name: "y"
+                    ,type: "linear"
+                    ,range: "height"
+                    ,nice: true
+                    ,zero: false
+                    ,domain: [minPrice, maxPrice]  // 最小値と最大値を使用
+                }
             ]
-        }).spec;
 
-        const path = require("path");
-        const targetFolderPath = "img";
-        const absoluteFolderPath = path.join(__dirname, '..', targetFolderPath);    // 1つ上の階層
-        // フォルダが未存在なら作る
-        isFolderExists(absoluteFolderPath, true);
-        const svgFile = "chart.svg";
-        const imgFile = "chart.png";
-        // Vegaのビューの作成とSVGの出力
-        const view = new vega.View(vega.parse(spec), {renderer: "none"});
-        const svg = await view.toSVG();
-        fs.writeFileSync(absoluteFolderPath + "/" + svgFile, svg);
-        // SVGをPNGに変換
-        try {
-            await sharp(absoluteFolderPath + "/" + svgFile).png().toFile(absoluteFolderPath + "/" + imgFile);
-            return absoluteFolderPath + "/" + imgFile;
-        } catch (err) {
-            console.error(err);
-            throw err; // SVGをPNGに変換する過程でエラーが発生した場合、エラーを再スローします
-        }
+            ,axes: [
+                {
+                    orient: "bottom"
+                    ,scale: "x"
+                    ,format: "%m/%d"
+                    ,tickCount: {interval: "date", step: 1}
+                    ,title: "date"              // タイトル
+                    ,grid: true                 // 罫線
+                    ,labelAngle: -90            // ラベルを垂直にする
+                    ,labelAlign: "right"        // ラベルを右寄せにする
+                    ,labelBaseline: "middle"    // ラベルを中央寄せにする
 
-    } catch(err) {
+
+                }
+                ,{
+                    orient: "left"
+                    ,scale: "y"
+                    ,title: "price(JPY)"        // タイトル
+                    ,grid: true                 // 罫線
+                }
+            ]
+
+            ,marks: [
+                {
+                    type: "line"
+                    ,from: {data: "table"}
+                    ,encode: {
+                        enter: {
+                            x: {scale: "x", field: "date"}
+                            ,y: {scale: "y", field: "price"}
+                            ,stroke: {value: "black"}
+                            ,strokeWidth: {value: 2}    // 線の太さを
+                        }
+                    }
+                }
+            ]
+        };
+    } else {
+        spec = {
+            $schema: schema
+            ,width: 600
+            ,height: 300
+            ,padding: 5
+            ,background: "whitesmoke"
+    
+            ,data: [
+                {
+                    name: "table"
+                    ,values: decData
+                }
+            ]
+    
+            ,scales: [
+                {
+                    name: "x"
+                    ,type: "time"
+                    ,range: "width"
+                    ,domain: {data: "table", field: "date"}
+                }
+                ,{
+                    name: "y"
+                    ,type: "linear"
+                    ,range: "height"
+                    ,nice: true
+                    ,zero: false
+                    ,domain: [minPrice, maxPrice]  // 最小値と最大値を使用
+                }
+            ]
+    
+            ,axes: [
+                {
+                    orient: "bottom"
+                    ,scale: "x"
+                    ,format: "%H:%M"
+                    ,tickCount: {interval: "minutes", step: 10}
+                    ,title: "time"              // タイトル
+                    ,grid: true                 // 罫線
+                    ,labelAngle: -90            // ラベルを垂直にする
+                    ,labelAlign: "right"        // ラベルを右寄せにする
+                    ,labelBaseline: "middle"    // ラベルを中央寄せにする                            
+                }
+                ,{
+                    orient: "left"
+                    ,scale: "y"
+                    ,title: "price(JPY)"  // タイトル
+                    ,grid: true  // 罫線
+                }
+            ]
+    
+            ,marks: [
+                {
+                    type: "line"
+                    ,from: {"data": "table"}
+                    ,encode: {
+                        enter: {
+                            x: {scale: "x", field: "date"}
+                            ,y: {scale: "y", field: "price"}
+                            ,stroke: {value: "black"}
+                            ,strokeWidth: {value: 2}    // 線の太さを
+                        }
+                    }
+                }
+            ]
+        };
+
+
+    }
+    
+    // Vegaのビューの作成とSVGの出力
+    const path = require("path");
+    const targetFolderPath = "img";
+    const absoluteFolderPath = path.join(__dirname, '..', targetFolderPath);    // 1つ上の階層
+    // フォルダが未存在なら作る
+    isFolderExists(absoluteFolderPath, true);
+    const svgFile = "chart" + dorh + ".svg";
+    const imgFile = "chart" + dorh + ".png";
+    const view = new vega.View(vega.parse(spec), {renderer: "none"});
+    const svg = await view.toSVG();
+    fs.writeFileSync(absoluteFolderPath + "/" + svgFile, svg);
+    // SVGをPNGに変換
+    try {
+        await sharp(absoluteFolderPath + "/" + svgFile).png().toFile(absoluteFolderPath + "/" + imgFile);
+        return absoluteFolderPath + "/" + imgFile;
+    } catch (err) {
         console.error(err);
         throw err; // SVGをPNGに変換する過程でエラーが発生した場合、エラーを再スローします
     }
-};
+}
 
 // 画像アップロードして、そのURLを得る
 const uploadImg = async (imgPath) => {
@@ -629,12 +761,18 @@ const uploadBTCtoJPYChartImg = async (presetJsonPath, nowDate, retPostEv, relay 
             for (let value of condition.value) {
                 const hitMinutes = value.minutes.includes(currentTime);
                 if (hitMinutes) {
-                    const chartData = await getBTCtoJPYChart();
-                    if(chartData !== undefined) {
-                        const imgPath = await createAndSaveChart(chartData);
-                        if(imgPath !== undefined) {
-                            const imgURL = await uploadImg(imgPath);
-                            if(imgURL !== undefined) {
+                    // BTCの日ごとと時間ごとのチャートデータを得る
+                    const chartDataD = await getBTCtoJPYChart("D","https://min-api.cryptocompare.com/data/v2/histoday");
+                    const chartDataH = await getBTCtoJPYChart("H","https://min-api.cryptocompare.com/data/v2/histominute");
+                    if(chartDataD !== undefined && chartDataH !== undefined) {
+                        // チャートを図にする
+                        const imgPathD = await createAndSaveChart("D", chartDataD, "https://vega.github.io/schema/vega/v5.json");
+                        const imgPathH = await createAndSaveChart("H", chartDataH, "https://vega.github.io/schema/vega/v5.json");
+                        if(imgPathD !== undefined && imgPathH !== undefined) {
+                            // チャート画像をアップデート
+                            const imgURLD = await uploadImg(imgPathD);
+                            const imgURLH = await uploadImg(imgPathH);
+                            if(imgURLD !== undefined && imgURLH !== undefined) {
 
                                 // ポスト語句は複数設定されており、設定数の範囲でランダムに取得
                                 const postIdx = random(0,value.messages.length - 1);
@@ -645,7 +783,7 @@ const uploadBTCtoJPYChartImg = async (presetJsonPath, nowDate, retPostEv, relay 
                                 }
 
                                 // リプライ
-                                const postEv = composePost(value.messages[postIdx] + "\n" + imgURL + (subMessage.length > 0? "\n" + subMessage : ""));
+                                const postEv = composePost(value.messages[postIdx] + "\n" + imgURLH + imgURLD + subMessage);
                                 if(relay !== undefined) {
                                     publishToRelay(relay, postEv);            
                                 } else {

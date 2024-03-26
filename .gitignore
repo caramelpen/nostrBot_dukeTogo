@@ -4,6 +4,7 @@ package-lock.json
 pnpm-lock.yaml
 .env
 pm2config.json
+pm2configSurveillance.json
 package.json
 /.log
 /_tst
@@ -16,3 +17,6 @@ _dev_autoReply.js
 _old_autoReply.js
 _dev_replytoReply.js
 _old_replytoReply.js
+
+surveillance.json
+surveillance.js
