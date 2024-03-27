@@ -119,6 +119,9 @@
 - 3-4.replytoReply.js
   - `README_replytoReply.md`をご覧ください
 
+- 3-5.surveillance.js
+  - `README_surveillance.md`をご覧ください 
+
 ### 4.その他
 - 4-1.秘密鍵
   - 秘密鍵は`.env`ファイルの`BOT_PRIVATE_KEY`(nsec...)から取得しています（0.で`dotenv`をインストールしているのはこのためです）
