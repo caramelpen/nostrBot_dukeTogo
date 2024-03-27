@@ -739,7 +739,7 @@ const uploadImg = async (imgPath) => {
 
 // ビットコインチャートをダウンロードして、画像保存してポストする
 const uploadBTCtoJPYChartImg = async (presetJsonPath, nowDate, retPostEv, relay = undefined) => {
-    const presetDateJson = jsonSetandOpen(presetJsonPath);
+    const presetDateJson = await jsonSetandOpen(presetJsonPath);
     if(presetDateJson === null || presetDateJson === undefined){
         console.error("uploadBTCtoJPYChartImg:json file is not get");
         return false;
@@ -783,7 +783,7 @@ const uploadBTCtoJPYChartImg = async (presetJsonPath, nowDate, retPostEv, relay 
                                 }
 
                                 // リプライ
-                                const postEv = composePost(value.messages[postIdx] + "\n" + imgURLH + imgURLD + subMessage);
+                                const postEv = composePost(value.messages[postIdx] + "\n" + imgURLH + "\n" + imgURLD + subMessage);
                                 if(relay !== undefined) {
                                     publishToRelay(relay, postEv);            
                                 } else {

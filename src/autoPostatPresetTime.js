@@ -35,13 +35,13 @@ let sunriseorSunset = "";
 let sunriseSunsetJsonPath = "";
 
 // 定刻ポスト
-const subPresetPost = (presetDatePath, nowDate, retPostEv = undefined) => {
+const subPresetPost = async(presetDatePath, nowDate, retPostEv = undefined) => {
 
     try {
         
         const hours = nowDate.getHours();
         const minutes = nowDate.getMinutes();
-        const presetDateJson = jsonSetandOpen(presetDatePath);
+        const presetDateJson = await jsonSetandOpen(presetDatePath);
         if(presetDateJson === null || presetDateJson === undefined){
             console.error("subPresetPost:json file is not get");
             return false;
@@ -197,7 +197,7 @@ const subPresetPost = (presetDatePath, nowDate, retPostEv = undefined) => {
 
 
 // 日の出日の入ポスト
-const subSunriseSunset = (sunriseSunsetPath, nowDate, retPostEv = undefined) => {
+const subSunriseSunset = async (sunriseSunsetPath, nowDate, retPostEv = undefined) => {
     const nowDateTime = formattedDateTime(new Date(nowDate));
     try {
         let isPostSunrise = false;
@@ -205,7 +205,7 @@ const subSunriseSunset = (sunriseSunsetPath, nowDate, retPostEv = undefined) => 
 
         // 日の出と日没の格納されたjsonを取得
         sunriseSunsetJson = null;
-        sunriseSunsetJson = jsonSetandOpen(sunriseSunsetPath);
+        sunriseSunsetJson = await jsonSetandOpen(sunriseSunsetPath);
         if(sunriseSunsetJson === null || sunriseSunsetJson === undefined ){
             console.error("subSunriseSunset:json file is not get");
             return false;

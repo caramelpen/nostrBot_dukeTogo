@@ -53,6 +53,7 @@ const jsonOpen = (jsonPath) => {
         return null;
     }
 }
+/*
 const jsonSetandOpen = (filePath) => {
     try {
         // jsonの場所を割り出すために
@@ -67,6 +68,23 @@ const jsonSetandOpen = (filePath) => {
         return null;
     }
 }
+*/
+const jsonSetandOpen = async (filePath) => {
+    try {
+        const jsonPath = require("path");
+        const lastJsonPath = jsonPath.join(__dirname, filePath);
+        const fs = require("fs").promises;  // Promise ベースの fs モジュールを使用
+        const data = await fs.readFile(lastJsonPath, "utf8");
+        const jsonData = JSON.parse(data);
+        return jsonData;
+    } catch (err)  {
+        console.error("json Read Err:" + err);
+        return null;
+    }
+}
+
+
+
 
 /**
  * json の指定のプロパティへ値を書き込む
