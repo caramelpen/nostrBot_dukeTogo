@@ -5,6 +5,8 @@
 
 const crypto = require("crypto");
 const { lastReplyTimePerPubkey } = require("./lastReplyTimePerPubkey.js");   // 公開鍵ごとに、最後にリプライを返した時刻(unixtime)を保持するMap
+//const {emergency} = require("..surveillance.js");
+
 
 // 現在の日本時間を取得
 const currDateTime = () => new Date();
@@ -13,15 +15,15 @@ const currDateTime = () => new Date();
 const currUnixtime = () => Math.floor(currDateTime().getTime() / 1000);
 
 
-// UNIX時間から日本時間に変換し、月と日のみを取得する関数
-const convertUnixTimeToJapanMonthAndDay = (unixTimeInSeconds) => {
-    // UNIX時間をミリ秒に変換してDateオブジェクトを作成
-    const date = new Date(unixTimeInSeconds * 1000);
+// // UNIX時間から日本時間に変換し、月と日のみを取得する関数
+// const convertUnixTimeToJapanMonthAndDay = (unixTimeInSeconds) => {
+//     // UNIX時間をミリ秒に変換してDateオブジェクトを作成
+//     const date = new Date(unixTimeInSeconds * 1000);
 
-    // 日本時間に変換し、月と日のみを取得 mm/dd
-    const japanMonthAndDay = date.toLocaleDateString("ja-JP", { timeZone: "Asia/Tokyo", month: "2-digit", day: "2-digit" });
-    return japanMonthAndDay;
-};
+//     // 日本時間に変換し、月と日のみを取得 mm/dd
+//     const japanMonthAndDay = date.toLocaleDateString("ja-JP", { timeZone: "Asia/Tokyo", month: "2-digit", day: "2-digit" });
+//     return japanMonthAndDay;
+// };
 
 
 
@@ -342,7 +344,7 @@ const probabilityDetermination = (probability) => {
  */
 module.exports = {
     currDateTime
-    ,currUnixtime, convertUnixTimeToJapanMonthAndDay
+    ,currUnixtime //, convertUnixTimeToJapanMonthAndDay
     // ,getCliArg
     ,jsonOpen, jsonSetandOpen
     ,writeJsonFile
