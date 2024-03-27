@@ -11,6 +11,7 @@ require("websocket-polyfill");
 const { finishEvent } = require("nostr-tools");
 const { currUnixtime, isSafeToReply, random, probabilityDetermination, retrievePostsInPeriod, isFolderExists, jsonSetandOpen } = require("./common/utils.js");
 const { publishToRelay } = require("./common/publishToRelay.js");
+const { emergency } = require("./surveillance.js");
 
 let BOT_PRIVATE_KEY_HEX = "";
 let pubKey = "";
@@ -82,7 +83,12 @@ const functionalPosting = async (relay, ev, functionalPostingJson, autoReactionJ
                 // 作動対象だ
                 if(postInfoObj.postCategory > 0) {
                     // リプライやリアクションしても安全なら、リプライイベントやリアクションイベントを組み立てて送信する
-                    if (isSafeToReply(ev) && retrievePostsInPeriod(relay, pubKey)) {
+                    //if (isSafeToReply(ev) && retrievePostsInPeriod(relay, pubKey)) {
+                    if(!retrievePostsInPeriod(relay, pubKey)) {
+                        await emergency();
+                        return;
+                    }
+                    if (isSafeToReply(ev)) {
                         // リプライ
                         const replyPostEv = !isFromReplytoReply ? composeReply(replyChr, ev) : composeReplytoReply(replyChr, ev);
 
@@ -215,7 +221,13 @@ const exchangeRate = async (relay, ev, exchangeRate, autoReactionJson, postInfoO
         // 作動対象だ
         if(postInfoObj.postCategory > 0) {
             // リプライしても安全なら、リプライイベントやリアクションイベントを組み立てて送信する
-            if (isSafeToReply(ev) && retrievePostsInPeriod(relay, pubKey)) {
+            //if (isSafeToReply(ev) && retrievePostsInPeriod(relay, pubKey)) {
+            if(!retrievePostsInPeriod(relay, pubKey)) {
+                await emergency();
+                return;
+            }
+            if (isSafeToReply(ev)) {
+                
                 // リプライ
                 const replyPostorreactionPostEv = !isFromReplytoReply ? composeReply(replyChr, ev) : composeReplytoReply(replyChr, ev);
 
@@ -326,7 +338,12 @@ const normalAutoReply = async (relay, ev, autoReplyJson, autoReactionJson, postI
             replyChr = "";
 
             // リプライやリアクションしても安全なら、リプライイベントやリアクションイベントを組み立てて送信する
-            if (isSafeToReply(ev) && retrievePostsInPeriod(relay, pubKey)) {
+            //if (isSafeToReply(ev) && retrievePostsInPeriod(relay, pubKey)) {
+            if(!retrievePostsInPeriod(relay, pubKey)) {
+                await emergency();
+                return;
+            }
+            if (isSafeToReply(ev)) {
                 let replyPostorreactionPostEv;
                 let randomReactionIdx;
                 if(postInfoObj.postCategory === 1) {
