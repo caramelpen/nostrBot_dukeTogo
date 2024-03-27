@@ -33,6 +33,7 @@
 │      infoUpNotification.json
 │      presetDate.json
 │      sunriseSunset.json
+│      surveillance.json
 │
 └─src
     │  autoPostatPresetTime.js
@@ -40,6 +41,7 @@
     │  infoUpNotification.js
     │  replyFunction.js
     │  replytoReply.js
+    │  surveillance.js
     │
     └─common
            │ env.js 
@@ -72,6 +74,9 @@
 - 2-1-7.sunriseSunset.json
   - `src\autoPostatPresetTime.js`で使用（後述）
   - 内容は随時更新していきます
+- 2-1-8.surveillance.json
+  - `src\surveillance.js`で使用（後述）
+  - 内容は随時更新していきます
 
 ### 2-2.src ディレクトリ
 - 2-2-1.autoPostatPresetTime.js
@@ -84,6 +89,8 @@
   - `replytoReply`や`replytoReply`では共通のポスト仕様が適用されるため、その機能を集約したもの 
 - 2-2-5.replytoReply.js
   - リプライを受けると`autoReply.json`に設定された設定値でリプライ
+- 2-2-6.surveillance.js
+  - `surveillance.json`に設定があると、本botの停止や起動、または緊急停止を行う
 
 ### 2-3.src/common ディレクトリ
 - 2-3-1.env.js
