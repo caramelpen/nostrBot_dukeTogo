@@ -33,7 +33,8 @@ const publishToRelay = async (relay, ev, isAutoReply = false, originallyPubKey =
     //             })
 
     try {
-        await relay.publish(ev);
+        //await relay.publish(ev);
+        relay.publish(ev);
         console.log("publishToRelay:success!" + ":" + (replyingtoaPost.length > 0 ? "find:" + displayName + "_" + originallyPubKey + ":" + replyingtoaPost + "\n=> " :"") + ev.content);
         // autoReply からやってきた
         if (isAutoReply && replyingtoaPost.length > 0) {

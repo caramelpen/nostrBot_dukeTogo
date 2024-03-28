@@ -30,7 +30,7 @@ const convertToCronFormat = (time) => {
 
 // リレーに接続
 const connectRelay = async () => {
-    relay = await relayInit(RELAY_URL);
+    relay = relayInit(RELAY_URL);
     relay.on("error", () => {
         console.error("surveillance:failed to connect");
         relay.close();
@@ -79,7 +79,7 @@ const emergency = async () => {
                 const postEv = composePost(config.emergencyComment);
 
                 // ポスト
-                await publishToRelay(relay, postEv);
+                publishToRelay(relay, postEv);
             }
         }
         
@@ -121,24 +121,28 @@ const runProcess = async (config, stoporStart) => {
         // ストップ／スタート
         const exec = await exeProcess(config.exec, config.runConfig, stoporStart);
         if(exec) {
+            try {
+                //リレーに接続
+                if(await connectRelay()) { 
+                    connectedSw = 1;
+                    // 語句配列の数の範囲からランダム値を取得し、それを配列要素とする
+                    const idx = random(0, config.comment.length - 1);
+                    if(idx >= 0) {
+                        // イベント組み立て
+                        const postEv = composePost(config.comment[idx]);
 
-            //リレーに接続
-            if(await connectRelay()) { 
-                connectedSw = 1;
-                // 語句配列の数の範囲からランダム値を取得し、それを配列要素とする
-                const idx = random(0, config.comment.length - 1);
-                if(idx >= 0) {
-                    // イベント組み立て
-                    const postEv = composePost(config.comment[idx]);
-
-                    // ポスト
-                    await publishToRelay(relay, postEv);
+                        // ポスト
+                        publishToRelay(relay, postEv);
+                    }
                 }
+            } catch (err){
+                errCondition = true;
+                console.error("publishToRelay of runProcess is error:["+ stoporStart + "]" + err);
             }
         }
     } catch (err){
         errCondition = true;
-        console.error("runProcess is error:" + err);
+        console.error("runProcess is error:["+ stoporStart + "]" + err);
 
     } finally {
         if(connectedSw === 1){
@@ -194,7 +198,7 @@ const main = async () => {
         }
 
     } catch (err) {
-        console.error(":" + err);
+        console.error("surveillance main is error:" + err);
     }
 }
 
