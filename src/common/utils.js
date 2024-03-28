@@ -244,18 +244,18 @@ const retrievePostsInPeriod = (relay, pubKey) => {
 
 
 //第2引数の公開鍵からユーザ名を取得する
-const userDisplayName = (relay, pubKey) => {
+const userDisplayName = async (relay, pubKey) => {
     return new Promise((resolve, reject) => {
-        try {
-            let displayName = "";
-            const sub = relay.sub([
-                { 
-                    kinds: [0]
-                    , authors: [pubKey]
-                }
-            ]);
-            sub.on("event", (ev) => {
-
+        let displayName = "";
+        const sub = relay.sub([
+            { 
+                kinds: [0]
+                , authors: [pubKey]
+            }
+        ]);
+        
+        sub.on("event", (ev) => {
+            try {
                 // JSON文字列をJavaScriptオブジェクトに変換
                 const evObj = JSON.parse(ev.content);
                 
@@ -263,10 +263,10 @@ const userDisplayName = (relay, pubKey) => {
                 displayName = evObj.display_name;
 
                 resolve(displayName);
-            });
-        } catch (error) {
-            reject(undefined);
-        }
+            } catch (error) {
+                reject(undefined);
+            }
+        });
     });
 }
 

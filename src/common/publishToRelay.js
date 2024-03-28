@@ -19,7 +19,9 @@ const publishToRelay = async (relay, ev, isAutoReply = false, originallyPubKey =
     */
     let displayName = "";
     if(originallyPubKey.length > 0){
+        console.log("into userDisplayName");
         displayName = await userDisplayName(relay, originallyPubKey);
+        console.log("get userDisplayName:" + displayName);
     }
     // relay.publish(ev).then(() => {
     //     console.log("publishToRelay:success!" + ":" + (replyingtoaPost.length > 0 ? "find:" + displayName + "_" + originallyPubKey + ":" + replyingtoaPost + "\n=> " :"") + ev.content);
