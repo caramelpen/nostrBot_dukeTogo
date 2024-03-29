@@ -30,9 +30,98 @@ initial(envKeys);
 
 let sunriseSunsetJson = null;
 let postEv;
-
 let sunriseorSunset = "";
 let sunriseSunsetJsonPath = "";
+
+
+// 起動時に1度だけ動く、日の出日の入りを検索し、jsonが古ければ更新する処理
+const sunCalcDatagetandJsonUpdate = async () => {
+    try {
+        // データを取得する処理
+        // 日の出と日没の格納されたjsonを取得
+        sunriseSunsetJson = null;
+        sunriseSunsetJson = await jsonSetandOpen("../../config/sunriseSunset.json");
+        if(sunriseSunsetJson === null || sunriseSunsetJson === undefined ){
+            console.error("subSunriseSunset of sunCalcDatagetandJsonUpdate:json file is not get");
+            return false;
+        }
+
+        // jsonファイルから日の出と日の入りを得る座標を取得
+        const lat = sunriseSunsetJson.lat;
+        const lng = sunriseSunsetJson.lng;
+
+        // jsonファイルから日の出と日の入りの日時を取得
+        const sunrise = sunriseSunsetJson.sunrise;
+        const sunset = sunriseSunsetJson.sunset;
+        const offset = sunriseSunsetJson.jpnTimezoneOffset1 * sunriseSunsetJson.jpnTimezoneOffset2 * 60 * 1000;
+
+        // 今日の日の出日の入りの時刻を取得
+        const nowDate = currDateTime();
+        const nowDateTime = formattedDateTime(new Date(nowDate));
+        const timesToday = sunCalc.getTimes(nowDateTime, lat, lng);
+        const nowDateTime12 = Number(nowDateTime.substring(0 ,12)); // 秒をカット
+
+     
+        // 明日の日の出日の入りの時刻を取得
+        const nextDaywk = nowDateTime.substring(0 ,4) + "/" 
+                        + nowDateTime.substring(4 ,6) + "/" 
+                        + nowDateTime.substring(6 ,8);
+        const mewDate = new Date(nextDaywk);
+        const addDay = mewDate.setDate(mewDate.getDate() + 1);
+        const nextDay = new Date(addDay);
+        const timesTomorrow = sunCalc.getTimes(nextDay, lat, lng);
+
+        const addDay2 = nowDate.setDate(nowDate.getDate() + 1);
+        const nextDayWk2 = formattedDateTime(new Date(addDay2));
+        const nextDay12 = Number(nextDayWk2.substring(0 ,12)); // 秒をカット
+
+        let finalSunrise = formattedDateTime(new Date(timesToday.sunrise.getTime() + offset));
+        finalSunrise = Number(finalSunrise.substring(0 ,12)); // 秒をカット
+        let finalSunset = formattedDateTime(new Date(timesToday.sunset.getTime() + offset));
+        finalSunset = Number(finalSunset.substring(0 ,12)); // 秒をカット
+
+        // 今日の日付において、日の出がもう過ぎている＝明日の日の出時刻をセットしなおす
+        if(nowDateTime12 < finalSunrise) {
+            // 明日の日の出が最終的な値
+            finalSunrise = formattedDateTime(new Date(timesTomorrow.sunrise.getTime() + offset));
+            finalSunrise = Number(finalSunrise.substring(0 ,12)); // 秒をカット
+        }
+        // 今日の日付において、日没がもう過ぎている＝明日の日没時刻をセットしなおす
+        if(nextDay12 < finalSunset) {
+            // 明日の日の出が最終的な値
+            finalSunset = formattedDateTime(new Date(timesTomorrow.sunset.getTime() + offset));
+            finalSunset = Number(finalSunset.substring(0 ,12)); // 秒をカット
+        }        
+
+        let runUpdate = false;
+        const jsonPath = require("path");
+        const sunriseSunsetJsonPathGitHub = jsonPath.join(__dirname, "../config/sunriseSunset.json");
+        // jsonが更新前だ
+        if(Number(sunrise) < finalSunrise){
+            writeJsonFile(sunriseSunsetJsonPathGitHub, "sunrise", finalSunrise.toString(), -1);
+            console.log("initial set write json(sunrise):" + finalSunrise.toString());
+            runUpdate = true;
+        }
+        if(Number(sunset) < finalSunset){
+            writeJsonFile(sunriseSunsetJsonPathGitHub, "sunset", finalSunset.toString(), -1);
+            console.log("initial set write json(sunset):" + finalSunset.toString());
+            runUpdate = true;
+        }
+
+        if(runUpdate) {
+            const fileNamewk = sunriseSunsetJsonPathGitHub.split("/").pop();
+            const sunriseSunsetPathSingle = `config/${fileNamewk}`; // "../config/sunriseSunset.json" を "config/sunriseSunset.json" の形にする
+            await toGitHubPush(GIT_REPO, sunriseSunsetJsonPathGitHub, sunriseSunsetPathSingle, GIT_USER_NAME, GIT_TOKEN, "[auto/initial set] update", GIT_BRANCH);
+            console.log("initial set sunriseSunset.json is commit/push");
+        }
+    } catch (err) {
+        console.error("sunCalcDatagetandJsonUpdate is error:" + err);
+    }
+}
+
+
+
+
 
 // 定刻ポスト
 const subPresetPost = async(presetDatePath, nowDate, retPostEv = undefined) => {
@@ -339,6 +428,7 @@ const funcConfig = {
  * メイン
  ***************/
 const main = async () => {
+    await sunCalcDatagetandJsonUpdate();
     cron.schedule("* * * * *", async () => {  // 分単位
         let retPostEv = {};
         // 現在日時
