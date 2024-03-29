@@ -8,7 +8,7 @@ const cron = require("node-cron");
 const { relayInit, finishEvent } = require("nostr-tools");
 const sunCalc = require("suncalc");
 const jpnHolidays = require('@holiday-jp/holiday_jp');
-const { currDateTime, currUnixtime, random, jsonSetandOpen, writeJsonFile, formattedDateTime } = require("./common/utils.js");
+const { currDateTime, currUnixtime, random, jsonSetandOpen, writeJsonFile, formattedDateTime, isSafeToReply, retrievePostsInPeriod } = require("./common/utils.js");
 const { BOT_PRIVATE_KEY_HEX, pubkey, adminPubkey, RELAY_URL, GIT_USER_NAME, GIT_REPO, GIT_TOKEN, GIT_BRANCH} = require("./common/env.js");
 const { publishToRelay } = require("./common/publishToRelay.js");
 const { toGitHubPush } = require("./common/gitHubCooperation.js");
@@ -467,6 +467,12 @@ const main = async () => {
                     if(retPostEv.postEv !== undefined) {
                         postEv = retPostEv.postEv;
                     }
+
+                    if(!retrievePostsInPeriod(relay, pubkey)) {
+                        await emergency();
+                        return;
+                    }
+
                     // ポスト
                     publishToRelay(relay, postEv);
 
