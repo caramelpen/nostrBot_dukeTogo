@@ -3,7 +3,7 @@ const util = require("util");
 const exec = util.promisify(require("child_process").exec);
 const cron = require("node-cron");
 const { relayInit, finishEvent } = require("nostr-tools");
-const { currDateTime, currUnixtime, jsonSetandOpen, random } = require("./common/utils.js");
+const { currUnixtime, jsonSetandOpen, random } = require("./common/utils.js");
 const { BOT_PRIVATE_KEY_HEX, pubkey, RELAY_URL } = require("./common/env.js");
 const { publishToRelay } = require("./common/publishToRelay.js");
 
