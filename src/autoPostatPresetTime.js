@@ -6,14 +6,12 @@
 require("websocket-polyfill");
 const cron = require("node-cron");
 const { relayInit, finishEvent } = require("nostr-tools");
-
 const sunCalc = require("suncalc");
 const jpnHolidays = require('@holiday-jp/holiday_jp');
 const { currDateTime, currUnixtime, random, jsonSetandOpen, writeJsonFile, formattedDateTime } = require("./common/utils.js");
 const { BOT_PRIVATE_KEY_HEX, pubkey, adminPubkey, RELAY_URL, GIT_USER_NAME, GIT_REPO, GIT_TOKEN, GIT_BRANCH} = require("./common/env.js");
 const { publishToRelay } = require("./common/publishToRelay.js");
 const { toGitHubPush } = require("./common/gitHubCooperation.js");
-
 const { initial, uploadBTCtoJPYChartImg } = require("./replyFunction.js");
 
 
@@ -456,7 +454,7 @@ const main = async () => {
                 if(postSubject) {
 
                     // リレー
-                    const relay = await relayInit(RELAY_URL);
+                    const relay = relayInit(RELAY_URL);
                     relay.on("error", () => {
                         console.error("autoPostatPresetTime:failed to connect");
                         relay.close();

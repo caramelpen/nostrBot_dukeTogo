@@ -100,7 +100,7 @@ const replytoReply = async (relay)=>{
 const main = async () => {
 
     // リレー
-    const relay = await relayInit(RELAY_URL);
+    const relay = relayInit(RELAY_URL);
     relay.on("error", () => {
         console.error("replytoReply:failed to connect");
         relay.close();

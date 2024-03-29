@@ -91,7 +91,7 @@ const autoReply = async (relay) => {
 const main = async () => {
 
     // リレー
-    const relay = await relayInit(RELAY_URL);
+    const relay = relayInit(RELAY_URL);
     relay.on("error", () => {
         relay.close();
         console.error("autoReply:failed to connect");

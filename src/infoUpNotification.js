@@ -34,7 +34,7 @@ const infoUpNotification = async (rssJsonPath, rssJson, i) => {
             postEv = composePost(postChr);
 
             // リレー
-            relay = await relayInit(RELAY_URL);
+            relay = relayInit(RELAY_URL);
             relay.on("error", () => {
                 console.error("infoUpNotification:failed to connect");
                 relay.close();
