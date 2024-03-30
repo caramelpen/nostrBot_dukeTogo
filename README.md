@@ -38,6 +38,7 @@
 └─src
     │  autoPostatPresetTime.js
     │  autoReply.js
+    │  emergency.js
     │  infoUpNotification.js
     │  replyFunction.js
     │  replytoReply.js
@@ -83,14 +84,16 @@
   - `presetDate.json`と`sunriseSunset.json`に設定された時刻や年月日分になると設定値をポスト
 - 2-2-2.autoReply.js
   - `autoReaction.json`、`exchangeRate.json`、`autoReply.json`に設定された語句を発見するとそれに対応する設定値をリアクションやリプライ
-- 2-2-3.infoUpNotification.js
+- 2-2-3.emergency.js
+  - `surveillance.js`が実行する際の条件を保持するオブジェクト変数や、 サーバへの本botの停止／起動コマンド、緊急停止時の実行などを実装
+- 2-2-4.infoUpNotification.js
   - `infoUpNotification.json`に設定されたRSSフィードを1時間おきに購読し、変更があればポスト
-- 2-2-4.replyFunction.js
+- 2-2-5.replyFunction.js
   - `replytoReply`や`replytoReply`では共通のポスト仕様が適用されるため、その機能を集約したもの 
-- 2-2-5.replytoReply.js
+- 2-2-6.replytoReply.js
   - リプライを受けると`autoReply.json`に設定された設定値でリプライ
-- 2-2-6.surveillance.js
-  - `surveillance.json`に設定があると、本botの停止や起動、または緊急停止を行う
+- 2-2-7.surveillance.js
+  - `surveillance.json`に設定があると、本botの停止や起動を行う
 
 ### 2-3.src/common ディレクトリ
 - 2-3-1.env.js
