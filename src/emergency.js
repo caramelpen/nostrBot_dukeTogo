@@ -70,4 +70,4 @@ const emergency = async (relay) => {
 }
 
 
-module.exports = { conditions, emergency }
+module.exports = { conditions, exeProcess, emergency }
