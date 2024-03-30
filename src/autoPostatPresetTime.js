@@ -13,6 +13,7 @@ const { BOT_PRIVATE_KEY_HEX, pubkey, adminPubkey, RELAY_URL, GIT_USER_NAME, GIT_
 const { publishToRelay } = require("./common/publishToRelay.js");
 const { toGitHubPush } = require("./common/gitHubCooperation.js");
 const { initial, uploadBTCtoJPYChartImg } = require("./replyFunction.js");
+const { emergency } = require("./emergency.js");
 
 
 // envファイルのかたまり
@@ -56,36 +57,30 @@ const sunCalcDatagetandJsonUpdate = async () => {
         // 今日の日の出日の入りの時刻を取得
         const nowDate = currDateTime();
         const nowDateTime = formattedDateTime(new Date(nowDate));
-        const timesToday = sunCalc.getTimes(nowDateTime, lat, lng);
+        const timesToday = sunCalc.getTimes(nowDate, lat, lng);
         const nowDateTime12 = Number(nowDateTime.substring(0 ,12)); // 秒をカット
 
      
         // 明日の日の出日の入りの時刻を取得
-        const nextDaywk = nowDateTime.substring(0 ,4) + "/" 
-                        + nowDateTime.substring(4 ,6) + "/" 
-                        + nowDateTime.substring(6 ,8);
-        const mewDate = new Date(nextDaywk);
-        const addDay = mewDate.setDate(mewDate.getDate() + 1);
-        const nextDay = new Date(addDay);
-        const timesTomorrow = sunCalc.getTimes(nextDay, lat, lng);
+        // 日付を1日進める
+        const nextDate = nowDate.setDate(nowDate.getDate() + 1);
+        const timesTomorrow = sunCalc.getTimes(nextDate, lat, lng);
 
-        const addDay2 = nowDate.setDate(nowDate.getDate() + 1);
-        const nextDayWk2 = formattedDateTime(new Date(addDay2));
-        const nextDay12 = Number(nextDayWk2.substring(0 ,12)); // 秒をカット
-
+        
+        // 今日の日の出日の入り
         let finalSunrise = formattedDateTime(new Date(timesToday.sunrise.getTime() + offset));
         finalSunrise = Number(finalSunrise.substring(0 ,12)); // 秒をカット
         let finalSunset = formattedDateTime(new Date(timesToday.sunset.getTime() + offset));
         finalSunset = Number(finalSunset.substring(0 ,12)); // 秒をカット
 
-        // 今日の日付において、日の出がもう過ぎている＝明日の日の出時刻をセットしなおす
-        if(nowDateTime12 < finalSunrise) {
+        // 現在日時が今日の日の出をもう過ぎている＝明日の日の出時刻をセットしなおす
+        if(nowDateTime12 > finalSunrise) {
             // 明日の日の出が最終的な値
             finalSunrise = formattedDateTime(new Date(timesTomorrow.sunrise.getTime() + offset));
             finalSunrise = Number(finalSunrise.substring(0 ,12)); // 秒をカット
         }
-        // 今日の日付において、日没がもう過ぎている＝明日の日没時刻をセットしなおす
-        if(nextDay12 < finalSunset) {
+        // 現在日時が今日の日没をもう過ぎている＝明日の日没時刻をセットしなおす
+        if(nowDateTime12 > finalSunset) {
             // 明日の日の出が最終的な値
             finalSunset = formattedDateTime(new Date(timesTomorrow.sunset.getTime() + offset));
             finalSunset = Number(finalSunset.substring(0 ,12)); // 秒をカット
@@ -469,7 +464,7 @@ const main = async () => {
                     }
 
                     if(!retrievePostsInPeriod(relay, pubkey)) {
-                        await emergency();
+                        await emergency(relay);
                         return;
                     }
 

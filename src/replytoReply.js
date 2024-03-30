@@ -60,7 +60,6 @@ const replytoReply = async (relay)=>{
 
             //有効とするのは自分以外の投稿と、(一応明示)リプライなのでtagに値があるもののみ
             if(pubkey !== undefined && ev.pubkey !== pubkey && ev.tags.length > 0) {
-
                 // jsonの場所の割り出しとリプライ語句入りjsonファイルの場所の設定（自動リプライ時に使用しているjsonの反応語句をそのまま利用する）
                 const jsonCommonPath = "../../config/";    // configの場所はここからみれば../config/だが、util関数の場所から見れば../../config/となる
                 // jsonの場所の割り出しと設定
@@ -102,13 +101,13 @@ const main = async () => {
     // リレー
     const relay = relayInit(RELAY_URL);
     relay.on("error", () => {
-        console.error("replytoReply:failed to connect");
         relay.close();
+        console.error("replytoReply:failed to connect");
         return;
     });
 
     await relay.connect();
-    console.log("replytoReply:connected to relay");        
+    console.log("replytoReply:connected to relay");
 
     try {
         /*
@@ -118,7 +117,6 @@ const main = async () => {
 
     } catch(err) {
         console.error(err);
-
     }
 }
 

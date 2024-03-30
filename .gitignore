@@ -9,6 +9,8 @@ package.json
 /.log
 /_tst
 /img
+_tst*.js
+_tst*.json
 _dev_presetDate.json
 _old_presetDate.json
 _dev_autoPostatPresetTime.js
