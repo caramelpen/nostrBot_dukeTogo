@@ -76,7 +76,7 @@
   - `src\autoPostatPresetTime.js`で使用（後述）
   - 内容は随時更新していきます
 - 2-1-8.surveillance.json
-  - `src\surveillance.js`で使用（後述）
+  - `src\surveillance.js`、`emergency.js`で使用（後述）
   - 内容は随時更新していきます
 
 ### 2-2.src ディレクトリ
@@ -115,14 +115,17 @@
 
 - 3-2.autoReply.js
   - `README_autoReply.md`をご覧ください
+ 
+- 3-3.emergency.js
+  - `README_emergency.md`をご覧ください 
 
-- 3-3.infoUpNotification.js
+- 3-4.infoUpNotification.js
   - `README_infoUpNotification.md`をご覧ください
 
-- 3-4.replytoReply.js
+- 3-5.replytoReply.js
   - `README_replytoReply.md`をご覧ください
 
-- 3-5.surveillance.js
+- 3-6.surveillance.js
   - `README_surveillance.md`をご覧ください 
 
 ### 4.その他
