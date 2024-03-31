@@ -1,3 +1,6 @@
+## ver.240331
+- `surveillance.js`を新規追加したことによる不具合の修正のため、`emergency.js`の追加を行い、機能の強化を図る
+
 ## ver.240327
 - `surveillance.json`、`surveillance.js`を新規追加し、自動停止/起動機能と緊急停止機能の追加
 
