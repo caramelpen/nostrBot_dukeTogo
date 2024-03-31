@@ -5,22 +5,21 @@ const { currUnixtime, jsonSetandOpen, random } = require("./common/utils.js");
 const { BOT_PRIVATE_KEY_HEX, pubkey, RELAY_URL } = require("./common/env.js");
 const { publishToRelay } = require("./common/publishToRelay.js");
 const { conditions, exeProcess } = require("./emergency.js");
+const fs = require("fs");
 
 
 const jsonCommonPath = "../../config/";    // configの場所はここからみれば../config/だが、util関数の場所から見れば../../config/となる
 const jsonFineName = "surveillance.json";
 
 
-const fs = require("fs");
 // JSONファイルの監視を開始
 fs.watchFile("../config/" + jsonFineName, (curr, prev) => {
     // ファイルが変更された場合の処理
-    console.log('surveillance.json has been updated.');
+    console.log("surveillance.json has been updated");
 
     // 変更があった場合にメインの処理を再起動する
     main();
 });
-
 
 
 // HH:MMで設定されたものをcron形式にして返す

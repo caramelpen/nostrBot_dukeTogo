@@ -35,6 +35,8 @@ const funcObj = {
     ,normalAutoReply    // 通常リプライ
 }
 
+const jsonPathDef = "../config/";
+
 // ディスパッチの設定値
 const funcConfig = {
     funcName: ["functionalPosting", "exchangeRate", "normalAutoReply"]                  // useJsonFile の記述順と対応させる
@@ -54,7 +56,7 @@ const autoReply = async (relay) => {
         try {
             // 有効とするのは自分の投稿以外でかつtagが空のもの
             if(pubkey !== undefined && ev.pubkey !== pubkey && ev.tags.length <= 0) {
-                const jsonCommonPath = "../../config/";    // configの場所はここからみれば../config/だが、util関数の場所から見れば../../config/となる
+                const jsonCommonPath = "../" + jsonPathDef;    // configの場所はここからみれば../config/だが、util関数の場所から見れば../../config/となる
                 // jsonの場所の割り出しと設定
                 const autoReactionJson = await jsonSetandOpen(jsonCommonPath + "autoReaction.json");    
             
