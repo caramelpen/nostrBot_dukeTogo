@@ -11,6 +11,18 @@ const jsonCommonPath = "../../config/";    // configの場所はここからみ�
 const jsonFineName = "surveillance.json";
 
 
+const fs = require("fs");
+// JSONファイルの監視を開始
+fs.watchFile("../config/" + jsonFineName, (curr, prev) => {
+    // ファイルが変更された場合の処理
+    console.log('surveillance.json has been updated.');
+
+    // 変更があった場合にメインの処理を再起動する
+    main();
+});
+
+
+
 // HH:MMで設定されたものをcron形式にして返す
 const convertToCronFormat = (time) => {
     // 時と分に分割
