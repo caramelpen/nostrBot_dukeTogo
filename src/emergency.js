@@ -1,3 +1,9 @@
+/**
+ * 狙撃屋13bot(@dukeTogo)
+ * emergency.js
+ * botの緊急停止プログラム
+ */
+
 const util = require("util");
 const exec = util.promisify(require("child_process").exec);
 const { currUnixtime, jsonSetandOpen } = require("./common/utils.js");

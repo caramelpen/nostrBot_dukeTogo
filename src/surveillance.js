@@ -1,3 +1,9 @@
+/**
+ * 狙撃屋13bot(@dukeTogo)
+ * surveillance.js
+ * botの監視プログラム
+ */
+
 require("websocket-polyfill");
 const cron = require("node-cron");
 const { relayInit, finishEvent } = require("nostr-tools");

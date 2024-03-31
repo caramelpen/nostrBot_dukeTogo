@@ -9,6 +9,7 @@ package.json
 /.log
 /_tst
 /img
+_botAccountkindzero.js
 _tst*.js
 _tst*.json
 _dev_presetDate.json
