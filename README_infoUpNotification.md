@@ -1,4 +1,4 @@
-### 3-3.infoUpNotification.js
+### 3-4.infoUpNotification.js
 - 毎時`infoUpNotification.json`の`rss`プロパティに設定してあるRSSフィードを取得し、更新が確認出来たらその旨をポストします
 - `contentsIdx`プロパティには取得するRSS中のコンテンツ要素番号を設定します
 - 取得するRSSのタグは`guid`と`pubDate`とし、jsonの`rssContents`に前回取得したフィードの情報を保存し、次回以降はこの値と毎時取得する取得情報を比較し、異なれば「更新された」と判断します
