@@ -445,7 +445,6 @@ const main = async () => {
             try {
                 // 処理の実行はディスパッチで行い、スリム化をはかる
                 const func = funcObj[funcConfig.funcName[i]];
-                //postSubject = await func(file, jsonPathCommon + funcConfig.useJsonFile[i], nowDate, retPostEv);
                 postSubject = await func(jsonPathCommon + file, nowDate, retPostEv);
 
                 if(postSubject) {
