@@ -2,6 +2,7 @@
     "runConfig": "pm2config.json"
     ,"stopTime": [
                     "00:01"
+                    ,"07:10"
                 ]
     ,"stopExec": "pm2 stop"
     ,"stopComment": [
@@ -10,6 +11,7 @@
 
     ,"startTime": [
                     "04:00"
+                    ,"17:15"
                 ]
     ,"startExec": "pm2 restart"
     ,"startComment": [

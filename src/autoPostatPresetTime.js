@@ -409,9 +409,9 @@ const funcObj = {
 
 // ディスパッチの設定値
 const funcConfig = {
-    funcName: ["subPresetPost", "subSunriseSunset", "uploadBTCtoJPYChartImg"]             // useJsonFile の記述順と対応させる
-    ,useJsonFile: ["presetDate.json", "sunriseSunset.json", "presetDate.json"]     // funcName の記述順と対応させる（jsonを使用しないなら""としておく）
-    ,operationCategory: [0, 1, 0]                                  // 1ならGitHubへプッシュコミット（useJsonFileやuncName の記述順と対応させる）
+    funcName: ["subPresetPost", "subSunriseSunset", "uploadBTCtoJPYChartImg"]       // useJsonFile の記述順と対応させる
+    ,useJsonFile: ["presetDate.json", "sunriseSunset.json", "presetDate.json"]      // funcName の記述順と対応させる（jsonを使用しないなら""としておく）
+    ,operationCategory: [0, 1, 0]                                                   // 1ならGitHubへプッシュコミット（useJsonFileやuncName の記述順と対応させる）
 }
 
 
@@ -430,21 +430,23 @@ const main = async () => {
         // jsonの場所を割り出すために
         const jsonPath = require("path");
 
-        for(let i = 0; i <= funcConfig.funcName.length - 1; i++) {            
-            let postSubject = false;
-            let connectedSw = 0;
-            sunriseSunsetJsonPath = "";
-            const jsonPathCommon = "../../config/"; // configの場所はここからみれば../config/だが、util関数の場所から見れば../../config/となる
+        let postSubject = false;
+        let connectedSw = 0;
+        sunriseSunsetJsonPath = "";
+        const jsonPathCommon = "../../config/"; // configの場所はここからみれば../config/だが、util関数の場所から見れば../../config/となる
 
+
+        const promises = funcConfig.useJsonFile.map(async (file, i) => {
+            if(funcConfig.operationCategory[i] === 1) {
+                // 日の出日の入りjsonファイルの場所の設定
+                sunriseSunsetJsonPath = jsonPath.join(__dirname, "../config/sunriseSunset.json");
+            }
+      
             try {
-                
-                if(funcConfig.operationCategory[i] === 1) {
-                    // 日の出日の入りjsonファイルの場所の設定
-                    sunriseSunsetJsonPath = jsonPath.join(__dirname, "../config/sunriseSunset.json");
-                }
-
                 // 処理の実行はディスパッチで行い、スリム化をはかる
-                postSubject = await funcObj[funcConfig.funcName[i]](jsonPathCommon + funcConfig.useJsonFile[i], nowDate, retPostEv);
+                const func = funcObj[funcConfig.funcName[i]];
+                //postSubject = await func(file, jsonPathCommon + funcConfig.useJsonFile[i], nowDate, retPostEv);
+                postSubject = await func(jsonPathCommon + file, nowDate, retPostEv);
 
                 if(postSubject) {
 
@@ -481,19 +483,85 @@ const main = async () => {
                             console.log("sunriseSunset.json is commit/push");
                         }
                     }
-
                 }
 
-            } catch(err) {
+            } catch (err) {
                 console.error(err);
-
             } finally {
                 if(connectedSw === 1) {
                     relay.close();
                     connectedSw = 0;
                 }
             }
-        }
+
+
+        });
+        await Promise.all(promises);
+
+        // for(let i = 0; i <= funcConfig.funcName.length - 1; i++) {            
+        //     let postSubject = false;
+        //     let connectedSw = 0;
+        //     sunriseSunsetJsonPath = "";
+        //     const jsonPathCommon = "../../config/"; // configの場所はここからみれば../config/だが、util関数の場所から見れば../../config/となる
+
+        //     try {
+                
+        //         if(funcConfig.operationCategory[i] === 1) {
+        //             // 日の出日の入りjsonファイルの場所の設定
+        //             sunriseSunsetJsonPath = jsonPath.join(__dirname, "../config/sunriseSunset.json");
+        //         }
+
+        //         // 処理の実行はディスパッチで行い、スリム化をはかる
+        //         postSubject = await funcObj[funcConfig.funcName[i]](jsonPathCommon + funcConfig.useJsonFile[i], nowDate, retPostEv);
+
+        //         if(postSubject) {
+
+        //             // リレー
+        //             const relay = relayInit(RELAY_URL);
+        //             relay.on("error", () => {
+        //                 console.error("autoPostatPresetTime:failed to connect");
+        //                 relay.close();
+        //                 return;
+        //             });
+
+        //             await relay.connect();
+        //             connectedSw = 1;
+
+        //             if(retPostEv.postEv !== undefined) {
+        //                 postEv = retPostEv.postEv;
+        //             }
+
+        //             if(!retrievePostsInPeriod(relay, pubkey)) {
+        //                 await emergency(relay);
+        //                 return;
+        //             }
+
+        //             // ポスト
+        //             publishToRelay(relay, postEv);
+
+        //             // 日の出日の入りポストなら更新されたjsonファイルをGitHubへプッシュする
+        //             if(funcConfig.operationCategory[i] === 1) {
+        //                 // GitHubへプッシュする
+        //                 if(sunriseSunsetJson.gitHubPush === 1) {
+        //                     const fileNamewk = sunriseSunsetJsonPath.split("/").pop();
+        //                     const sunriseSunsetPathSingle = `config/${fileNamewk}`; // "../config/sunriseSunset.json" を "config/sunriseSunset.json" の形にする
+        //                     await toGitHubPush(GIT_REPO, sunriseSunsetJsonPath, sunriseSunsetPathSingle, GIT_USER_NAME, GIT_TOKEN, "[auto/" + sunriseorSunset + "] daily update", GIT_BRANCH);
+        //                     console.log("sunriseSunset.json is commit/push");
+        //                 }
+        //             }
+
+        //         }
+
+        //     } catch(err) {
+        //         console.error(err);
+
+        //     } finally {
+        //         if(connectedSw === 1) {
+        //             relay.close();
+        //             connectedSw = 0;
+        //         }
+        //     }
+        // }
     });
 }
 
