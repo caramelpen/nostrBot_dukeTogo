@@ -802,7 +802,7 @@ const uploadBTCtoJPYChartImg = async (presetJsonPath, nowDate, retPostEv, relay 
                                 }
 
                                 // リプライ
-                                const postEv = composePost(value.messages[postIdx] + "\n" + imgURLH + " " + imgURLD + subMessage);
+                                const postEv = composePost(value.messages[postIdx] + "\n" + imgURLH + " " + imgURLD + (subMessage.length > 0 ? " \n" + subMessage:""));
                                 if(relay !== undefined) {
                                     publishToRelay(relay, postEv);            
                                 } else {
