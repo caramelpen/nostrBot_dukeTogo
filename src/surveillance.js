@@ -64,26 +64,34 @@ const runProcess = async (config, stoporStart) => {
         const exec = await exeProcess(config.exec, config.runConfig, stoporStart);
         if(exec) {
             try {
-                //リレーに接続
-                relay = relayInit(RELAY_URL);
-                relay.on("error", () => {
-                    console.error("surveillance:failed to connect");
-                    relay.close();
-                    return;
-                });
-            
-                await relay.connect();
-                console.log("surveillance:connected to relay");
-
-                connectedSw = 1;
                 // 語句配列の数の範囲からランダム値を取得し、それを配列要素とする
                 const idx = random(0, config.comment.length - 1);
                 if(idx >= 0) {
-                    // イベント組み立て
-                    const postEv = composePost(config.comment[idx]);
+                    // 語句未設定の場合はポストしない
+                    if(config.comment[idx].length > 0) {
+                        //リレーに接続
+                        relay = relayInit(RELAY_URL);
+                        relay.on("error", () => {
+                            console.error("surveillance:failed to connect");
+                            relay.close();
+                            return;
+                        });
+                    
+                        await relay.connect();
+                        console.log("surveillance:connected to relay");
+                        connectedSw = 1;
 
-                    // ポスト
-                    publishToRelay(relay, postEv);
+                        // イベント組み立て
+                        const postEv = composePost(config.comment[idx]);
+
+                        // ポスト
+                        publishToRelay(relay, postEv);
+                        
+                    } else {
+                        console.log("surveillance:no submission has been made because the word is not set(["+ stoporStart + "] is done)");
+                    }
+                } else {
+                    console.log("surveillance:for some reason, [" + stoporStart + "] was not performed");
                 }
 
             } catch (err){
