@@ -96,12 +96,12 @@ const runProcess = async (config, stoporStart) => {
 
             } catch (err){
                 errCondition = true;
-                console.error("publishToRelay of runProcess is error:["+ stoporStart + "]" + err);
+                console.error("surveillance of runProcess is error:["+ stoporStart + "]" + err);
             }
         }
     } catch (err){
         errCondition = true;
-        console.error("runProcess is error:["+ stoporStart + "]" + err);
+        console.error("surveillance of runProcess is error:["+ stoporStart + "]" + err);
 
     } finally {
         if(connectedSw === 1){
