@@ -490,6 +490,7 @@ const main = async () => {
                 if(connectedSw) {
                     relay.close();
                     connectedSw = false;
+                    console.log("autoPostatPresetTime:disconnected from relay");
                 }
             }
 
