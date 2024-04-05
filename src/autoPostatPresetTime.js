@@ -431,11 +431,11 @@ const main = async () => {
         const jsonPath = require("path");
 
         let postSubject = false;
-        let connectedSw = 0;
+        let connectedSw = false;
         sunriseSunsetJsonPath = "";
         const jsonPathCommon = "../../config/"; // configの場所はここからみれば../config/だが、util関数の場所から見れば../../config/となる
 
-
+        let relay;
         const promises = funcConfig.useJsonFile.map(async (file, i) => {
             if(funcConfig.operationCategory[i] === 1) {
                 // 日の出日の入りjsonファイルの場所の設定
@@ -450,7 +450,7 @@ const main = async () => {
                 if(postSubject) {
 
                     // リレー
-                    const relay = relayInit(RELAY_URL);
+                    relay = relayInit(RELAY_URL);
                     relay.on("error", () => {
                         console.error("autoPostatPresetTime:failed to connect");
                         relay.close();
@@ -458,7 +458,7 @@ const main = async () => {
                     });
 
                     await relay.connect();
-                    connectedSw = 1;
+                    connectedSw = true;
 
                     if(retPostEv.postEv !== undefined) {
                         postEv = retPostEv.postEv;
@@ -470,7 +470,7 @@ const main = async () => {
                     }
 
                     // ポスト
-                    publishToRelay(relay, postEv);
+                    await publishToRelay(relay, postEv);
 
                     // 日の出日の入りポストなら更新されたjsonファイルをGitHubへプッシュする
                     if(funcConfig.operationCategory[i] === 1) {
@@ -487,9 +487,9 @@ const main = async () => {
             } catch (err) {
                 console.error(err);
             } finally {
-                if(connectedSw === 1) {
+                if(connectedSw) {
                     relay.close();
-                    connectedSw = 0;
+                    connectedSw = false;
                 }
             }
 

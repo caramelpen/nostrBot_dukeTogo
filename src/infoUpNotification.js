@@ -15,7 +15,7 @@ const parser = require("rss-parser");
 let postEv;
 
 const infoUpNotification = async (rssJsonPath, rssJson, i) => {
-    let connectedSw = 0;
+    let connectedSw = false;
     let relay = null;
     try {
         // rss調査
@@ -42,10 +42,10 @@ const infoUpNotification = async (rssJsonPath, rssJson, i) => {
             });
 
             await relay.connect();
-            connectedSw = 1;
+            connectedSw = true;
 
             // ポスト
-            publishToRelay(relay, postEv);
+            await publishToRelay(relay, postEv);
 
             // json更新
             writeJsonFile(rssJsonPath, "rssContents", newData, i);
@@ -64,8 +64,9 @@ const infoUpNotification = async (rssJsonPath, rssJson, i) => {
         console.error(err);
 
     } finally {
-        if(connectedSw === 1) {
+        if(connectedSw) {
             relay.close();
+            connectedSw = false;
         }
     }
 

@@ -94,7 +94,7 @@ const functionalPosting = async (relay, ev, functionalPostingJson, autoReactionJ
                         // リプライ
                         const replyPostEv = !isFromReplytoReply ? composeReply(replyChr, ev) : composeReplytoReply(replyChr, ev);
 
-                        publishToRelay(relay, replyPostEv, (isFromReplytoReply ? false : true), ev.pubkey, ev.content);
+                        await publishToRelay(relay, replyPostEv, (isFromReplytoReply ? false : true), ev.pubkey, ev.content);
                     }
                 }
             }
@@ -233,7 +233,7 @@ const exchangeRate = async (relay, ev, exchangeRate, autoReactionJson, postInfoO
                 // リプライ
                 const replyPostorreactionPostEv = !isFromReplytoReply ? composeReply(replyChr, ev) : composeReplytoReply(replyChr, ev);
 
-                publishToRelay(relay, replyPostorreactionPostEv, (isFromReplytoReply ? false : true), ev.pubkey, ev.content);
+                await publishToRelay(relay, replyPostorreactionPostEv, (isFromReplytoReply ? false : true), ev.pubkey, ev.content);
             }
         }
 
@@ -394,12 +394,12 @@ const normalAutoReply = async (relay, ev, autoReplyJson, autoReactionJson, postI
                     return;
                 }
 
-                publishToRelay(relay, replyPostorreactionPostEv, (isFromReplytoReply ? false : true), ev.pubkey, ev.content);
+                await publishToRelay(relay, replyPostorreactionPostEv, (isFromReplytoReply ? false : true), ev.pubkey, ev.content);
                 // リアクションとリアクション絵文字でのリプライを行う動作区分で、かつカスタム絵文字URLが設定されているならリアクション絵文字でリプライも行う
                 if(postInfoObj.postCategory === 4) {
                     // リプライ
                     replyPostorreactionPostEv = composeReplyEmoji(ev, autoReactionJson, randomReactionIdx);
-                    publishToRelay(relay, replyPostorreactionPostEv, (isFromReplytoReply ? false : true), ev.pubkey, ev.content);
+                    await publishToRelay(relay, replyPostorreactionPostEv, (isFromReplytoReply ? false : true), ev.pubkey, ev.content);
                 }
             }
         }
@@ -804,7 +804,7 @@ const uploadBTCtoJPYChartImg = async (presetJsonPath, nowDate, retPostEv, relay 
                                 // リプライ
                                 const postEv = composePost(value.messages[postIdx] + "\n" + imgURLH + " " + imgURLD + (subMessage.length > 0 ? " \n" + subMessage:""));
                                 if(relay !== undefined) {
-                                    publishToRelay(relay, postEv);            
+                                    await publishToRelay(relay, postEv);            
                                 } else {
                                     retPostEv.postEv = postEv;
                                 }

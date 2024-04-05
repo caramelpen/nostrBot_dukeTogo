@@ -66,7 +66,7 @@ const emergency = async (relay) => {
             const postEv = composePost(config.emergencyComment);
 
             // ポスト
-            publishToRelay(relay, postEv);
+            await publishToRelay(relay, postEv);
         }
 
     } catch(err) {

@@ -56,7 +56,7 @@ const composePost = (postChar) => {
 
 // 停止／起動
 const runProcess = async (config, stoporStart) => {
-    let connectedSw = 0;
+    let connectedSw = false;
     let errCondition = false;
     let relay;
     try {
@@ -79,14 +79,13 @@ const runProcess = async (config, stoporStart) => {
                     
                         await relay.connect();
                         console.log("surveillance:connected to relay");
-                        connectedSw = 1;
+                        connectedSw = true;
 
                         // イベント組み立て
-                        const postEv = composePost(config.comment[idx]);
-
+                        const postEv = composePost(config.surveillanceCommonName + config.comment[idx]);
                         // ポスト
-                        publishToRelay(relay, postEv);
-                        
+                        await publishToRelay(relay, postEv);
+
                     } else {
                         console.log("surveillance:no submission has been made because the word is not set(["+ stoporStart + "] is done)");
                     }
@@ -104,9 +103,10 @@ const runProcess = async (config, stoporStart) => {
         console.error("surveillance of runProcess is error:["+ stoporStart + "]" + err);
 
     } finally {
-        if(connectedSw === 1){
+        if(connectedSw){
             relay.close();
-            connectedSw = 0;
+            connectedSw = false;
+            console.log("surveillance:disconnected from relay");
         }
 
         if(errCondition) {
