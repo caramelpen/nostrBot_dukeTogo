@@ -82,7 +82,7 @@ const runProcess = async (config, stoporStart) => {
                         connectedSw = true;
 
                         // イベント組み立て
-                        const postEv = composePost(config.surveillanceCommonName + config.comment[idx]);
+                        const postEv = composePost(config.surveillanceCommonHeader + config.comment[idx]);
                         // ポスト
                         await publishToRelay(relay, postEv);
 
@@ -131,7 +131,7 @@ const main = async () => {
                 const cronTime = convertToCronFormat(time);
                 cron.schedule(cronTime, () => {
                     if(!conditions.occurrenceEmergency && !conditions.runStop) {
-                        if(runProcess( {exec: config.stopExec , runConfig: config.runConfig, comment: config.stopComment},"stopped" )) {
+                        if(runProcess( {exec: config.stopExec , runConfig: config.runConfig, surveillanceCommonHeader: config.surveillanceCommonHeader, comment: config.stopComment},"stopped" )) {
                             conditions.runStop = true;
                             conditions.runStart = false;
                         }
