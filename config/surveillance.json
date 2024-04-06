@@ -1,6 +1,7 @@
 {
     "surveillanceCommonHeader": "□□ [監視ｼｽﾃﾑ] ﾖﾘ 発報 □□\n"
     ,"runConfig": "pm2config.json"
+
     ,"stopTime": [
                     "00:02"
                 ]

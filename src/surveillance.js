@@ -125,21 +125,18 @@ const main = async () => {
         // jsonの場所の割り出しと設定
         const config = await jsonSetandOpen(jsonCommonPath + jsonFineName); 
 
-        // 停止と起動で2か所あるので、まとめてしまう
-        const processOptions = {
-            exec: config.stopExec
-            , runConfig: config.runConfig
-            , surveillanceCommonHeader: config.surveillanceCommonHeader
-            , comment: config.stopComment
-        }
-
         // 停止時間の設定がある場合
         if (config.stopTime) {
             config.stopTime.forEach(time => {
                 const cronTime = convertToCronFormat(time);
                 cron.schedule(cronTime, () => {
                     if(!conditions.occurrenceEmergency && !conditions.runStop) {
-                        if(runProcess( processOptions, "stopped" )) {
+                        if(runProcess( {exec: config.stopExec
+                                        , runConfig: config.runConfig
+                                        , surveillanceCommonHeader: config.surveillanceCommonHeader
+                                        , comment: config.stopComment
+                                        }
+                                    ,"stopped" )) {
                             conditions.runStop = true;
                             conditions.runStart = false;
                         }
@@ -155,7 +152,12 @@ const main = async () => {
                 const cronTime = convertToCronFormat(time);
                 cron.schedule(cronTime, () => {
                     if(!conditions.occurrenceEmergency && !conditions.runStart) {
-                        if(runProcess( processOptions, "started" )) {                            
+                        if(runProcess( {exec: config.startExec 
+                                        , runConfig: config.runConfig
+                                        , surveillanceCommonHeader: config.surveillanceCommonHeader
+                                        , comment: config.startComment
+                                        }
+                                    ,"started" )) {                            
                             conditions.runStart = true;
                             conditions.runStop = false;
                         }
