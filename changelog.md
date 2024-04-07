@@ -1,3 +1,6 @@
+## ver.240407
+- `autoPostatPresetTime.js`に周年投稿機能を追加
+
 ## ver.240331
 - `surveillance.js`を新規追加したことによる不具合の修正のため、`emergency.js`の追加を行い、機能の強化を図る
 
