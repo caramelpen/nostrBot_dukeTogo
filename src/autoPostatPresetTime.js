@@ -8,7 +8,7 @@ const cron = require("node-cron");
 const { relayInit, finishEvent } = require("nostr-tools");
 const sunCalc = require("suncalc");
 const jpnHolidays = require('@holiday-jp/holiday_jp');
-const { currDateTime, currUnixtime, random, jsonSetandOpen, writeJsonFile, formattedDateTime, isSafeToReply, retrievePostsInPeriod } = require("./common/utils.js");
+const { currDateTime, currUnixtime, random, jsonSetandOpen, writeJsonFile, formattedDateTime, retrievePostsInPeriod } = require("./common/utils.js");
 const { BOT_PRIVATE_KEY_HEX, pubkey, adminPubkey, RELAY_URL, GIT_USER_NAME, GIT_REPO, GIT_TOKEN, GIT_BRANCH} = require("./common/env.js");
 const { publishToRelay } = require("./common/publishToRelay.js");
 const { toGitHubPush } = require("./common/gitHubCooperation.js");
@@ -113,8 +113,25 @@ const sunCalcDatagetandJsonUpdate = async () => {
 }
 
 
+// 周年チェック
+const getAnniversary = async (baseDate, nowDate) => {
+    // 日付をパースしてDateオブジェクトを作成
+    const [year, month, day] = baseDate.split("/").map(Number);
+    const targetDate = new Date(year, month - 1, day); // 月は0から始まるため、1を引く
 
+    // 経過年数を計算
+    //const today = new Date();
+    const elapsedYears = nowDate.getFullYear() - targetDate.getFullYear();
 
+    // 経過年数が0以上でかつ今日の日付とtargetDateが同じ月と日である場合、周年数を返す
+    if (elapsedYears >= 0 && 
+        nowDate.getMonth() === targetDate.getMonth() && 
+        nowDate.getDate() === targetDate.getDate()) {
+        return elapsedYears;
+    } else {
+        return 0;
+    }
+}
 
 // 定刻ポスト
 const subPresetPost = async(presetDatePath, nowDate, retPostEv = undefined) => {
@@ -142,13 +159,27 @@ const subPresetPost = async(presetDatePath, nowDate, retPostEv = undefined) => {
                 let subMessage = "";
                 let postSubject = false;
                 let idx = 0;
-                // 投稿の優先順位は 指定月日 祝日 指定月 指定日 残10日単位 指定曜日 で行う
+                // 投稿の優先順位は 指定月日 周年 祝日 指定月 指定日 残10日単位 指定曜日 で行う
                 // 指定月日
                 if (condition.type === "specificDate") {
                     for (let value of condition.value) {
                         if(value.date.length > 0) {
                             const [month, date] = value.date.split("/");
                             if (nowDate.getMonth() + 1 === Number(month) && nowDate.getDate() === Number(date)) {
+                                postSubject = true;
+                                break;
+                            }
+                        }
+                        idx ++;
+                    }
+
+                // 周年
+                } else if(condition.type === "anniversary") {
+                    for (let value of condition.value) {
+                        if(value.date.length > 0) {
+                            let anniversary = getAnniversary(value.date, nowDate);
+                            if(anniversary > 0) {
+                                message = anniversary.toString();
                                 postSubject = true;
                                 break;
                             }

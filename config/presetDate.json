@@ -1,18 +1,18 @@
 {
-    "[description of midnightConditions]": [
+    "◆◆◆[description of midnightConditions]◆◆◆": [
         {
             "description": "midnightConditions は毎日0:00に稼働します"
-            ,"description2": "specificDate jpnHoliday specificMonth specificDay everyNDays dayName everyMinutes の優先順に見ていき、どこかでポストしたら後のものは無視します"
+            ,"description2": "specificDate anniversary jpnHoliday specificMonth specificDay everyNDays dayName everyMidnight の優先順に見ていき、どこかでポストしたら後のものは無視します"
         }
     ]
     ,"midnightConditions": [
         {
-            "[description of specificDate]": "date になったら messages と subMessages を使用してポストします(date は MM/DD 形式で設定)"
+            "◇◇◇[description of specificDate]◇◇◇": "date になったら messages と subMessages を使用してポストします(date は MM/DD 形式で設定)"
             ,"type": "specificDate"
             ,"value": [
                 {
                     "date": "12/31"
-                    ,"messages": ["大晦日だ…やり残したことはないか…？"]
+                    ,"messages": ["大晦日だ… やり残したことはないか…？"]
                     ,"subMessages": []
                 }
                 ,{
@@ -22,7 +22,7 @@
                 }
                 ,{
                     "date": "12/25"
-                    ,"messages": ["まだ言っていなかったが…メリークリスマス！"]
+                    ,"messages": ["まだ言っていなかったが… メリークリスマス！"]
                     ,"subMessages": []
                 }
                 ,{
@@ -33,9 +33,20 @@
             ]
         }
 
+        ,{
+            "◇◇◇[description of anniversary]◇◇◇": "今日が date に設定された YYYY/MM/DD からn周年なら messages と subMessages を使用してポストします"
+            ,"type": "anniversary"
+            ,"value": [
+                {
+                    "date": "2023/05/01"
+                    ,"messages": ["今日は俺の管理者が nostr を始めて"]
+                    ,"subMessages": ["周年らしい…"]
+                }
+            ]
+        }
 
         ,{
-            "[description of jpnHoliday]": "今日が祝日なら messages と subMessages を使用してポストします"
+            "◇◇◇[description of jpnHoliday]◇◇◇": "今日が祝日なら messages と subMessages を使用してポストします"
             ,"type": "jpnHoliday"
             ,"value": [
                 {
@@ -47,7 +58,7 @@
 
 
         ,{
-            "[description of specificMonth]": "month になったら messages と subMessages を使用してポストします"            
+            "◇◇◇[description of specificMonth]◇◇◇": "month になったら messages と subMessages を使用してポストします"            
             ,"type": "specificMonth"
             ,"value": [
                 {
@@ -58,8 +69,9 @@
             ]
         }
 
+
         ,{
-            "[description of specificDay]": "day になったら messages と subMessages を使用してポストします(day は「1」「31」などの日付を設定すること)" 
+            "◇◇◇[description of specificDay]◇◇◇": "day になったら messages と subMessages を使用してポストします(day は「1」「31」などの日付を設定すること)" 
             ,"type": "specificDay"
             ,"value": [
                 {
@@ -71,7 +83,7 @@
         }
 
         ,{
-            "[description of everyNDays]": "今年の残り日数が number で割り切れたら messages と subMessages を使用してポストします" 
+            "◇◇◇[description of everyNDays]◇◇◇": "今年の残り日数が number で割り切れたら messages と subMessages を使用してポストします" 
             ,"type": "everyNDays"
             ,"value": [
                 {
@@ -83,7 +95,7 @@
         }
 
         ,{
-            "[description of dayName]": "曜日が dayName だったら messages と subMessages を使用してポストします（dayName の指定は「月」や「火」など「曜日」は含めないで指定すること）"
+            "◇◇◇[description of dayName]◇◇◇": "曜日が dayName だったら messages と subMessages を使用してポストします（dayName の指定は「月」や「火」など「曜日」は含めないで指定すること）"
             ,"type": "dayName"
             ,"value": [
                 {
@@ -95,12 +107,12 @@
         }
 
         ,{
-            "[description of everyMidnight]": "minutes だったら messages と subMessages を使用してポストします(minutes は HH:MM 形式で指定すること)"
+            "◇◇◇[description of everyMidnight]◇◇◇": "messages と subMessages を使用してポストします(minutes は HH:MM 形式で指定すること)"
             ,"type": "everyMidnight"
             ,"value": [
                 {
                     "messages": [
-                                    "もういい…眠れ…"
+                                    "もういい… 眠れ…"
                                     ,"そろそろ眠ったらどうだ…？"
                                     ,"けっこうだ……俺はどこででも眠れる……"
                                     ,"眠れなくても目を閉じていろ…"
@@ -117,14 +129,14 @@
 
 
 
-    ,"[description of minuteConditions]": [
+    ,"◆◆◆[description of minuteConditions]◆◆◆": [
         {
             "description": "minuteConditions は毎分稼働します"
         }
     ]
     ,"minuteConditions": [
         {
-            "[description of everyMinutes]": "minutes だったら messages と subMessages を使用してポストします(minutes は HH:MM 形式で指定すること)"
+            "◇◇◇[description of everyMinutes]◇◇◇": "minutes だったら messages と subMessages を使用してポストします(minutes は HH:MM 形式で指定すること)"
             ,"type": "everyMinutes"
             ,"value": [
                 {
@@ -146,7 +158,8 @@
                                     ,"夕食に何を食べようが…それはお前の勝手だ…"
                                     ,"…さっさと夕食を食べたらどうだ…？"
                                     ,"…食事の時間だ…"
-                                    ,"…食事の量は 朝>昼>夕 がいいと聞くが…？"
+                                    ,"…食事の量は 朝 > 昼 > 夕 がいいと聞くが…？"
+                                    ,"…偏食だとは、よほど贅沢ができる身分なのか…？"
                                 ]
                     ,"subMessages": []
                 }
@@ -158,14 +171,14 @@
 
 
 
-   ,"[description of specifiedProcessatSpecifiedTime]": [
+   ,"◆◆◆[description of specifiedProcessatSpecifiedTime]◆◆◆": [
         {
             "description": "specifiedProcessatSpecifiedTime は指定の時刻に funcName プロパティを実行します"
         }
     ]
     ,"specifiedProcessatSpecifiedTime": [
         {
-            "[description of specifiedTime]": "minutes だったら messages と subMessages を使用してポストします(minutes は HH:MM 形式で指定すること)"
+            "◇◇◇[description of specifiedTime]◇◇◇": "minutes だったら messages と subMessages を使用してポストします(minutes は HH:MM 形式で指定すること)"
             ,"type": "specifiedTime"
             ,"value": [
                 {
@@ -177,6 +190,7 @@
                     ,"subMessages": [
                                     "…売るか買うかは… 俺の知ったことではない…"
                                     ,"よく見極めることだな…"
+                                    ,"お前が投資に向いているかどうか… さあ、な…"
                                     ]
                 }
             ]
