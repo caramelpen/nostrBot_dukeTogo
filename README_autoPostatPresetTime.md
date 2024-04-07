@@ -4,20 +4,22 @@
   - `presetDate.json`の設定値を使用します
   - 3-1-1-1.親プロパティ`midnightConditions`
     - `midnightConditions`は毎日0:00に起動します
-    - 子プロパティ`specificDate`、`jpnHoliday`、`specificMonth`、`specificDay`、`everyNDays`、`dayName`、`everyMidnight`の順に作動し、どこかで作動すれば以降の動作は行いません
+    - 子プロパティ`specificDate`、`anniversary`、`jpnHoliday`、`specificMonth`、`specificDay`、`everyNDays`、`dayName`、`everyMidnight`の順に作動し、どこかで作動すれば以降の動作は行いません
       - 3-1-1-1-1.`specificDate`
         - `date`プロパティの日付なら、`messages`と`subMessages`を使用してポストします(※1)
-      - 3-1-1-1-2.`jpnHoliday`
+      - 3-1-1-1-2.`anniversary`
+        - `date`プロパティの日付から周年を迎えていれば、`messages`と`subMessages`を使用してポストします(※1)   
+      - 3-1-1-1-3.`jpnHoliday`
         - 祝日なら`messages`と`subMessages`を使用してポストします(※1)
-      - 3-1-1-1-3.`specificMonth`
+      - 3-1-1-1-4.`specificMonth`
         - 今日の「月」が`month`なら`messages`と`subMessages`を使用して今年の残り日数をポストします(※1)
-      - 3-1-1-1-4.`specificDay`
+      - 3-1-1-1-5.`specificDay`
         - 今日の「日」が`day`なら`messages`と`subMessages`を使用してポストします(※1)
-      - 3-1-1-1-5.`everyNDays`
+      - 3-1-1-1-6.`everyNDays`
         - 今日が今年の残り日数`number`で割り切れれば`messages`と`subMessages`を使用してポストします(※1)
-      - 3-1-1-1-6.`dayName`
+      - 3-1-1-1-7.`dayName`
         - 今日が`dayName`曜日なら`messages`と`subMessages`を使用してポストします(※1)
-      - 3-1-1-1-7.`everyMidnight`
+      - 3-1-1-1-8.`everyMidnight`
         - 上記すべてに該当しなければ`messages`と`subMessages`を使用してポストします(※1)
   
   - 3-1-1-2.親プロパティ`minuteConditions`
