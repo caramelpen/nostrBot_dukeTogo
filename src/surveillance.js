@@ -11,21 +11,36 @@ const { currUnixtime, jsonSetandOpen, random } = require("./common/utils.js");
 const { BOT_PRIVATE_KEY_HEX, pubkey, RELAY_URL } = require("./common/env.js");
 const { publishToRelay } = require("./common/publishToRelay.js");
 const { conditions, exeProcess } = require("./emergency.js");
-//const fs = require("fs");
-
+const fs = require("fs");
+const path = require("path");
 
 const jsonCommonPath = "../../config/";    // configの場所はここからみれば../config/だが、util関数の場所から見れば../../config/となる
 const jsonFineName = "surveillance.json";
 
+//let jobs = [];
+let job;
 
-// // JSONファイルの監視を開始
-// fs.watchFile("../config/" + jsonFineName, (curr, prev) => {
-//     // ファイルが変更された場合の処理
-//     console.log("surveillance.json has been updated");
+// JSONファイルの監視を開始
+const absolutePath = path.resolve(__dirname, "..", "config", jsonFineName);
+fs.watch(absolutePath, (eventType, filename) => {
+    if (eventType === "change") {
+        // ファイルが変更された場合の処理
+        console.log("surveillance.json has been updated");
+        // 変更があった場合にメインの処理を再起動する
+        //main();
+        restartMain();
+    }
+});
 
-//     // 変更があった場合にメインの処理を再起動する
-//     main();
-// });
+const restartMain = async () => {
+    // 以前のcronジョブがあれば停止する
+    if (job) {
+        await job.stop();
+    }
+
+    // main関数を再起動する
+    main();
+};
 
 
 // HH:MMで設定されたものをcron形式にして返す
@@ -121,6 +136,16 @@ const runProcess = async (config, stoporStart) => {
 
 
 const main = async () => {
+
+    // // 前のジョブをすべて停止する
+    // jobs = jobs.filter(job => {
+    //     if (job) {
+    //         job.stop();
+    //         return false;
+    //     }
+    //     return true;
+    // });
+
     try {
         // jsonの場所の割り出しと設定
         const config = await jsonSetandOpen(jsonCommonPath + jsonFineName); 
@@ -129,7 +154,7 @@ const main = async () => {
         if (config.stopTime) {
             config.stopTime.forEach(time => {
                 const cronTime = convertToCronFormat(time);
-                cron.schedule(cronTime, () => {
+                job = cron.schedule(cronTime, () => {
                     if(!conditions.occurrenceEmergency && !conditions.runStop) {
                         if(runProcess( {exec: config.stopExec
                                         , runConfig: config.runConfig
@@ -142,6 +167,7 @@ const main = async () => {
                         }
                     }
                 });
+                //jobs.push(job);
             });
 
         }
@@ -150,7 +176,7 @@ const main = async () => {
         if (config.startTime) {
             config.startTime.forEach(time => {
                 const cronTime = convertToCronFormat(time);
-                cron.schedule(cronTime, () => {
+                job = cron.schedule(cronTime, () => {
                     if(!conditions.occurrenceEmergency && !conditions.runStart) {
                         if(runProcess( {exec: config.startExec 
                                         , runConfig: config.runConfig
@@ -163,6 +189,7 @@ const main = async () => {
                         }
                     }
                 });
+                //jobs.push(job);
             });
         }
 
