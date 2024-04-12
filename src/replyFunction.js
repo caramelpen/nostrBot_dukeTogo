@@ -410,6 +410,40 @@ const normalAutoReply = async (relay, ev, autoReplyJson, autoReactionJson, postI
 }
 
 
+// zap反応リプライ
+const zaptoReply = async (relay, ev, autoReplyJson, autoReactionJson, postInfoObj, isFromReplytoReply = false) => {
+    try {
+        // 公開キー ev.Pubkey のフォローの中に自分の公開キー pubkey がいるなら真
+        let isChkMyFollower = false;
+        // 作動区分
+        postInfoObj.postCategory = 1;
+        // 公開キー ev.Pubkey のフォローの中に自分の公開キー pubkey がいるなら真（自分のフォロアだ）
+        isChkMyFollower = await chkMyFollower(relay, ev.pubkey);
+        if(isChkMyFollower) {
+            // jsonに設定されている対応するリプライ語句の数を利用してランダムでリプライ語句を決める
+            const randomIdx = random(0, autoReplyJson.reply.length - 1);
+            // リプライ
+            let replyPostorreactionPostEv = composeReply(autoReplyJson.reply[randomIdx], ev);
+            await publishToRelay(relay, replyPostorreactionPostEv, false, ev.pubkey, ev.content);
+            
+            //100回まわってカスタム絵文字URLが設定されている要素をランダム取得出来たらリアクション（100に意味はない　なんとなく）
+            for (let i = 0; i < 100; i++) {
+                const randomReactionIdx = random(0, autoReactionJson.contentReaction.length - 1);
+                // randomReactionIdx 番目のカスタム絵文字URLが設定されているならリアクション
+                if(autoReactionJson.reactionImgURL[randomReactionIdx].length > 0) {
+                    // リアクション
+                    replyPostorreactionPostEv = composeReaction(ev, autoReactionJson, randomReactionIdx);
+                    await publishToRelay(relay, replyPostorreactionPostEv, false, ev.pubkey, ev.content);
+                    break;
+                }
+            }
+
+        }
+
+    } catch (err) {
+        throw err;
+    }
+}
 
 // 投稿者の公開キー evPubkey のフォローの中に自分の公開キー pubkey がいるなら真
 const chkMyFollower = (relay, evPubkey) => {
@@ -916,5 +950,6 @@ module.exports = {
     ,exchangeRate           // 為替ポスト
     ,normalAutoReply        // 通常リプライ
     ,uploadBTCtoJPYChartImg // BTCチャート画像ポスト
+    ,zaptoReply             // zap反応リプライ
 };
   
