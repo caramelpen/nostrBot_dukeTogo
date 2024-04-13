@@ -427,8 +427,8 @@ const zaptoReply = async (relay, ev, autoReplyJson, postInfoObj) => {
                 break;
             }
         }
-        if(isChkMyFollower) {
 
+        if(isChkMyFollower) {
             if(!retrievePostsInPeriod(relay, pubKey)) {
                 await emergency(relay);
                 return;
