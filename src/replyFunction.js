@@ -438,7 +438,7 @@ const zaptoReply = async (relay, ev, autoReplyJson, postInfoObj) => {
                 // jsonに設定されている対応するリプライ語句の数を利用してランダムでリプライ語句を決める
                 const randomIdx = random(0, autoReplyJson.reply.length - 1);
                 // リプライ
-                let replyPostorreactionPostEv = composeReplyforReceiptZap(autoReplyJson.reply[randomIdx], ev);
+                const replyPostorreactionPostEv = composeReplyforReceiptZap(autoReplyJson.reply[randomIdx], ev);
                 await publishToRelay(relay, replyPostorreactionPostEv, false, repPubkey);
             }
         }
