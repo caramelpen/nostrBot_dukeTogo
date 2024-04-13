@@ -409,7 +409,7 @@ const normalAutoReply = async (relay, ev, autoReplyJson, autoReactionJson, postI
 
 
 // zap反応リプライ
-const zaptoReply = async (relay, ev, autoReplyJson, autoReactionJson, postInfoObj, isFromReplytoReply = false) => {
+const zaptoReply = async (relay, ev, autoReplyJson, postInfoObj) => {
     try {
         // 公開キー ev.Pubkey のフォローの中に自分の公開キー pubkey がいるなら真
         let isChkMyFollower = false;
