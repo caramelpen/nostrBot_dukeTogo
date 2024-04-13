@@ -338,7 +338,6 @@ const normalAutoReply = async (relay, ev, autoReplyJson, autoReactionJson, postI
             replyChr = "";
 
             // リプライやリアクションしても安全なら、リプライイベントやリアクションイベントを組み立てて送信する
-            // if (isSafeToReply(ev) && retrievePostsInPeriod(relay, pubKey)) {
             if(!retrievePostsInPeriod(relay, pubKey)) {
                 await emergency(relay);
                 return;
