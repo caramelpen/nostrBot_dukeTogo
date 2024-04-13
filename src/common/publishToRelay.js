@@ -19,13 +19,19 @@ const publishToRelay = async (relay, ev, isAutoReply = false, originallyPubKey =
     */
     try {
         
+        let findChar = "";
         let displayName = "";
         if(originallyPubKey.length > 0){
             displayName = await userDisplayName(relay, originallyPubKey);
+            findChar = findChar + "find:" + displayName + "( " + originallyPubKey + " )";
         }
+        if(replyingtoaPost.length > 0 ) {
+            findChar = findChar + " original messege:" + replyingtoaPost;
+        }
+        findChar = findChar + (findChar.length > 0 ? "\n=> ":"");
 
         await relay.publish(ev).then(() => {
-            console.log("publishToRelay:success!" + "\n" + (replyingtoaPost.length > 0 ? "find:" + displayName + ":" + originallyPubKey + ":" + replyingtoaPost + "\n=> " :"") + ev.content);
+            console.log("publishToRelay:success!" + "\n" + findChar + ev.content);
             // autoReply からやってきた
             if(isAutoReply && replyingtoaPost.length > 0) {
                 // 最終更新日時を保存

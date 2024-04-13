@@ -7,8 +7,6 @@ const axios = require("axios");
 const vega = require("vega");
 const sharp = require("sharp");
 const fs = require("fs");
-// const util = require("util");
-// const exec = util.promisify(require("child_process").exec);
 require("websocket-polyfill");
 const { finishEvent } = require("nostr-tools");
 const { currUnixtime, isSafeToReply, random, probabilityDetermination, retrievePostsInPeriod, isFolderExists, jsonSetandOpen } = require("./common/utils.js");
@@ -417,27 +415,33 @@ const zaptoReply = async (relay, ev, autoReplyJson, autoReactionJson, postInfoOb
         let isChkMyFollower = false;
         // 作動区分
         postInfoObj.postCategory = 1;
-        // 公開キー ev.Pubkey のフォローの中に自分の公開キー pubkey がいるなら真（自分のフォロアだ）
-        isChkMyFollower = await chkMyFollower(relay, ev.pubkey);
+
+        let repPubkey = "";
+
+        // ev.tags の P(大文字p) に限定し、(一応)かつ自分の公開キーは外したものを格納する
+        const filteredSecondElements = ev.tags.filter(tag => tag[0] === "P" && tag[1] !== pubKey).map(tag => tag[1]);
+        if(filteredSecondElements.length > 0) {
+            for (let i = 0; i <= filteredSecondElements.length - 1; i++ ) {
+                // 公開キー ev.Pubkey のフォローの中に自分の公開キーがいるなら真（自分のフォロアだ）
+                isChkMyFollower = await chkMyFollower(relay, filteredSecondElements[i]);
+                repPubkey = filteredSecondElements[i];
+                break;
+            }
+        }
         if(isChkMyFollower) {
-            // jsonに設定されている対応するリプライ語句の数を利用してランダムでリプライ語句を決める
-            const randomIdx = random(0, autoReplyJson.reply.length - 1);
-            // リプライ
-            let replyPostorreactionPostEv = composeReply(autoReplyJson.reply[randomIdx], ev);
-            await publishToRelay(relay, replyPostorreactionPostEv, false, ev.pubkey, ev.content);
-            
-            //100回まわってカスタム絵文字URLが設定されている要素をランダム取得出来たらリアクション（100に意味はない　なんとなく）
-            for (let i = 0; i < 100; i++) {
-                const randomReactionIdx = random(0, autoReactionJson.contentReaction.length - 1);
-                // randomReactionIdx 番目のカスタム絵文字URLが設定されているならリアクション
-                if(autoReactionJson.reactionImgURL[randomReactionIdx].length > 0) {
-                    // リアクション
-                    replyPostorreactionPostEv = composeReaction(ev, autoReactionJson, randomReactionIdx);
-                    await publishToRelay(relay, replyPostorreactionPostEv, false, ev.pubkey, ev.content);
-                    break;
-                }
+
+            if(!retrievePostsInPeriod(relay, pubKey)) {
+                await emergency(relay);
+                return;
             }
 
+            if (isSafeToReply(ev)) {
+                // jsonに設定されている対応するリプライ語句の数を利用してランダムでリプライ語句を決める
+                const randomIdx = random(0, autoReplyJson.reply.length - 1);
+                // リプライ
+                let replyPostorreactionPostEv = composeReplyforReceiptZap(autoReplyJson.reply[randomIdx], ev);
+                await publishToRelay(relay, replyPostorreactionPostEv, false, repPubkey);
+            }
         }
 
     } catch (err) {
@@ -885,6 +889,36 @@ const composeReply = (replyPostChar, targetEvent) => {
     // イベントID(ハッシュ値)計算・署名
     return finishEvent(ev, BOT_PRIVATE_KEY_HEX);
 };
+// リプライイベント(zap受け取り時)を組み立てる
+const composeReplyforReceiptZap = (replyPostChar, targetEvent) => {
+    const descriptionValues = targetEvent.tags.filter(tag => tag[0] === "description").map(tag => tag[1]);
+
+    // 文字列を JSON オブジェクトに変換
+    const eventData = JSON.parse(descriptionValues);
+
+    // pubkey と id の値を取得
+    const targetPubkey = eventData.pubkey;
+    //const targetid = eventData.id;
+    const eid = eventData.tags.find(tag => tag[0] === "e")[1];
+
+    const ev = {
+        pubkey: pubKey
+        ,kind: 1
+        ,content: replyPostChar
+        ,tags: [ 
+            ["p", targetPubkey, ""]
+            ,["e", eid, ""] 
+        ]
+        ,created_at: currUnixtime()
+    };
+
+    // イベントID(ハッシュ値)計算・署名
+    return finishEvent(ev, BOT_PRIVATE_KEY_HEX);
+};
+
+
+
+
 // 絵文字リプライイベントを組み立てる
 const composeReplyEmoji = (targetEvent,autoReactionJson,randomReactionIdx) => {
     const ev = {
