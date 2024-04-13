@@ -898,7 +898,6 @@ const composeReplyforReceiptZap = (replyPostChar, targetEvent) => {
 
     // pubkey と id の値を取得
     const targetPubkey = eventData.pubkey;
-    //const targetid = eventData.id;
     const eid = eventData.tags.find(tag => tag[0] === "e")[1];
 
     const ev = {
