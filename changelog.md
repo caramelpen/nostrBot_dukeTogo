@@ -1,3 +1,6 @@
+## ver.240414
+- `postUponReceiptofZap.js`、`postUponReceiptofZap.json`を追加し、zap受領時投稿機能を追加
+
 ## ver.240407
 - `autoPostatPresetTime.js`に周年投稿機能を追加
 
