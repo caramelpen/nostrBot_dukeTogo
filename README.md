@@ -31,6 +31,7 @@
 │      exchangeRate.json
 │      functionalPosting.json
 │      infoUpNotification.json
+│      postUponReceiptofZap.json
 │      presetDate.json
 │      sunriseSunset.json
 │      surveillance.json
@@ -40,6 +41,7 @@
     │  autoReply.js
     │  emergency.js
     │  infoUpNotification.js
+    │  postUponReceiptofZap.js
     │  replyFunction.js
     │  replytoReply.js
     │  surveillance.js
@@ -69,13 +71,15 @@
 - 2-1-5.infoUpNotification.json
   - `src\infoUpNotification.js`で使用（後述）
   - 内容は随時更新していきます
-- 2-1-6.presetDate.json
+- 2-1-6.postUponReceiptofZap.json
+  - `src\postUponReceiptofZap.js`で使用（後述）
+- 2-1-7.presetDate.json
   - `src\autoPostatPresetTime.js`で使用（後述）
   - 内容は随時更新していきます
-- 2-1-7.sunriseSunset.json
+- 2-1-8.sunriseSunset.json
   - `src\autoPostatPresetTime.js`で使用（後述）
   - 内容は随時更新していきます
-- 2-1-8.surveillance.json
+- 2-1-9.surveillance.json
   - `src\surveillance.js`、`emergency.js`で使用（後述）
   - 内容は随時更新していきます
 
@@ -88,11 +92,13 @@
   - `surveillance.js`が実行する際の条件を保持するオブジェクト変数や、 サーバへの本botの停止／起動コマンド、緊急停止時の実行などを実装
 - 2-2-4.infoUpNotification.js
   - `infoUpNotification.json`に設定されたRSSフィードを1時間おきに購読し、変更があればポスト
-- 2-2-5.replyFunction.js
+- 2-2-5.postUponReceiptofZap.js
+  - zapをされたら、`postUponReceiptofZap.json`に設定された投稿語句を使用してポスト
+- 2-2-6.replyFunction.js
   - `replytoReply`や`replytoReply`では共通のポスト仕様が適用されるため、その機能を集約したもの 
-- 2-2-6.replytoReply.js
+- 2-2-7.replytoReply.js
   - リプライを受けると`autoReply.json`に設定された設定値でリプライ
-- 2-2-7.surveillance.js
+- 2-2-8.surveillance.js
   - `surveillance.json`に設定があると、本botの停止や起動を行う
 
 ### 2-3.src/common ディレクトリ
@@ -122,10 +128,13 @@
 - 3-4.infoUpNotification.js
   - `README_infoUpNotification.md`をご覧ください
 
-- 3-5.replytoReply.js
+- 3-5.postUponReceiptofZap.js
+  - 'README_postUponReceiptofZap.md'をご覧ください
+
+- 3-6.replytoReply.js
   - `README_replytoReply.md`をご覧ください
 
-- 3-6.surveillance.js
+- 3-7.surveillance.js
   - `README_surveillance.md`をご覧ください 
 
 ### 4.その他
