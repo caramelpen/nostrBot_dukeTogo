@@ -129,7 +129,7 @@
   - `README_infoUpNotification.md`をご覧ください
 
 - 3-5.postUponReceiptofZap.js
-  - 'README_postUponReceiptofZap.md'をご覧ください
+  - `README_postUponReceiptofZap.md`をご覧ください
 
 - 3-6.replytoReply.js
   - `README_replytoReply.md`をご覧ください
