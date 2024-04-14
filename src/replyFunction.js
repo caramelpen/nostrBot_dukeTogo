@@ -407,39 +407,28 @@ const normalAutoReply = async (relay, ev, autoReplyJson, autoReactionJson, postI
 }
 
 
-// zap反応リプライ
-const zaptoReply = async (relay, ev, autoReplyJson, postInfoObj) => {
+// zap反応ポスト
+const postUponReceiptofZap = async (relay, ev, autoReplyJson, postInfoObj) => {
     try {
-        // 公開キー ev.Pubkey のフォローの中に自分の公開キー pubkey がいるなら真
-        let isChkMyFollower = false;
         // 作動区分
-        postInfoObj.postCategory = 1;
-
-        let repPubkey = "";
+        postInfoObj.postCategory = 0;
 
         // ev.tags の P(大文字p) に限定し、(一応)かつ自分の公開キーは外したものを格納する
         const filteredSecondElements = ev.tags.filter(tag => tag[0] === "P" && tag[1] !== pubKey).map(tag => tag[1]);
         if(filteredSecondElements.length > 0) {
-            for (let i = 0; i <= filteredSecondElements.length - 1; i++ ) {
-                // 公開キー ev.Pubkey のフォローの中に自分の公開キーがいるなら真（自分のフォロアだ）
-                isChkMyFollower = await chkMyFollower(relay, filteredSecondElements[i]);
-                repPubkey = filteredSecondElements[i];
-                break;
-            }
+            // 反応する
+            postInfoObj.postCategory = 1;
         }
 
-        if(isChkMyFollower) {
-            if(!retrievePostsInPeriod(relay, pubKey)) {
-                await emergency(relay);
-                return;
-            }
-
+        if(postInfoObj.postCategory >= 1) {
+            // 投稿しても大丈夫だ
             if (isSafeToReply(ev)) {
-                // jsonに設定されている対応するリプライ語句の数を利用してランダムでリプライ語句を決める
-                const randomIdx = random(0, autoReplyJson.reply.length - 1);
-                // リプライ
-                const replyPostorreactionPostEv = composeReplyforReceiptZap(autoReplyJson.reply[randomIdx], ev);
-                await publishToRelay(relay, replyPostorreactionPostEv, false, repPubkey);
+                // jsonに設定されている対応するリプライ語句の数を利用してランダムで投稿語句を決める
+                const randomIdx = random(0, autoReplyJson.postedWord.length - 1);
+                const randomSubIdx = random(0, autoReplyJson.postedSubWord.length - 1);
+                // 投稿
+                const replyPostorreactionPostEv = composePost(autoReplyJson.postedWord[randomIdx] + " \n" + autoReplyJson.postedSubWord[randomSubIdx]);
+                await publishToRelay(relay, replyPostorreactionPostEv);
             }
         }
 
@@ -888,31 +877,31 @@ const composeReply = (replyPostChar, targetEvent) => {
     // イベントID(ハッシュ値)計算・署名
     return finishEvent(ev, BOT_PRIVATE_KEY_HEX);
 };
-// リプライイベント(zap受け取り時)を組み立てる
-const composeReplyforReceiptZap = (replyPostChar, targetEvent) => {
-    const descriptionValues = targetEvent.tags.filter(tag => tag[0] === "description").map(tag => tag[1]);
+// // リプライイベント(zap受け取り時)を組み立てる
+// const composeReplyforReceiptZap = (replyPostChar, targetEvent) => {
+//     const descriptionValues = targetEvent.tags.filter(tag => tag[0] === "description").map(tag => tag[1]);
 
-    // 文字列を JSON オブジェクトに変換
-    const eventData = JSON.parse(descriptionValues);
+//     // 文字列を JSON オブジェクトに変換
+//     const eventData = JSON.parse(descriptionValues);
 
-    // pubkey と id の値を取得
-    const targetPubkey = eventData.pubkey;
-    const eid = eventData.tags.find(tag => tag[0] === "e")[1];
+//     // pubkey と id の値を取得
+//     const targetPubkey = eventData.pubkey;
+//     const eid = eventData.tags.find(tag => tag[0] === "e")[1];
 
-    const ev = {
-        pubkey: pubKey
-        ,kind: 1
-        ,content: replyPostChar
-        ,tags: [ 
-            ["p", targetPubkey, ""]
-            ,["e", eid, ""] 
-        ]
-        ,created_at: currUnixtime()
-    };
+//     const ev = {
+//         pubkey: pubKey
+//         ,kind: 1
+//         ,content: replyPostChar
+//         ,tags: [ 
+//             ["p", targetPubkey, ""]
+//             ,["e", eid, ""] 
+//         ]
+//         ,created_at: currUnixtime()
+//     };
 
-    // イベントID(ハッシュ値)計算・署名
-    return finishEvent(ev, BOT_PRIVATE_KEY_HEX);
-};
+//     // イベントID(ハッシュ値)計算・署名
+//     return finishEvent(ev, BOT_PRIVATE_KEY_HEX);
+// };
 
 
 
@@ -982,6 +971,6 @@ module.exports = {
     ,exchangeRate           // 為替ポスト
     ,normalAutoReply        // 通常リプライ
     ,uploadBTCtoJPYChartImg // BTCチャート画像ポスト
-    ,zaptoReply             // zap反応リプライ
+    ,postUponReceiptofZap   // zap反応ポスト
 };
   

@@ -32,7 +32,7 @@ const publishToRelay = async (relay, ev, isAutoReply = false, originallyPubKey =
 
         await relay.publish(ev).then(() => {
             console.log("publishToRelay:success!" + "\n" + findChar + ev.content);
-            // autoReply からやってきた
+            // autoReply 系統からやってきた
             if(isAutoReply && replyingtoaPost.length > 0) {
                 // 最終更新日時を保存
                 updateLastReplyTime(originallyPubKey, currUnixtime());
