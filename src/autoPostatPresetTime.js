@@ -151,7 +151,7 @@ const subPresetPost = async(presetDatePath, nowDate, retPostEv = undefined) => {
             // jsonの親プロパティ midnightConditions を取得
             const midnightConditions = presetDateJson.midnightConditions;
             const endOfYear = new Date(nowDate.getFullYear(), 11, 31);
-            const remainingDays = Math.floor((endOfYear - nowDate) / (1000 * 60 * 60 * 24));
+            const remainingDays = Math.floor((endOfYear - nowDate) / (1000 * 60 * 60 * 24)) + 1;
         
             // 各条件をチェック
             for (let condition of midnightConditions) {
@@ -191,7 +191,7 @@ const subPresetPost = async(presetDatePath, nowDate, retPostEv = undefined) => {
                 } else if (condition.type === "jpnHoliday") {
                     if (jpnHolidays.isHoliday(nowDate)) {   // 今日は祝日だ
                         const holiday = jpnHolidays.between(nowDate, nowDate);  // 今日から今日までの祝日情報を取得(まわりくどい...)
-                        message = holiday[0].name;  // 今日のみの指定なので、0番目固定で祝日の名前を取得
+                        message = holiday[0].name;                              // 今日のみの指定なので、0番目固定で祝日の名前を取得
                         postSubject = true;
                     }
 

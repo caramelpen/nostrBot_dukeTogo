@@ -39,7 +39,7 @@ const funcObj = {
 const funcConfig = {
     funcName: ["postUponReceiptofZap"]                   // useJsonFile の記述順と対応させる
     ,useJsonFile: ["postUponReceiptofZap.json"]          // funcName の記述順と対応させる
-    ,operationCategory: [1]                    // 1ならポストできたら次へ進めない（useJsonFileやuncName の記述順と対応させる）
+    ,operationCategory: [1]                              // 1ならポストできたら次へ進めない（useJsonFileやuncName の記述順と対応させる）
 }
 
 
