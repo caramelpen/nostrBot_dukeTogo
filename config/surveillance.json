@@ -4,7 +4,6 @@
 
     ,"stopTime": [
                     "00:02"
-                    ,"07:13"
                 ]
     ,"stopExec": "pm2 stop"
     ,"stopComment": [
@@ -13,7 +12,6 @@
 
     ,"startTime": [
                     "04:00"
-                    ,"16:30"                    
                 ]
     ,"startExec": "pm2 restart"
     ,"startComment": [
