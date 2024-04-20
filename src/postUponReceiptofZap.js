@@ -9,6 +9,9 @@ const { jsonSetandOpen, currUnixtime } = require("./common/utils.js");
 const { BOT_PRIVATE_KEY_HEX, pubkey, RELAY_URL, adminPubkey, RELAY_URL_ZAP, ZAPPER_PUBKEYS } = require("./common/env.js");
 const { initial, postUponReceiptofZap } = require("./replyFunction.js");
 
+let writeLog = false;
+let writeLogZap = false;
+
 // envファイルのかたまり
 const keys = {
     BOT_PRIVATE_KEY_HEX: BOT_PRIVATE_KEY_HEX
@@ -101,7 +104,10 @@ const main = async () => {
         return;
     });
     await relay.connect();
-    console.log("zaptoReply:connected to relay");
+    if(!writeLog) {
+        console.log("zaptoReply:connected to relay");
+        writeLog = true;
+    }
 
     const zapRelay = relayInit(RELAY_URL_ZAP);
     zapRelay.on("error", () => {
@@ -110,8 +116,10 @@ const main = async () => {
         return;
     });
     await zapRelay.connect();
-    console.log("zaptoReply:connected to zapRelay");
-
+    if(!writeLogZap) {
+        console.log("zaptoReply:connected to zapRelay");
+        writeLogZap = true;
+    }
 
 
     try {

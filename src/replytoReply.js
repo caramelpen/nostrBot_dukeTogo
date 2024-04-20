@@ -9,6 +9,8 @@ const { jsonSetandOpen } = require("./common/utils.js");
 const { BOT_PRIVATE_KEY_HEX, pubkey, RELAY_URL, adminPubkey } = require("./common/env.js");
 const { initial, functionalPosting, exchangeRate, normalAutoReply } = require("./replyFunction.js");
 
+let writeLog = false;
+
 // envファイルのかたまり
 const keys = {
     BOT_PRIVATE_KEY_HEX: BOT_PRIVATE_KEY_HEX
@@ -107,7 +109,10 @@ const main = async () => {
     });
 
     await relay.connect();
-    console.log("replytoReply:connected to relay");
+    if(!writeLog) {
+        console.log("replytoReply:connected to relay");
+        writeLog = true;
+    }
 
     try {
         /*
