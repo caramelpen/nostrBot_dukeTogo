@@ -9,7 +9,7 @@ const sharp = require("sharp");
 const fs = require("fs");
 require("websocket-polyfill");
 const { finishEvent } = require("nostr-tools");
-const { currUnixtime, isSafeToReply, random, probabilityDetermination, retrievePostsInPeriod, isFolderExists, jsonSetandOpen } = require("./common/utils.js");
+const { currUnixtime, isSafeToReply, random, probabilityDetermination, retrievePostsInPeriod, isFolderExists, jsonSetandOpen, asyncIsFileExists, deleteFile } = require("./common/utils.js");
 const { publishToRelay } = require("./common/publishToRelay.js");
 const { emergency } = require("./emergency.js");
 
@@ -729,6 +729,7 @@ const createAndSaveChart = async (dorh, data, schema) => {
 
     }
     
+    const slash = "/";
     // Vegaのビューの作成とSVGの出力
     const path = require("path");
     const targetFolderPath = "img";
@@ -737,13 +738,21 @@ const createAndSaveChart = async (dorh, data, schema) => {
     isFolderExists(absoluteFolderPath, true);
     const svgFile = "chart" + dorh + ".svg";
     const imgFile = "chart" + dorh + ".png";
+    // ファイルが存在していたら削除する
+    if(await asyncIsFileExists(absoluteFolderPath + slash + svgFile)) {
+        await deleteFile(absoluteFolderPath + slash + svgFile);
+    }
+    if(await asyncIsFileExists(absoluteFolderPath + slash + imgFile)) {
+        await deleteFile(absoluteFolderPath + slash + imgFile);
+    }    
+
     const view = new vega.View(vega.parse(spec), {renderer: "none"});
     const svg = await view.toSVG();
-    fs.writeFileSync(absoluteFolderPath + "/" + svgFile, svg);
+    fs.writeFileSync(absoluteFolderPath + slash + svgFile, svg);
     // SVGをPNGに変換
     try {
-        await sharp(absoluteFolderPath + "/" + svgFile).png().toFile(absoluteFolderPath + "/" + imgFile);
-        return absoluteFolderPath + "/" + imgFile;
+        await sharp(absoluteFolderPath + slash + svgFile).png().toFile(absoluteFolderPath + slash + imgFile);
+        return absoluteFolderPath + slash + imgFile;
     } catch (err) {
         console.error(err);
         throw err; // SVGをPNGに変換する過程でエラーが発生した場合、エラーを再スローします

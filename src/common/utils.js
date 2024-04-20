@@ -5,7 +5,6 @@
 
 const crypto = require("crypto");
 const { lastReplyTimePerPubkey } = require("./lastReplyTimePerPubkey.js");   // 公開鍵ごとに、最後にリプライを返した時刻(unixtime)を保持するMap
-//const {emergency} = require("..surveillance.js");
 
 
 // 現在の日本時間を取得
@@ -131,21 +130,34 @@ const asyncIsFileExists = async (targetFilePath) => {
         return stats.isFile();
     } catch (error) {
         if (error.code === 'ENOENT') {
-        console.error("asyncIsFileExists:file is not exists");
-        return false;
+            console.error("asyncIsFileExists:file is not exists");
+            return false;
         }
     }
 }
-const isFileExists = (targetFilePath) => {
+const isFileExists = (targetFilePath, notExistsErrlog = false) => {
     const fs = require("fs");
     if (fs.existsSync(targetFilePath)) {
         return true;
     } else {
-        console.error("isFileExists:file is not exists");
+        if(notExistsErrlog) {
+            console.error("isFileExists:file is not exists");
+        }
         return false;
     }
 }
 
+/**
+ * ファイルの削除 
+ */
+const deleteFile = async (filePath) => {
+    const fs = require("fs").promises;
+    try {
+        await fs.unlink(filePath);
+    } catch (err) {
+        console.error("deleteFile is error", err);
+    }
+}
 
 /**
  * フォルダの存在チェック（第2引数に真を設定すれば存在していないときにはフォルダを作る）
@@ -349,6 +361,7 @@ module.exports = {
     ,jsonOpen, jsonSetandOpen
     ,writeJsonFile
     ,asyncIsFileExists, isFileExists
+    ,deleteFile
     ,isFolderExists
     ,isSafeToReply, updateLastReplyTime, retrievePostsInPeriod, userDisplayName
     ,random
