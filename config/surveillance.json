@@ -2,23 +2,29 @@
     "surveillanceCommonHeader": "◇◇◇◇ [監視ｼｽﾃﾑ] ﾖﾘ 発報 ◇◇◇◇\n"
     ,"runConfig": "pm2config.json"
 
+
     ,"stopTime": [
                     "00:02"
-                    ,"07:10"
+                    ,"08:30"
                 ]
     ,"stopExec": "pm2 stop"
     ,"stopComment": [
                     "[ゴルゴ] ﾌﾟﾛｸﾞﾗﾑ ｦ [停止] ｼﾏｼﾀ"
                     ]
 
+
+
+
     ,"startTime": [
                     "04:00"
-                    ,"7:41"
+                    ,"8:32"
                 ]
     ,"startExec": "pm2 restart"
     ,"startComment": [
                     "[ゴルゴ] ﾌﾟﾛｸﾞﾗﾑ ｦ [開始] ｼﾏｼﾀ"
                     ]
+
+
                     
     ,"emergencyComment": "◆◆ 緊Q ◆◆ [監視ｼｽﾃﾑ] ﾖﾘ 発報 ◆◆ 緊Q ◆◆\n[ゴルゴ] ﾌﾟﾛｸﾞﾗﾑ ﾆ 異常 ｦ 検知\n[緊急停止] ｼﾏｽ\n繰ﾘ返ｼﾏｽ\n[ゴルゴ] ﾌﾟﾛｸﾞﾗﾑ ｦ [緊急停止] ｼﾏｼﾀ"
 

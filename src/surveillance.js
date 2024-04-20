@@ -18,7 +18,6 @@ const jsonCommonPath = "../../config/";    // configの場所はここからみ�
 const jsonFineName = "surveillance.json";
 
 let jobs = [];
-//let job;
 
 // JSONファイルの監視を開始
 const absolutePath = path.resolve(__dirname, "..", "config", jsonFineName);
@@ -27,26 +26,18 @@ fs.watch(absolutePath, (eventType, filename) => {
         // ファイルが変更された場合の処理
         console.log("surveillance.json has been updated");
         // 変更があった場合にメインの処理を再起動する
-        //main();
         restartMain();
     }
 });
 
-//const restartMain = async () => {
-const restartMain = () => {
-    // // 以前のcronジョブがあれば停止する
-    // if (job) {
-    //     await job.stop();
-    // }
 
+const restartMain = () => {
     // 前のジョブをすべて停止する
     jobs = jobs.filter (job => {
         // 以前のcronジョブがあれば停止する
         if (job) {
             job.stop();
-            //return false;
         }
-        //return true;
     });
 
     // main関数を再起動する
@@ -147,16 +138,6 @@ const runProcess = async (config, stoporStart) => {
 
 
 const main = async () => {
-
-    // // 前のジョブをすべて停止する
-    // jobs = jobs.filter(job => {
-    //     if (job) {
-    //         job.stop();
-    //         return false;
-    //     }
-    //     return true;
-    // });
-
     let job;
     try {
         // jsonの場所の割り出しと設定
