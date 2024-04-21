@@ -556,7 +556,8 @@ const getBTCtoJPYChart = async (dorh, APIEndPoint) => {
                 fsym: "BTC",
                 tsym: "JPY",
                 aggregate: 1,
-                limit: 179
+                limit: 179,
+                aggregatePredictableTimePeriods: false
             };
         }
 
