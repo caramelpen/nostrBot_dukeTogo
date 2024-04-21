@@ -4,7 +4,7 @@
 
 
     ,"stopTime": [
-                    "00:02"
+                    "00:10"
                     ,"07:10"
                 ]
     ,"stopExec": "pm2 stop"
