@@ -1,3 +1,6 @@
+## ver.240427
+- `autoReactionJson.nativeWords` に完全一致しない場合でも、投稿の先頭文字がその文字なら、全反応語句からランダムでリプライするように変更
+
 ## ver.240414
 - `postUponReceiptofZap.js`、`postUponReceiptofZap.json`を追加し、zap受領時投稿機能を追加
 
