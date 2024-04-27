@@ -318,6 +318,15 @@ const normalAutoReply = async (relay, ev, autoReplyJson, autoReactionJson, postI
                 } else {
                     if(isFromReplytoReply) {
                         postInfoObj.postCategory = 2;     // リプライ(全リプライ語句からのランダムリプライ)
+                    } else {
+                        // 管理者だ
+                        if(isAdminPubkey) {
+                            // フィードのポスト先頭がjsonの nativeWords プロパティを含んでいる
+                            const includeNativeWords = autoReactionJson.nativeWords.some(word => ev.content.startsWith(word));
+                            if(includeNativeWords) {
+                                postInfoObj.postCategory = 2;     // リプライ(全リプライ語句からのランダムリプライ)
+                            }
+                        }
                     }
                 }
             // 投稿者が管理者以外だし、replytoReply からも来ていない
