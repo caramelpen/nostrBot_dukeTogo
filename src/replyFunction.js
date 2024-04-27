@@ -310,6 +310,8 @@ const normalAutoReply = async (relay, ev, autoReplyJson, autoReactionJson, postI
 
             // フィードのポストがjsonの nativeWords プロパティそのものなら真
             const isNativeWords = autoReactionJson.nativeWords.length > 0 && autoReactionJson.nativeWords.some(name => name === ev.content) ? true : false;
+            // フィードのポスト先頭がjsonの nativeWords プロパティを含んでいるなら真
+            const includeNativeWords = autoReactionJson.nativeWords.some(word => ev.content.startsWith(word));
 
             // 投稿者が管理者か replytoReply から来た
             if(isAdminPubkey || isFromReplytoReply) {
@@ -322,7 +324,6 @@ const normalAutoReply = async (relay, ev, autoReplyJson, autoReactionJson, postI
                         // 管理者だ
                         if(isAdminPubkey) {
                             // フィードのポスト先頭がjsonの nativeWords プロパティを含んでいる
-                            const includeNativeWords = autoReactionJson.nativeWords.some(word => ev.content.startsWith(word));
                             if(includeNativeWords) {
                                 postInfoObj.postCategory = 2;     // リプライ(全リプライ語句からのランダムリプライ)
                             }
@@ -342,7 +343,6 @@ const normalAutoReply = async (relay, ev, autoReplyJson, autoReactionJson, postI
                     // 自分をフォローしている人なら
                     if(isChkMyFollower) {
                         // フィードのポスト先頭がjsonの nativeWords プロパティを含んでいる
-                        const includeNativeWords = autoReactionJson.nativeWords.some(word => ev.content.startsWith(word));
                         if(includeNativeWords) {
                             postInfoObj.postCategory = 2;     // リプライ(全リプライ語句からのランダムリプライ)
                         }
