@@ -9,7 +9,7 @@
   - 上記機能は`replytoReply.js`と大部分で共通のため、`replyFunction.js`上でコーディングされています
 
 - 3-2-1. functionalPosting
-  - フィードを購読し、`functionalPosting.json`の`orgPost`プロパティに設定してある値を発見し、その前方に`autoReaction.json`の`nativeWords`プロパティに設定してある語句'固有設定値'があれば、  `functionalPosting.json`の`replyPostChar`プロパティの値をリプライします
+  - フィードを購読し、`functionalPosting.json`の`orgPost`プロパティに設定してある値を発見し、その前方に`autoReaction.json`の`nativeWords`プロパティに設定してある語句(以下「固有設定値」)があれば、  `functionalPosting.json`の`replyPostChar`プロパティの値をリプライします
   - リプライができたら以降の処理へは進みません
   
 - 3-2-2. exchangeRate
