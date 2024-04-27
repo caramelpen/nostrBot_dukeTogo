@@ -322,12 +322,21 @@ const normalAutoReply = async (relay, ev, autoReplyJson, autoReactionJson, postI
                 }
             // 投稿者が管理者以外だし、replytoReply からも来ていない
             } else {
+                // 自分をフォローしている人なら真
+                isChkMyFollower = isFromReplytoReply ? true : await chkMyFollower(relay, ev.pubkey);
                 // フィードのポストがjsonの nativeWords プロパティそのもので、かつ自分をフォローしている人なら
                 if(isNativeWords) {
-                    isChkMyFollower = isFromReplytoReply ? true : await chkMyFollower(relay, ev.pubkey);
-
                     if(isChkMyFollower) {
                         postInfoObj.postCategory = 3;     // リアクションとリアクション絵文字でのリプライ
+                    }
+                } else {
+                    // 自分をフォローしている人なら
+                    if(isChkMyFollower) {
+                        // フィードのポスト先頭がjsonの nativeWords プロパティを含んでいる
+                        const includeNativeWords = autoReactionJson.nativeWords.some(word => ev.content.startsWith(word));
+                        if(includeNativeWords) {
+                            postInfoObj.postCategory = 2;     // リプライ(全リプライ語句からのランダムリプライ)
+                        }
                     }
                 }
             }
