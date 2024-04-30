@@ -3,7 +3,7 @@
  * autoReply.js
  * フィードを購読し、リプライ対象となるポストがないか調べ、存在するならリプライ等の動作をする
  */
-const cron = require("node-cron");
+//const cron = require("node-cron");
 require("websocket-polyfill");
 const { relayInit } = require("nostr-tools");
 const { jsonSetandOpen } = require("./common/utils.js");
@@ -116,7 +116,7 @@ const main = async () => {
 
 main();
 
-cron.schedule('*/5 * * * *', () => {
-    main();
-});
+// cron.schedule('*/5 * * * *', () => {
+//     main();
+// });
 
