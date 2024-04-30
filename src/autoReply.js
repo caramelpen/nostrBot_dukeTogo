@@ -10,6 +10,7 @@ const { jsonSetandOpen } = require("./common/utils.js");
 const { BOT_PRIVATE_KEY_HEX, pubkey, adminPubkey, RELAY_URL } = require("./common/env.js");
 const { initial, functionalPosting, exchangeRate, normalAutoReply } = require("./replyFunction.js");
 
+let connect = false;
 
 // envファイルのかたまり
 const keys = {
@@ -92,7 +93,8 @@ const autoReply = async (relay) => {
  * メイン
  ***************/
 const main = async () => {
-
+    connect = false;
+    
     // リレー
     const relay = relayInit(RELAY_URL);
     relay.on("error", () => {
@@ -101,6 +103,7 @@ const main = async () => {
     });
     
     await relay.connect();
+    connect = true;
     console.log("autoReply:connected to relay");
 
     try {
@@ -116,7 +119,11 @@ const main = async () => {
 
 main();
 
-// cron.schedule('*/5 * * * *', () => {
-//     main();
-// });
+cron.schedule('*/5 * * * *', () => {
+    if(connect) {
+        relay.close();
+        connect = false;
+    }
+    main();
+});
 
