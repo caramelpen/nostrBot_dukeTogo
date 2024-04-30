@@ -97,8 +97,8 @@ const main = async () => {
     relay.on("error", () => {
         relay.close();
         console.error("autoReply:failed to connect");
-        return;
     });
+    
     await relay.connect();
     console.log("autoReply:connected to relay");
 
