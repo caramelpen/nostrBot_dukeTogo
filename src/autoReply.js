@@ -3,13 +3,14 @@
  * autoReply.js
  * フィードを購読し、リプライ対象となるポストがないか調べ、存在するならリプライ等の動作をする
  */
-//const cron = require("node-cron");
+const cron = require("node-cron");
 require("websocket-polyfill");
 const { relayInit } = require("nostr-tools");
 const { jsonSetandOpen } = require("./common/utils.js");
 const { BOT_PRIVATE_KEY_HEX, pubkey, adminPubkey, RELAY_URL } = require("./common/env.js");
 const { initial, functionalPosting, exchangeRate, normalAutoReply } = require("./replyFunction.js");
 
+let relay;
 let connect = false;
 
 // envファイルのかたまり
@@ -96,7 +97,8 @@ const main = async () => {
     connect = false;
     
     // リレー
-    const relay = relayInit(RELAY_URL);
+    //const relay = relayInit(RELAY_URL);
+    relay = relayInit(RELAY_URL);
     relay.on("error", () => {
         relay.close();
         console.error("autoReply:failed to connect");
