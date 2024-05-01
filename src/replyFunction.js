@@ -758,13 +758,22 @@ const createAndSaveChart = async (dorh, data, schema) => {
     const svgFile = "chart" + dorh + ".svg";
     const imgFile = "chart" + dorh + ".png";
     // ファイルが存在していたら削除する
-    if(await asyncIsFileExists(absoluteFolderPath + slash + svgFile)) {
-        await deleteFile(absoluteFolderPath + slash + svgFile);
+    for (;;) {
+        if(await asyncIsFileExists(absoluteFolderPath + slash + svgFile)) {
+            await deleteFile(absoluteFolderPath + slash + svgFile);
+        }
+        if(!await asyncIsFileExists(absoluteFolderPath + slash + svgFile)) {
+            break;
+        }
     }
-    if(await asyncIsFileExists(absoluteFolderPath + slash + imgFile)) {
-        await deleteFile(absoluteFolderPath + slash + imgFile);
-    }    
-
+    for (;;) {        
+        if(await asyncIsFileExists(absoluteFolderPath + slash + imgFile)) {
+            await deleteFile(absoluteFolderPath + slash + imgFile);
+        }
+        if(!await asyncIsFileExists(absoluteFolderPath + slash + imgFile)) {
+            break;
+        }
+    }
     const view = new vega.View(vega.parse(spec), {renderer: "none"});
     const svg = await view.toSVG();
     fs.writeFileSync(absoluteFolderPath + slash + svgFile, svg);
