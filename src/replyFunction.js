@@ -297,7 +297,9 @@ const normalAutoReply = async (relay, ev, autoReplyJson, autoReactionJson, postI
                                     postInfoObj.postCategory = 5;
                                 } else {
                                     // ログに確率で外れたことを書いておく
-                                    console.log("out of probability determination:" + target.orgPost);
+                                    if(target.probability > 0) {
+                                        console.log("out of probability determination:" + target.orgPost);
+                                    }
                                 }
                             }
                         }
