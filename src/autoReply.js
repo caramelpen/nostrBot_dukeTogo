@@ -93,7 +93,7 @@ const autoReply = async (relay) => {
 /****************
  * メイン
  ***************/
-const main = async () => {
+const main = async (sw = 0) => {
     connect = false;
     
     // リレー
@@ -106,7 +106,9 @@ const main = async () => {
     
     await relay.connect();
     connect = true;
-    console.log("autoReply:connected to relay");
+    if(sw === 0) {
+        console.log("autoReply:connected to relay");
+    }
 
     try {
         /*
@@ -121,11 +123,11 @@ const main = async () => {
 
 main();
 
-cron.schedule('*/5 * * * *', () => {
+cron.schedule('*/20 * * * *', () => {
     if(connect) {
         relay.close();
         connect = false;
     }
-    main();
+    main(1);
 });
 
