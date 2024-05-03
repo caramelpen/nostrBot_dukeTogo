@@ -759,7 +759,7 @@ const createAndSaveChart = async (dorh, data, schema) => {
     isFolderExists(absoluteFolderPath, true);
     const svgFile = "chart" + dorh + ".svg";
     const imgFile = "chart" + dorh + ".png";
-    // ファイルが存在していたら削除する
+    // (前回アップロード時に削除してあるはずだが)ファイルが存在していたら削除する
     for (;;) {
         if(await asyncIsFileExists(absoluteFolderPath + slash + svgFile)) {
             await deleteFile(absoluteFolderPath + slash + svgFile);
@@ -818,6 +818,7 @@ const uploadImg = async (imgPath) => {
         return response.data + ".png";
     } catch (error) {
         console.error('Error uploading image:', error);
+        return "";
     }
 }
 
@@ -856,7 +857,7 @@ const uploadBTCtoJPYChartImg = async (presetJsonPath, nowDate, retPostEv, relay 
                             // チャート画像をアップデート
                             const imgURLD = await uploadImg(imgPathD);
                             const imgURLH = await uploadImg(imgPathH);
-                            if(imgURLD !== undefined && imgURLH !== undefined) {
+                            if(imgURLD !== undefined && imgURLH !== undefined && imgURLD.length > 0 && imgURLH.length > 0) {
 
                                 // ポスト語句は複数設定されており、設定数の範囲でランダムに取得
                                 const postIdx = random(0,value.messages.length - 1);
@@ -873,6 +874,32 @@ const uploadBTCtoJPYChartImg = async (presetJsonPath, nowDate, retPostEv, relay 
                                 } else {
                                     retPostEv.postEv = postEv;
                                 }
+
+                                // ファイルはアップロードしたので削除する
+                                for (let i = 1; i <= 2; i++) {
+                                    let dorh = i === 1? "D": "H";
+                                    let imgPath = i === 1? imgPathD: imgPathH;
+                                    let lastIndex = imgPath.lastIndexOf("/");
+                                    let commonPath = imgPath.substring(0, lastIndex + 1);
+                                    let imgFileName = "chart" + dorh + ".svg";
+                                    for (;;) {
+                                        if(await asyncIsFileExists(commonPath + imgFileName)) {
+                                            await deleteFile(commonPath + imgFileName);
+                                        }
+                                        if(!await asyncIsFileExists(commonPath + imgFileName)) {
+                                            break;
+                                        }
+                                    }
+                                    for (;;) {        
+                                        if(await asyncIsFileExists(imgPath)) {
+                                            await deleteFile(imgPath);
+                                        }
+                                        if(!await asyncIsFileExists(imgPath)) {
+                                            break;
+                                        }
+                                    }
+                                }
+
                                 return true;                            
                             }
                         }
