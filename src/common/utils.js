@@ -123,14 +123,16 @@ const writeJsonFile = (jsonPath, propertyName, writeValue, idx) => {
 /**
  * ファイルの存在チェック
  */
-const asyncIsFileExists = async (targetFilePath) => {
+const asyncIsFileExists = async (targetFilePath, notExistsErrlog = false) => {
     const fs = require("fs").promises;
     try {
         const stats = await fs.stat(targetFilePath);
         return stats.isFile();
     } catch (error) {
-        if (error.code === 'ENOENT') {
-            console.error("asyncIsFileExists:file is not exists");
+        if (error.code === "ENOENT") {
+            if(notExistsErrlog) {
+                console.error("asyncIsFileExists:file is not exists");
+            }
             return false;
         }
     }
