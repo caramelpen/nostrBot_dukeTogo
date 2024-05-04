@@ -57,6 +57,10 @@ const autoReply = async (relay) => {
 
     sub.on("event", async (ev) => {
         try {
+
+            // キャッシュのクリア
+            delete require.cache[require.resolve("./replyFunction.js")];
+
             // 有効とするのは自分の投稿以外でかつtagが空のもの
             if(pubkey !== undefined && ev.pubkey !== pubkey && ev.tags.length <= 0) {
                 const jsonCommonPath = "../" + jsonPathDef;    // configの場所はここからみれば../config/だが、util関数の場所から見れば../../config/となる

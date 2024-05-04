@@ -60,6 +60,9 @@ const replytoReply = async (relay)=>{
     sub.on("event", async (ev) => {
         try {
 
+            // キャッシュのクリア
+            delete require.cache[require.resolve("./replyFunction.js")];
+
             //有効とするのは自分以外の投稿と、(一応明示)リプライなのでtagに値があるもののみ
             if(pubkey !== undefined && ev.pubkey !== pubkey && ev.tags.length > 0) {
                 // jsonの場所の割り出しとリプライ語句入りjsonファイルの場所の設定（自動リプライ時に使用しているjsonの反応語句をそのまま利用する）
