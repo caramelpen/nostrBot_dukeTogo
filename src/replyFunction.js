@@ -844,31 +844,31 @@ const uploadBTCtoJPYChartImg = async (presetJsonPath, nowDate, retPostEv, relay 
         // 指定時刻
         if (condition.type === "specifiedTime") {
             for (let value of condition.value) {
-                let hitMinutes = value.minutes.includes(currentTime);
+                const hitMinutes = value.minutes.includes(currentTime);
                 if (hitMinutes) {
                     // BTCの日ごとと時間ごとのチャートデータを得る
-                    let chartDataD = await getBTCtoJPYChart("D","https://min-api.cryptocompare.com/data/v2/histoday");
-                    let chartDataH = await getBTCtoJPYChart("H","https://min-api.cryptocompare.com/data/v2/histominute");
+                    const chartDataD = await getBTCtoJPYChart("D","https://min-api.cryptocompare.com/data/v2/histoday");
+                    const chartDataH = await getBTCtoJPYChart("H","https://min-api.cryptocompare.com/data/v2/histominute");
                     if(chartDataD !== undefined && chartDataH !== undefined) {
                         // チャートを図にする
-                        let imgPathD = await createAndSaveChart("D", chartDataD, "https://vega.github.io/schema/vega/v5.json");
-                        let imgPathH = await createAndSaveChart("H", chartDataH, "https://vega.github.io/schema/vega/v5.json");
+                        const imgPathD = await createAndSaveChart("D", chartDataD, "https://vega.github.io/schema/vega/v5.json");
+                        const imgPathH = await createAndSaveChart("H", chartDataH, "https://vega.github.io/schema/vega/v5.json");
                         if(imgPathD !== undefined && imgPathH !== undefined) {
                             // チャート画像をアップデート
-                            let imgURLD = await uploadImg(imgPathD);
-                            let imgURLH = await uploadImg(imgPathH);
+                            const imgURLD = await uploadImg(imgPathD);
+                            const imgURLH = await uploadImg(imgPathH);
                             if(imgURLD !== undefined && imgURLH !== undefined && imgURLD.length > 0 && imgURLH.length > 0) {
 
                                 // ポスト語句は複数設定されており、設定数の範囲でランダムに取得
-                                let postIdx = random(0,value.messages.length - 1);
+                                const postIdx = random(0,value.messages.length - 1);
                                 let subMessage = "";
                                 if(value.subMessages.length > 0){
-                                    let subPostIdx = random(0,value.subMessages.length - 1);
+                                    const subPostIdx = random(0,value.subMessages.length - 1);
                                     subMessage = value.subMessages[subPostIdx];
                                 }
 
                                 // リプライ
-                                let postEv = composePost(value.messages[postIdx] + "\n" + imgURLH + " " + "\n" + imgURLD + (subMessage.length > 0 ? " \n" + subMessage:""));
+                                const postEv = composePost(value.messages[postIdx] + "\n" + imgURLH + " " + "\n" + imgURLD + (subMessage.length > 0 ? " \n" + subMessage:""));
                                 if(relay !== undefined) {
                                     await publishToRelay(relay, postEv);            
                                 } else {
