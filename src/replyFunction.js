@@ -824,89 +824,101 @@ const uploadImg = async (imgPath) => {
 
 // ビットコインチャートをダウンロードして、画像保存してポストする
 const uploadBTCtoJPYChartImg = async (presetJsonPath, nowDate, retPostEv, relay = undefined) => {
-    const presetDateJson = await jsonSetandOpen(presetJsonPath);
-    if(presetDateJson === null || presetDateJson === undefined){
-        console.error("uploadBTCtoJPYChartImg:json file is not get");
-        return false;
-    }
+    let processingResult = false;
 
-    const hours = nowDate.getHours();
-    const minutes = nowDate.getMinutes();
+    try {
+        const presetDateJson = await jsonSetandOpen(presetJsonPath);
+        if(presetDateJson === null || presetDateJson === undefined){
+            console.error("uploadBTCtoJPYChartImg:json file is not get");
+            return false;
+        }
 
-    // jsonの親プロパティ specifiedProcessatSpecifiedTime を取得
-    const specifiedProcessatSpecifiedTime = presetDateJson.specifiedProcessatSpecifiedTime;
+        const hours = nowDate.getHours();
+        const minutes = nowDate.getMinutes();
 
-    // HH:MM
-    const currentTime = String(hours).padStart(2, "0") + ":" + String(minutes).padStart(2, "0");
+        // jsonの親プロパティ specifiedProcessatSpecifiedTime を取得
+        const specifiedProcessatSpecifiedTime = presetDateJson.specifiedProcessatSpecifiedTime;
 
-    // 各条件をチェック
-    for (let condition of specifiedProcessatSpecifiedTime) {
-        // 指定時刻
-        if (condition.type === "specifiedTime") {
-            for (let value of condition.value) {
-                const hitMinutes = value.minutes.includes(currentTime);
-                if (hitMinutes) {
-                    // BTCの日ごとと時間ごとのチャートデータを得る
-                    const chartDataD = await getBTCtoJPYChart("D","https://min-api.cryptocompare.com/data/v2/histoday");
-                    const chartDataH = await getBTCtoJPYChart("H","https://min-api.cryptocompare.com/data/v2/histominute");
-                    if(chartDataD !== undefined && chartDataH !== undefined) {
-                        // チャートを図にする
-                        const imgPathD = await createAndSaveChart("D", chartDataD, "https://vega.github.io/schema/vega/v5.json");
-                        const imgPathH = await createAndSaveChart("H", chartDataH, "https://vega.github.io/schema/vega/v5.json");
-                        if(imgPathD !== undefined && imgPathH !== undefined) {
-                            // チャート画像をアップデート
-                            const imgURLD = await uploadImg(imgPathD);
-                            const imgURLH = await uploadImg(imgPathH);
-                            if(imgURLD !== undefined && imgURLH !== undefined && imgURLD.length > 0 && imgURLH.length > 0) {
+        // HH:MM
+        const currentTime = String(hours).padStart(2, "0") + ":" + String(minutes).padStart(2, "0");
 
-                                // ポスト語句は複数設定されており、設定数の範囲でランダムに取得
-                                const postIdx = random(0,value.messages.length - 1);
-                                let subMessage = "";
-                                if(value.subMessages.length > 0){
-                                    const subPostIdx = random(0,value.subMessages.length - 1);
-                                    subMessage = value.subMessages[subPostIdx];
-                                }
+        // 各条件をチェック
+        outerloop: for (let condition of specifiedProcessatSpecifiedTime) {
+            // 指定時刻
+            if (condition.type === "specifiedTime") {
+                for (let value of condition.value) {
+                    const hitMinutes = value.minutes.includes(currentTime);
+                    if (hitMinutes) {
+                        // BTCの日ごとと時間ごとのチャートデータを得る
+                        const chartDataD = await getBTCtoJPYChart("D","https://min-api.cryptocompare.com/data/v2/histoday");
+                        const chartDataH = await getBTCtoJPYChart("H","https://min-api.cryptocompare.com/data/v2/histominute");
+                        if(chartDataD !== undefined && chartDataH !== undefined) {
+                            // チャートを図にする
+                            const imgPathD = await createAndSaveChart("D", chartDataD, "https://vega.github.io/schema/vega/v5.json");
+                            const imgPathH = await createAndSaveChart("H", chartDataH, "https://vega.github.io/schema/vega/v5.json");
+                            if(imgPathD !== undefined && imgPathH !== undefined) {
+                                // チャート画像をアップデート
+                                const imgURLD = await uploadImg(imgPathD);
+                                const imgURLH = await uploadImg(imgPathH);
+                                if(imgURLD !== undefined && imgURLH !== undefined && imgURLD.length > 0 && imgURLH.length > 0) {
 
-                                // リプライ
-                                const postEv = composePost(value.messages[postIdx] + "\n" + imgURLH + " " + "\n" + imgURLD + (subMessage.length > 0 ? " \n" + subMessage:""));
-                                if(relay !== undefined) {
-                                    await publishToRelay(relay, postEv);            
-                                } else {
-                                    retPostEv.postEv = postEv;
-                                }
+                                    // ポスト語句は複数設定されており、設定数の範囲でランダムに取得
+                                    const postIdx = random(0,value.messages.length - 1);
+                                    let subMessage = "";
+                                    if(value.subMessages.length > 0){
+                                        const subPostIdx = random(0,value.subMessages.length - 1);
+                                        subMessage = value.subMessages[subPostIdx];
+                                    }
 
-                                // ファイルはアップロードしたので削除する
-                                for (let i = 1; i <= 2; i++) {
-                                    let dorh = i === 1? "D": "H";
-                                    let imgPath = i === 1? imgPathD: imgPathH;
-                                    let lastIndex = imgPath.lastIndexOf("/");
-                                    let commonPath = imgPath.substring(0, lastIndex + 1);
-                                    let imgFileName = "chart" + dorh + ".svg";
-                                    for (;;) {
-                                        if(await asyncIsFileExists(commonPath + imgFileName)) {
-                                            await deleteFile(commonPath + imgFileName);
+                                    // リプライ
+                                    const postEv = composePost(value.messages[postIdx] + "\n" + imgURLH + " " + "\n" + imgURLD + (subMessage.length > 0 ? " \n" + subMessage:""));
+                                    if(relay !== undefined) {
+                                        await publishToRelay(relay, postEv);            
+                                    } else {
+                                        retPostEv.postEv = postEv;
+                                    }
+
+                                    // ファイルはアップロードしたので削除する
+                                    for (let i = 1; i <= 2; i++) {
+                                        let dorh = i === 1? "D": "H";
+                                        let imgPath = i === 1? imgPathD: imgPathH;
+                                        let lastIndex = imgPath.lastIndexOf("/");
+                                        let commonPath = imgPath.substring(0, lastIndex + 1);
+                                        let imgFileName = "chart" + dorh + ".svg";
+                                        for (;;) {
+                                            if(await asyncIsFileExists(commonPath + imgFileName)) {
+                                                await deleteFile(commonPath + imgFileName);
+                                            }
+                                            if(!await asyncIsFileExists(commonPath + imgFileName)) {
+                                                break;
+                                            }
                                         }
-                                        if(!await asyncIsFileExists(commonPath + imgFileName)) {
-                                            break;
+                                        for (;;) {        
+                                            if(await asyncIsFileExists(imgPath)) {
+                                                await deleteFile(imgPath);
+                                            }
+                                            if(!await asyncIsFileExists(imgPath)) {
+                                                break;
+                                            }
                                         }
                                     }
-                                    for (;;) {        
-                                        if(await asyncIsFileExists(imgPath)) {
-                                            await deleteFile(imgPath);
-                                        }
-                                        if(!await asyncIsFileExists(imgPath)) {
-                                            break;
-                                        }
-                                    }
-                                }
 
-                                return true;                            
+                                    //return true;
+                                    processingResult = true;
+                                }
                             }
                         }
+                        break outerloop;
                     }
                 }
             }
         }
+        
+    } catch(err) {
+        console.error("uploadBTCtoJPYChartImg is error:" + err)
+
+    } finally {
+        return processingResult;
     }
 }
 
