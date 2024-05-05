@@ -286,12 +286,16 @@ const subPresetPost = async(presetDatePath, nowDate, retPostEv = undefined) => {
                         let targetDate = "";
                         targetDate = value.date;
                         let isToday = false;
+                        // date プロパティに設定がある場合、その日でないと投稿はしない
                         if(targetDate.length > 0) {
                             let [month, date] = targetDate.split("/");
-                            if (nowDate.getMonth() + 1 === Number(month) && nowDate.getDate() === Number(date)) {
+                            if (nowDate.getMonth() + 1 === Number(month) && 
+                                nowDate.getDate() === Number(date)
+                            ) {
                                 isToday = true;
                             }
                         } else {
+                            // 設定がないなら無条件で真として、時刻のみで有効と同じ状態にする
                             isToday = true;
                         }
 
