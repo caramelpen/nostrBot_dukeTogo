@@ -473,9 +473,6 @@ const main = async () => {
     await sunCalcDatagetandJsonUpdate();
     cron.schedule("* * * * *", async () => {  // 分単位
 
-        // キャッシュのクリア
-        delete require.cache[require.resolve("./replyFunction.js")];
-
         let retPostEv = {};
         // 現在日時
         const nowDate = currDateTime();
@@ -496,6 +493,10 @@ const main = async () => {
             }
       
             try {
+
+                // キャッシュのクリア
+                delete require.cache[require.resolve("./replyFunction.js")];
+
                 // 処理の実行はディスパッチで行い、スリム化をはかる
                 const func = funcObj[funcConfig.funcName[i]];
                 postSubject = await func(jsonPathCommon + file, nowDate, retPostEv);
