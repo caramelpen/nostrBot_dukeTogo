@@ -120,13 +120,13 @@ const getAnniversary = async (baseDate, nowDate) => {
     const targetDate = new Date(year, month - 1, day); // 月は0から始まるため、1を引く
 
     // 経過年数を計算
-    //const today = new Date();
     const elapsedYears = nowDate.getFullYear() - targetDate.getFullYear();
 
-    // 経過年数が0以上でかつ今日の日付とtargetDateが同じ月と日である場合、周年数を返す
-    if (elapsedYears >= 0 && 
+    // 経過年数が0より大きくかつ今日の日付とtargetDateが同じ月と日である場合、周年数を返す
+    if (elapsedYears > 0 && 
         nowDate.getMonth() === targetDate.getMonth() && 
-        nowDate.getDate() === targetDate.getDate()) {
+        nowDate.getDate() === targetDate.getDate()
+    ) {
         return elapsedYears;
     } else {
         return 0;
@@ -152,6 +152,8 @@ const subPresetPost = async(presetDatePath, nowDate, retPostEv = undefined) => {
             const midnightConditions = presetDateJson.midnightConditions;
             const endOfYear = new Date(nowDate.getFullYear(), 11, 31);
             const remainingDays = Math.floor((endOfYear - nowDate) / (1000 * 60 * 60 * 24)) + 1;
+            console.log("endOfYear:" + endOfYear);
+            console.log("remainingDays:" + remainingDays);
         
             // 各条件をチェック
             for (let condition of midnightConditions) {
@@ -281,7 +283,19 @@ const subPresetPost = async(presetDatePath, nowDate, retPostEv = undefined) => {
             for (let condition of minuteConditions) {
                 if (condition.type === "everyMinutes") {
                     for (let value of condition.value) {
-                        if (currentTime === value.minutes) {
+                        let targetDate = "";
+                        targetDate = value.date;
+                        let isToday = false;
+                        if(targetDate.length > 0) {
+                            let [month, date] = targetDate.split("/");
+                            if (nowDate.getMonth() + 1 === Number(month) && nowDate.getDate() === Number(date)) {
+                                isToday = true;
+                            }
+                        } else {
+                            isToday = true;
+                        }
+
+                        if ( isToday && currentTime === value.minutes ) {
                             // ポスト語句は複数設定されており、設定数の範囲でランダムに取得
                             const postIdx = random(0,value.messages.length - 1);
                             let subMessage = "";

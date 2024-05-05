@@ -35,13 +35,6 @@
                     ,"messages": ["今日はガウタマ・シッダールタの誕生日だ…\n灌仏会に行ってみることだな…"]
                     ,"subMessages": []
                 }
-                ,{
-                    "date": "5/4"
-                    ,"messages": ["May the Force be with you …"]
-                    ,"subMessages": []
-                }
-
-                
             ]
         }
 
@@ -149,11 +142,12 @@
     ]
     ,"minuteConditions": [
         {
-            "◇◇◇[description of everyMinutes]◇◇◇": "minutes だったら messages と subMessages を使用してポストします(minutes は HH:MM 形式で指定すること)"
+            "◇◇◇[description of everyMinutes]◇◇◇": "minutes だったら messages と subMessages を使用してポストします(minutes は HH:MM 形式で指定すること) また date に設定があれば、その日付でしか作動しません(設定は MM/DD 形式で)"
             ,"type": "everyMinutes"
             ,"value": [
                 {
                     "minutes": "07:00"
+                    ,"date": ""
                     ,"messages": [
                                     "…朝食の時間だ…"
                                     ,"…朝食のメニューは…知らないほうがいい…"
@@ -167,6 +161,7 @@
 
                 ,{
                     "minutes": "19:15"
+                    ,"date": ""
                     ,"messages": [
                                     "…食事は仕事の後と決めている…"
                                     ,"夕食に何を食べようが…それはお前の勝手だ…"
@@ -177,6 +172,18 @@
                                 ]
                     ,"subMessages": []
                 }
+
+                ,{
+                    "minutes": "10:00"
+                    ,"date": "5/4"
+                    ,"messages": [
+                                    "May the Force be with you …"
+                                ]
+                    ,"subMessages": []
+                }
+
+
+
             ]
         }
   
