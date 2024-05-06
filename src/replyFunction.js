@@ -3,10 +3,10 @@
  * eachPostingFunctions.js
  * autoReply や replytoReply では共通のポスト仕様が適用されるためここで1本化する
  */
-const axios = require("axios");
-const vega = require("vega");
-const sharp = require("sharp");
-const fs = require("fs");
+let axios = require("axios");
+let vega = require("vega");
+let sharp = require("sharp");
+let fs = require("fs");
 require("websocket-polyfill");
 const { finishEvent } = require("nostr-tools");
 const { currUnixtime, isSafeToReply, random, probabilityDetermination, retrievePostsInPeriod, isFolderExists, jsonSetandOpen, asyncIsFileExists, deleteFile } = require("./common/utils.js");
@@ -824,6 +824,25 @@ const uploadImg = async (imgPath) => {
 
 // ビットコインチャートをダウンロードして、画像保存してポストする
 const uploadBTCtoJPYChartImg = async (presetJsonPath, nowDate, retPostEv, relay = undefined) => {
+
+    // キャッシュのクリア
+    axios = require.resolve("axios");
+    vega = require.resolve("vega");
+    sharp = require.resolve("sharp");
+    fs = require.resolve("fs");
+    
+    // モジュールを再ロード
+    delete require.cache[axios];
+    delete require.cache[vega];
+    delete require.cache[sharp];
+    delete require.cache[fs];
+    
+    axios = require("axios");
+    vega = require("vega");
+    sharp = require("sharp");
+    fs = require("fs");
+
+
     let processingResult = false;
 
     try {
@@ -843,7 +862,7 @@ const uploadBTCtoJPYChartImg = async (presetJsonPath, nowDate, retPostEv, relay 
         const currentTime = String(hours).padStart(2, "0") + ":" + String(minutes).padStart(2, "0");
 
         // 各条件をチェック
-        outerloop: for (let condition of specifiedProcessatSpecifiedTime) {
+        for (let condition of specifiedProcessatSpecifiedTime) {
             // 指定時刻
             if (condition.type === "specifiedTime") {
                 for (let value of condition.value) {
@@ -918,7 +937,7 @@ const uploadBTCtoJPYChartImg = async (presetJsonPath, nowDate, retPostEv, relay 
                             console.error("failed to retrieve chart data");
                             return false;
                         }
-                        break outerloop;
+                        //break outerloop;
                     }
                 }
             }
