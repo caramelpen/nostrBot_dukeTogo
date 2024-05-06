@@ -828,7 +828,7 @@ const uploadBTCtoJPYChartImg = async (presetJsonPath, nowDate, retPostEv, relay 
 
     try {
         const presetDateJson = await jsonSetandOpen(presetJsonPath);
-        if(presetDateJson === null || presetDateJson === undefined){
+        if(presetDateJson === null || presetDateJson === undefined || !presetDateJson){
             console.error("uploadBTCtoJPYChartImg:json file is not get");
             return false;
         }
@@ -858,8 +858,9 @@ const uploadBTCtoJPYChartImg = async (presetJsonPath, nowDate, retPostEv, relay 
                             const imgPathH = await createAndSaveChart("H", chartDataH, "https://vega.github.io/schema/vega/v5.json");
                             if(imgPathD !== undefined && imgPathH !== undefined) {
                                 // チャート画像をアップデート
-                                const imgURLD = await uploadImg(imgPathD);
-                                const imgURLH = await uploadImg(imgPathH);
+                                // const imgURLD = await uploadImg(imgPathD);
+                                // const imgURLH = await uploadImg(imgPathH);
+                                const [imgURLD, imgURLH] = await Promise.all([uploadImg(imgPathD), uploadImg(imgPathH)]);
                                 if(imgURLD !== undefined && imgURLH !== undefined && imgURLD.length > 0 && imgURLH.length > 0) {
 
                                     // ポスト語句は複数設定されており、設定数の範囲でランダムに取得
@@ -905,8 +906,17 @@ const uploadBTCtoJPYChartImg = async (presetJsonPath, nowDate, retPostEv, relay 
 
                                     //return true;
                                     processingResult = true;
+                                } else {
+                                    console.error("failed to upload chart images");
+                                    return false;                                    
                                 }
+                            } else {
+                                console.error("failed to create and save chart images");
+                                return false;
                             }
+                        } else {
+                            console.error("failed to retrieve chart data");
+                            return false;
                         }
                         break outerloop;
                     }
@@ -916,10 +926,8 @@ const uploadBTCtoJPYChartImg = async (presetJsonPath, nowDate, retPostEv, relay 
         
     } catch(err) {
         console.error("uploadBTCtoJPYChartImg is error:" + err)
-
-    } finally {
-        return processingResult;
     }
+    return processingResult;
 }
 
 
