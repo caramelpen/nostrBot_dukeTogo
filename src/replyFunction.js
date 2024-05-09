@@ -528,7 +528,8 @@ const  getAvailableCurrencies = async (baseCurrency, targetCurrency, funcSw = 0)
 
         // 為替レート
         if(funcSw === 1) {
-            const response = await axios.get(`${API_URL}?pair=${pair}`);
+            //const response = await axios.get(`${API_URL}?pair=${pair}`);
+            const response = await axios.get(`${API_URL}?pair=${pair}`, {headers: {"Cache-Control": "no-cache"}});
             const data = response.data;
             if (data.error && data.error.length) {
                 // 取得できない場合はなにもしない
