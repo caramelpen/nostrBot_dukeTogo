@@ -4,14 +4,15 @@
  * autoReply や replytoReply では共通のポスト仕様が適用されるためここで1本化する
  */
 
-// const axios = require("axios");
-// const vega = require("vega");
-// const sharp = require("sharp");
-// const fs = require("fs");
-let axios = require("axios");
-let vega = require("vega");
-let sharp = require("sharp");
-let fs = require("fs");
+const axios = require("axios");
+const vega = require("vega");
+const sharp = require("sharp");
+const fs = require("fs");
+// let axios = require("axios");
+// let vega = require("vega");
+// let sharp = require("sharp");
+// let fs = require("fs");
+//const nodefetch = require("node-fetch");
 
 require("websocket-polyfill");
 const { finishEvent } = require("nostr-tools");
@@ -589,8 +590,23 @@ const getBTCtoJPYChart = async (dorh, APIEndPoint) => {
             };
         }
 
+        
         // APIにリクエストを送信してデータを取得
-        const response = await axios.get(APIEndPoint + "?timestamp=" + timeStamp, {params, headers: {"Cache-Control": "no-cache"}});
+        //const response = await axios.get(APIEndPoint + "?timestamp=" + timeStamp, {params, headers: {"Cache-Control": "no-cache"}});
+        const url = APIEndPoint + "?timestamp=" + timeStamp;
+        const response = await axios.get(url, {params, headers: {"Cache-Control": "no-cache"}});
+        // await Cache.delete(url);
+        // //const response = 
+        // await nodefetch(APIEndPoint + "?timestamp=" + timeStamp
+        // , {
+        //      params
+        //     // , method: "GET"
+        //     // , headers: {"Cache-Control": "no-cache"}
+            
+        // })
+        // .then(res => res.json())
+        // .then(json => console.log(json));
+
         return response.data.Data.Data; // データは価格の配列として返されます
     } catch (err) {
         console.error(err);
@@ -815,12 +831,14 @@ const uploadImg = async (imgPath) => {
 
 
         // void.cat へのHTTP POSTリクエストの設定
+        axios.defaults.cache = false;
         const response = await axios.post(uploadUrl, imageData, {
             headers: {
                 "accept": "*/*"
                 ,"V-Content-Type": "image/png" // 画像のコンテンツタイプを指定
                 ,"V-Filename": imgPath 
-                ,"V-Full-Digest": fileHash 
+                ,"V-Full-Digest": fileHash
+                ,"Cache-Control": "no-cache"
             }
         });
         return response.data + ".png";
@@ -833,22 +851,22 @@ const uploadImg = async (imgPath) => {
 // ビットコインチャートをダウンロードして、画像保存してポストする
 const uploadBTCtoJPYChartImg = async (presetJsonPath, nowDate, retPostEv, relay = undefined) => {
 
-    // キャッシュのクリア
-    axios = require.resolve("axios");
-    vega = require.resolve("vega");
-    sharp = require.resolve("sharp");
-    fs = require.resolve("fs");
+    // // キャッシュのクリア
+    // axios = require.resolve("axios");
+    // vega = require.resolve("vega");
+    // sharp = require.resolve("sharp");
+    // fs = require.resolve("fs");
     
-    // モジュールを再ロード
-    delete require.cache[axios];
-    delete require.cache[vega];
-    delete require.cache[sharp];
-    delete require.cache[fs];
+    // // モジュールを再ロード
+    // delete require.cache[axios];
+    // delete require.cache[vega];
+    // delete require.cache[sharp];
+    // delete require.cache[fs];
     
-    axios = require("axios");
-    vega = require("vega");
-    sharp = require("sharp");
-    fs = require("fs");
+    // axios = require("axios");
+    // vega = require("vega");
+    // sharp = require("sharp");
+    // fs = require("fs");
 
 
     let processingResult = false;
