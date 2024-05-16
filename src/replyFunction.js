@@ -4,21 +4,18 @@
  * autoReply や replytoReply では共通のポスト仕様が適用されるためここで1本化する
  */
 
-const axios = require("axios");
 const vega = require("vega");
 const sharp = require("sharp");
 const fs = require("fs");
-// let axios = require("axios");
-// let vega = require("vega");
-// let sharp = require("sharp");
-// let fs = require("fs");
-//const nodefetch = require("node-fetch");
-
 require("websocket-polyfill");
 const { finishEvent } = require("nostr-tools");
 const { currUnixtime, isSafeToReply, random, probabilityDetermination, retrievePostsInPeriod, isFolderExists, jsonSetandOpen, asyncIsFileExists, deleteFile } = require("./common/utils.js");
 const { publishToRelay } = require("./common/publishToRelay.js");
 const { emergency } = require("./emergency.js");
+
+const chartFile = "chart";
+const slash = "/";
+const exts = [".svg", ".png"];
 
 let BOT_PRIVATE_KEY_HEX = "";
 let pubKey = "";
@@ -496,6 +493,8 @@ const  getAvailableCurrencies = async (baseCurrency, targetCurrency, funcSw = 0)
     let currencyList = [];
     let arrayRet = [];
 
+    const timeStamp = new Date().getTime();
+
     // 為替レート
     if(funcSw === 1) {
         if(baseCurrency.length <= 0 || targetCurrency.length <= 0) {
@@ -507,8 +506,8 @@ const  getAvailableCurrencies = async (baseCurrency, targetCurrency, funcSw = 0)
     try {
 
         const API_URL_Asset = "https://api.kraken.com/0/public/AssetPairs";
-        const responseAsset = await axios.get(API_URL_Asset);
-        const dataAsset = responseAsset.data;
+        const responseAsset = await fetch(API_URL_Asset + "?timestamp=" + timeStamp, {headers: {"Cache-Control": "no-store"}});
+        const dataAsset = await responseAsset.json();
         const assetPairs = dataAsset.result;
         const baseCurrencies = Object.values(assetPairs).map(pairData => pairData.wsname);
         // 通貨リストを収める
@@ -523,21 +522,22 @@ const  getAvailableCurrencies = async (baseCurrency, targetCurrency, funcSw = 0)
         }
         // 重複を除去
         const uniquecurrencyList = [...new Set(currencyList)];
-        const API_URL = "https://api.kraken.com/0/public/Ticker";
+        const API_URL = "https://api.kraken.com/0/public/Ticker" + "?timestamp=" + timeStamp + "&";
         const pair = baseCurrency + targetCurrency;
 
         // 為替レート
         if(funcSw === 1) {
-            //const response = await axios.get(`${API_URL}?pair=${pair}`);
-            const response = await axios.get(`${API_URL}?pair=${pair}`, {headers: {"Cache-Control": "no-cache"}});
-            const data = response.data;
-            if (data.error && data.error.length) {
+            const response = await fetch(`${API_URL}pair=${pair}`, {headers: {"Cache-Control": "no-store"}});
+            const pairJson = await response.json();
+
+            if (pairJson.error && pairJson.error.length) {
                 // 取得できない場合はなにもしない
             } else {
-                const pairInfo = data.result[Object.keys(data.result)[0]]; // レスポンス内の最初のペアを取得
+                const pairInfo = pairJson.result[Object.keys(pairJson.result)[0]]; // レスポンス内の最初のペアを取得
                 const lastTrade = pairInfo.c[0]; // 最終取引価格
                 arrayRet.push(lastTrade);
             }
+
             return arrayRet;
 
         } else {
@@ -571,9 +571,9 @@ const convertUnixTimeToJapanISOUTC = (unixTimeInSeconds) => {
 const getBTCtoJPYChart = async (dorh, APIEndPoint) => {
     const timeStamp = new Date().getTime();
     try {
-        axios.defaults.cache = false;
         // パラメーターを設定
         let params;
+        //params = "";
         if(dorh === "D") {
             params = {
                 fsym: "BTC",
@@ -581,6 +581,12 @@ const getBTCtoJPYChart = async (dorh, APIEndPoint) => {
                 aggregate: 1,
                 limit: 29
             };
+
+            // params = params + "?fsym=BTC";
+            // params = params + "&tsym=JPY";
+            // params = params + "&aggregate=1";
+            // params = params + "&limit=29";
+
         } else {
             params = {
                 fsym: "BTC",
@@ -589,26 +595,40 @@ const getBTCtoJPYChart = async (dorh, APIEndPoint) => {
                 limit: 179,
                 aggregatePredictableTimePeriods: false
             };
+            // params = params + "?fsym=BTC";
+            // params = params + "&tsym=JPY";
+            // params = params + "&aggregate=1";
+            // params = params + "&limit=179";
+            // params = params + "&aggregatePredictableTimePeriods=false";
         }
 
         
         // APIにリクエストを送信してデータを取得
-        //const response = await axios.get(APIEndPoint + "?timestamp=" + timeStamp, {params, headers: {"Cache-Control": "no-cache"}});
-        const url = APIEndPoint + "?timestamp=" + timeStamp;
-        const response = await axios.get(url, {params, headers: {"Cache-Control": "no-cache"}});
-        // await Cache.delete(url);
-        // //const response = 
-        // await nodefetch(APIEndPoint + "?timestamp=" + timeStamp
-        // , {
-        //      params
-        //     // , method: "GET"
-        //     // , headers: {"Cache-Control": "no-cache"}
-            
-        // })
-        // .then(res => res.json())
-        // .then(json => console.log(json));
+        const endPoint = APIEndPoint + "?timestamp=" + timeStamp;
+        //const endPoint = APIEndPoint + params + "&timestamp=" + timeStamp;
+        
+        try {
+             const url = new URL(endPoint);
+             Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
+            //const url = endPoint;
+            const response = await fetch(url, 
+                {
+                    method: "GET",
+                    headers: { "Cache-Control": "no-store, no-cache, must-revalidate, post-check=0, pre-check=0", "Pragma": "no-cache" }
+                }
+            );
 
-        return response.data.Data.Data; // データは価格の配列として返されます
+            const resJson = await response.json();
+            const chartData = resJson.Data.Data;
+            // console.log("↓---------- chartData(" + dorh + ") --------");
+            // console.log(chartData);
+            // console.log("↑---------- chartData(" + dorh + ") --------");
+
+            return chartData; // データは価格の配列として返されます
+        } catch (error) {
+            console.error("エラーが発生しました:", error);
+        }
+        
     } catch (err) {
         console.error(err);
     }
@@ -617,7 +637,7 @@ const getBTCtoJPYChart = async (dorh, APIEndPoint) => {
 
 
 // チャート作成（第1引数がDなら日ごと、Hなら時間ごと）して画像として保存する
-const createAndSaveChart = async (dorh, data, schema) => {
+const createAndSaveChart = async (dorh, data, schema, nowUnixDate) => {
     let decData = [];
     for (let i = 0; i <= data.length-1; i++){
         decData.push({
@@ -775,34 +795,39 @@ const createAndSaveChart = async (dorh, data, schema) => {
 
     }
     
-    const slash = "/";
     // Vegaのビューの作成とSVGの出力
     const path = require("path");
     const targetFolderPath = "img";
     const absoluteFolderPath = path.join(__dirname, '..', targetFolderPath);    // 1つ上の階層
     // フォルダが未存在なら作る
     isFolderExists(absoluteFolderPath, true);
-    const svgFile = "chart" + dorh + ".svg";
-    const imgFile = "chart" + dorh + ".png";
+    const svgFile = chartFile + dorh + "_" + nowUnixDate + ".svg";
+    const imgFile = chartFile + dorh + "_" + nowUnixDate + ".png";
+
     // (前回アップロード時に削除してあるはずだが)ファイルが存在していたら削除する
-    for (;;) {
-        if(await asyncIsFileExists(absoluteFolderPath + slash + svgFile)) {
-            await deleteFile(absoluteFolderPath + slash + svgFile);
+    try {
+        const files = fs.readdirSync(absoluteFolderPath);
+        const regex = new RegExp(`^${chartFile + dorh}.*(${exts.join("|")})$`);
+        for (const file of files) {
+            if (regex.test(file)) {
+                await deleteFile(absoluteFolderPath + slash + file);
+            }
         }
-        if(!await asyncIsFileExists(absoluteFolderPath + slash + svgFile)) {
-            break;
-        }
+    } catch (err) {
+        console.error(err);
     }
-    for (;;) {        
-        if(await asyncIsFileExists(absoluteFolderPath + slash + imgFile)) {
-            await deleteFile(absoluteFolderPath + slash + imgFile);
-        }
-        if(!await asyncIsFileExists(absoluteFolderPath + slash + imgFile)) {
-            break;
-        }
-    }
-    const view = new vega.View(vega.parse(spec), {renderer: "none"});
-    const svg = await view.toSVG();
+ 
+    const view = new vega.View(vega.parse(spec), {renderer: "svg", rendererConfig: {cache: false}});
+    // console.log("↓--------- view(" + dorh + ") --------");
+    // console.log(view);
+    // console.log("↑--------- view(" + dorh + ") --------");
+
+    const svg = await view.toSVG();    
+    // console.log("↓--------- svg(" + dorh + ") --------");
+    // console.log(svg);
+    // console.log("↑--------- svg(" + dorh + ") --------");
+
+
     fs.writeFileSync(absoluteFolderPath + slash + svgFile, svg);
     // SVGをPNGに変換
     try {
@@ -832,17 +857,23 @@ const uploadImg = async (imgPath) => {
 
 
         // void.cat へのHTTP POSTリクエストの設定
-        axios.defaults.cache = false;
-        const response = await axios.post(uploadUrl, imageData, {
+        const response = await fetch(uploadUrl, {
+            method: "POST",
+            body: imageData,
             headers: {
-                "accept": "*/*"
-                ,"V-Content-Type": "image/png" // 画像のコンテンツタイプを指定
+                "V-Content-Type": "image/png" // 画像のコンテンツタイプを指定
                 ,"V-Filename": imgPath 
                 ,"V-Full-Digest": fileHash
-                ,"Cache-Control": "no-cache"
+                ,"Cache-Control": "no-store, no-cache, must-revalidate, post-check=0, pre-check=0"
+                , "Pragma": "no-cache"
             }
         });
-        return response.data + ".png";
+
+        if (response.ok) {
+            const resURL = await response.text();
+            return resURL + ".png";
+        }
+
     } catch (error) {
         console.error('Error uploading image:', error);
         return "";
@@ -851,24 +882,6 @@ const uploadImg = async (imgPath) => {
 
 // ビットコインチャートをダウンロードして、画像保存してポストする
 const uploadBTCtoJPYChartImg = async (presetJsonPath, nowDate, retPostEv, relay = undefined) => {
-
-    // // キャッシュのクリア
-    // axios = require.resolve("axios");
-    // vega = require.resolve("vega");
-    // sharp = require.resolve("sharp");
-    // fs = require.resolve("fs");
-    
-    // // モジュールを再ロード
-    // delete require.cache[axios];
-    // delete require.cache[vega];
-    // delete require.cache[sharp];
-    // delete require.cache[fs];
-    
-    // axios = require("axios");
-    // vega = require("vega");
-    // sharp = require("sharp");
-    // fs = require("fs");
-
 
     let processingResult = false;
 
@@ -900,13 +913,13 @@ const uploadBTCtoJPYChartImg = async (presetJsonPath, nowDate, retPostEv, relay 
                         const chartDataH = await getBTCtoJPYChart("H","https://min-api.cryptocompare.com/data/v2/histominute");
                         if(chartDataD !== undefined && chartDataH !== undefined) {
                             // チャートを図にする
-                            const imgPathD = await createAndSaveChart("D", chartDataD, "https://vega.github.io/schema/vega/v5.json");
-                            const imgPathH = await createAndSaveChart("H", chartDataH, "https://vega.github.io/schema/vega/v5.json");
+                            nowUnixDate = currUnixtime();
+                            const imgPathD = await createAndSaveChart("D", chartDataD, "https://vega.github.io/schema/vega/v5.json", nowUnixDate);
+                            const imgPathH = await createAndSaveChart("H", chartDataH, "https://vega.github.io/schema/vega/v5.json", nowUnixDate);
                             if(imgPathD !== undefined && imgPathH !== undefined) {
                                 // チャート画像をアップデート
-                                // const imgURLD = await uploadImg(imgPathD);
-                                // const imgURLH = await uploadImg(imgPathH);
-                                const [imgURLD, imgURLH] = await Promise.all([uploadImg(imgPathD), uploadImg(imgPathH)]);
+                                const imgURLD = await uploadImg(imgPathD);
+                                const imgURLH = await uploadImg(imgPathH);
                                 if(imgURLD !== undefined && imgURLH !== undefined && imgURLD.length > 0 && imgURLH.length > 0) {
 
                                     // ポスト語句は複数設定されており、設定数の範囲でランダムに取得
@@ -926,31 +939,22 @@ const uploadBTCtoJPYChartImg = async (presetJsonPath, nowDate, retPostEv, relay 
                                     }
 
                                     // ファイルはアップロードしたので削除する
-                                    for (let i = 1; i <= 2; i++) {
-                                        let dorh = i === 1? "D": "H";
-                                        let imgPath = i === 1? imgPathD: imgPathH;
-                                        let lastIndex = imgPath.lastIndexOf("/");
-                                        let commonPath = imgPath.substring(0, lastIndex + 1);
-                                        let imgFileName = "chart" + dorh + ".svg";
-                                        for (;;) {
-                                            if(await asyncIsFileExists(commonPath + imgFileName)) {
-                                                await deleteFile(commonPath + imgFileName);
-                                            }
-                                            if(!await asyncIsFileExists(commonPath + imgFileName)) {
-                                                break;
-                                            }
-                                        }
-                                        for (;;) {        
-                                            if(await asyncIsFileExists(imgPath)) {
-                                                await deleteFile(imgPath);
-                                            }
-                                            if(!await asyncIsFileExists(imgPath)) {
-                                                break;
-                                            }
-                                        }
-                                    }
+                                    const path = require("path");
+                                    const imgPath = imgPathD;
+                                    const lastIndex = imgPath.lastIndexOf("/");
+                                    const commonPath = imgPath.substring(0, lastIndex + 1);
 
-                                    //return true;
+                                    try {
+                                        const files = fs.readdirSync(commonPath.slice(0, -1));  //末尾スラッシュを取る
+                                        for (const file of files) {
+                                            if (exts.includes(path.extname(file))) {
+                                                await deleteFile(commonPath + slash + file);
+                                            }
+                                        }
+
+                                    } catch (err) {
+                                        console.error(err);
+                                    }
                                     processingResult = true;
                                 } else {
                                     console.error("failed to upload chart images");
@@ -964,7 +968,6 @@ const uploadBTCtoJPYChartImg = async (presetJsonPath, nowDate, retPostEv, relay 
                             console.error("failed to retrieve chart data");
                             return false;
                         }
-                        //break outerloop;
                     }
                 }
             }

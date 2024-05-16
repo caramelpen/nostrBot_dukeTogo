@@ -460,7 +460,7 @@ const funcObj = {
 const funcConfig = {
     funcName: ["subPresetPost", "subSunriseSunset", "uploadBTCtoJPYChartImg"]       // useJsonFile の記述順と対応させる
     ,useJsonFile: ["presetDate.json", "sunriseSunset.json", "presetDate.json"]      // funcName の記述順と対応させる（jsonを使用しないなら""としておく）
-    ,operationCategory: [0, 1, 0]                                                   // 1ならGitHubへプッシュコミット（useJsonFileやuncName の記述順と対応させる）
+    ,operationCategory: [0, 1, 0]                                                   // 1ならGitHubへプッシュコミット（useJsonFile や funcName の記述順と対応させる）
 }
 
 
@@ -493,9 +493,6 @@ const main = async () => {
             }
       
             try {
-
-                // キャッシュのクリア
-                delete require.cache[require.resolve("./replyFunction.js")];
 
                 // 処理の実行はディスパッチで行い、スリム化をはかる
                 const func = funcObj[funcConfig.funcName[i]];
