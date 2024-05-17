@@ -11,8 +11,8 @@
   - npm (10.2.3)
     - nostr-tools (1.17.0)
     - websocket-polyfill (0.0.3)
-    - @holiday-jp/holiday_jp@ (2.4.0) ...祝日取得のために使用しています  
-    ~ - axios (1.6.7) ...通貨の為替レートの取得のために使用しています~ ver.240517 で削除
+    - @holiday-jp/holiday_jp@ (2.4.0) ...祝日取得のために使用しています
+    - ~axios (1.6.7) ...通貨の為替レートの取得のために使用しています~ ver.240517 で削除  
     - dotenv (16.3.1) ... .envファイルが使用できます
     - node-cron (3.0.3) ...cronが使えます
     - octokit (3.1.2) ...GitHubへのプッシュで使用しています
