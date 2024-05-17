@@ -1,11 +1,13 @@
 {
-    "surveillanceCommonHeader": "◇◇◇◇ [監視ｼｽﾃﾑ] ﾖﾘ 発報 ◇◇◇◇\n"
+
+    "◇◇◇[description of surveillanceCommonHeader]◇◇◇": "stopTime だったらプログラムの停止、 startTime だったらプログラム起動します(stopTime と startTime はゼロ埋め HH:MM 形式で指定すること)"
+
+    ,"surveillanceCommonHeader": "◇◇◇◇ [監視ｼｽﾃﾑ] ﾖﾘ 発報 ◇◇◇◇\n"
     ,"runConfig": "pm2config.json"
 
 
     ,"stopTime": [
                     "00:10"
-                    ,"07:12"
                 ]
     ,"stopExec": "pm2 stop"
     ,"stopComment": [
@@ -17,7 +19,6 @@
 
     ,"startTime": [
                     "04:00"
-                    ,"16:00"
                 ]
     ,"startExec": "pm2 restart"
     ,"startComment": [
@@ -31,9 +32,9 @@
     ,"temporalies:": [
                         "[ゴルゴ] ﾌﾟﾛｸﾞﾗﾑ ｦ [停止] ｼﾖｳﾄｼﾃ ﾔﾒﾏｼﾀ"
                         ,"[ゴルゴ] ﾌﾟﾛｸﾞﾗﾑ ｦ [停止] ｼﾏｼﾀ"
-                        ,"07:12"
+                    ,"07:12"
                         ,"17:15"
-                        ,"16:00"
+                    ,"16:00"
                         ,"07:07"                        
                     ]
 }
