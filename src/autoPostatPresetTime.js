@@ -124,8 +124,8 @@ const getAnniversary = async (baseDate, nowDate) => {
 
     // 経過年数が0より大きくかつ今日の日付とtargetDateが同じ月と日である場合、周年数を返す
     if (elapsedYears > 0 && 
-        nowDate.getMonth() === targetDate.getMonth() && 
-        nowDate.getDate() === targetDate.getDate()
+        await nowDate.getMonth() === targetDate.getMonth() && 
+        await nowDate.getDate() === targetDate.getDate()
     ) {
         return elapsedYears;
     } else {
@@ -147,8 +147,7 @@ const subPresetPost = async(presetDatePath, nowDate, retPostEv = undefined) => {
         }
 
         // 0:00
-//if (hours === 0 && minutes === 0) {
-if (hours === 21 && minutes === 44) {    
+        if (hours === 0 && minutes === 0) {
             // jsonの親プロパティ midnightConditions を取得
             const midnightConditions = presetDateJson.midnightConditions;
             const endOfYear = new Date(nowDate.getFullYear(), 11, 31);
@@ -262,6 +261,7 @@ if (hours === 21 && minutes === 44) {
                 // 0:00 
                 } else if(condition.type === "everyMidnight") {
                     postSubject = true;
+                    console.log("everyMidnight");
                 }
 
                 
