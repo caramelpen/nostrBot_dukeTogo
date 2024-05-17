@@ -371,15 +371,15 @@ const normalAutoReply = async (relay, ev, autoReplyJson, autoReactionJson, postI
                 let randomReactionIdx;
                 if(postInfoObj.postCategory === 1) {
                     // jsonに設定されている対応するリプライ語句の数を利用してランダムでリプライ語句を決める
-                    const randomIdx = random(0, target.replyPostChar.length - 1);
+                    const randomIdx = await random(0, target.replyPostChar.length - 1);
                     // リプライ
                     replyPostorreactionPostEv = !isFromReplytoReply ? composeReply(target.replyPostChar[randomIdx], ev) : composeReplytoReply(target.replyPostChar[randomIdx], ev);
 
                 } else if(postInfoObj.postCategory === 2) {
                     // 反応語句配列の数の範囲からランダム値を取得し、それを配列要素とする
-                    const replyChrPresetIdx = random(0, autoReplyJson.length - 1);
+                    const replyChrPresetIdx = await random(0, autoReplyJson.length - 1);
                     // 配列要素を決めたら、その配列に設定されているリプライ語句の設定配列の範囲からさらにランダム値を取得
-                    const replyChrIdx = random(0, autoReplyJson[replyChrPresetIdx].replyPostChar.length - 1);
+                    const replyChrIdx = await random(0, autoReplyJson[replyChrPresetIdx].replyPostChar.length - 1);
                     // リプライ語句決定
                     replyChr = autoReplyJson[replyChrPresetIdx].replyPostChar[replyChrIdx];
                     // リプライ
@@ -387,7 +387,7 @@ const normalAutoReply = async (relay, ev, autoReplyJson, autoReactionJson, postI
 
                 } else if(postInfoObj.postCategory === 3) {
                     // jsonに設定されているリアクション絵文字の数を利用してランダムで反応語句を決める
-                    randomReactionIdx = random(0, autoReactionJson.contentReaction.length - 1);
+                    randomReactionIdx = await random(0, autoReactionJson.contentReaction.length - 1);
                     // randomReactionIdx 番目のカスタム絵文字URLが設定されているならリアクション
                     if(autoReactionJson.reactionImgURL[randomReactionIdx].length > 0) {
                         postInfoObj.postCategory = 4;
@@ -403,7 +403,7 @@ const normalAutoReply = async (relay, ev, autoReplyJson, autoReactionJson, postI
                 } else if(postInfoObj.postCategory === 5) {
                     //100回まわってカスタム絵文字URLが設定されている要素をランダム取得出来たらリアクション（100に意味はない　なんとなく）
                     for (let i = 0; i < 100; i++) {
-                        randomReactionIdx = random(0, autoReactionJson.contentReaction.length - 1);
+                        randomReactionIdx = await random(0, autoReactionJson.contentReaction.length - 1);
                         // randomReactionIdx 番目のカスタム絵文字URLが設定されているならリアクション
                         if(autoReactionJson.reactionImgURL[randomReactionIdx].length > 0) {
                             // リアクション
@@ -448,8 +448,8 @@ const postUponReceiptofZap = async (relay, ev, autoReplyJson, postInfoObj) => {
             // 投稿しても大丈夫だ
             if (isSafeToReply(ev)) {
                 // jsonに設定されている対応するリプライ語句の数を利用してランダムで投稿語句を決める
-                const randomIdx = random(0, autoReplyJson.postedWord.length - 1);
-                const randomSubIdx = random(0, autoReplyJson.postedSubWord.length - 1);
+                const randomIdx = await random(0, autoReplyJson.postedWord.length - 1);
+                const randomSubIdx = await random(0, autoReplyJson.postedSubWord.length - 1);
                 // 投稿
                 const replyPostorreactionPostEv = composePost(autoReplyJson.postedWord[randomIdx] + " \n" + autoReplyJson.postedSubWord[randomSubIdx]);
                 await publishToRelay(relay, replyPostorreactionPostEv);
@@ -892,8 +892,8 @@ const uploadBTCtoJPYChartImg = async (presetJsonPath, nowDate, retPostEv, relay 
             return false;
         }
 
-        const hours = nowDate.getHours();
-        const minutes = nowDate.getMinutes();
+        const hours = await nowDate.getHours();
+        const minutes = await nowDate.getMinutes();
 
         // jsonの親プロパティ specifiedProcessatSpecifiedTime を取得
         const specifiedProcessatSpecifiedTime = presetDateJson.specifiedProcessatSpecifiedTime;
@@ -923,10 +923,10 @@ const uploadBTCtoJPYChartImg = async (presetJsonPath, nowDate, retPostEv, relay 
                                 if(imgURLD !== undefined && imgURLH !== undefined && imgURLD.length > 0 && imgURLH.length > 0) {
 
                                     // ポスト語句は複数設定されており、設定数の範囲でランダムに取得
-                                    const postIdx = random(0,value.messages.length - 1);
+                                    const postIdx = await random(0,value.messages.length - 1);
                                     let subMessage = "";
                                     if(value.subMessages.length > 0){
-                                        const subPostIdx = random(0,value.subMessages.length - 1);
+                                        const subPostIdx = await random(0,value.subMessages.length - 1);
                                         subMessage = value.subMessages[subPostIdx];
                                     }
 

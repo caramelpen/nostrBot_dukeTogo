@@ -26,8 +26,8 @@ const infoUpNotification = async (rssJsonPath, rssJson, i) => {
 
         if (newData !== previousData) {
             // ポスト準備
-            const constCommentIdx = random(0, rssJson[i].constComment.length - 1);
-            const commentIdx = random(0, rssJson[i].comment.length - 1);
+            const constCommentIdx = await random(0, rssJson[i].constComment.length - 1);
+            const commentIdx = await random(0, rssJson[i].comment.length - 1);
             const postChr = rssJson[i].nickName + " " + rssJson[i].constComment[constCommentIdx] 
                             + "\n" + rssJson[i].comment[commentIdx] + " " 
                             + "\n" + feed.items[rssJson[i].contentsIdx].link;

@@ -147,12 +147,13 @@ const subPresetPost = async(presetDatePath, nowDate, retPostEv = undefined) => {
         }
 
         // 0:00
-        if (hours === 0 && minutes === 0) {
+//if (hours === 0 && minutes === 0) {
+if (hours === 21 && minutes === 44) {    
             // jsonの親プロパティ midnightConditions を取得
             const midnightConditions = presetDateJson.midnightConditions;
             const endOfYear = new Date(nowDate.getFullYear(), 11, 31);
             const remainingDays = Math.floor((endOfYear - nowDate) / (1000 * 60 * 60 * 24)) + 1;
-            console.log("endOfYear:" + endOfYear);
+            //console.log("endOfYear:" + endOfYear);
             console.log("remainingDays:" + remainingDays);
         
             // 各条件をチェック
@@ -166,9 +167,10 @@ const subPresetPost = async(presetDatePath, nowDate, retPostEv = undefined) => {
                 if (condition.type === "specificDate") {
                     for (let value of condition.value) {
                         if(value.date.length > 0) {
-                            const [month, date] = value.date.split("/");
-                            if (nowDate.getMonth() + 1 === Number(month) && nowDate.getDate() === Number(date)) {
+                            const [month, date] = await value.date.split("/");
+                            if (await nowDate.getMonth() + 1 === Number(month) && await nowDate.getDate() === Number(date)) {
                                 postSubject = true;
+                                console.log("specificDate:" + value.date);
                                 break;
                             }
                         }
@@ -179,10 +181,11 @@ const subPresetPost = async(presetDatePath, nowDate, retPostEv = undefined) => {
                 } else if(condition.type === "anniversary") {
                     for (let value of condition.value) {
                         if(value.date.length > 0) {
-                            let anniversary = getAnniversary(value.date, nowDate);
+                            let anniversary = await getAnniversary(value.date, nowDate);
                             if(anniversary > 0) {
                                 message = anniversary.toString();
                                 postSubject = true;
+                                console.log("anniversary:" + value.date);
                                 break;
                             }
                         }
@@ -194,6 +197,7 @@ const subPresetPost = async(presetDatePath, nowDate, retPostEv = undefined) => {
                     if (jpnHolidays.isHoliday(nowDate)) {   // 今日は祝日だ
                         const holiday = jpnHolidays.between(nowDate, nowDate);  // 今日から今日までの祝日情報を取得(まわりくどい...)
                         message = holiday[0].name;                              // 今日のみの指定なので、0番目固定で祝日の名前を取得
+                        console.log("jpnHoliday:" + holiday[0].name);
                         postSubject = true;
                     }
 
@@ -201,9 +205,10 @@ const subPresetPost = async(presetDatePath, nowDate, retPostEv = undefined) => {
                 } else if (condition.type === "specificMonth") {
                     for (let value of condition.value) {
                         if(value.month.length > 0) {
-                            if (nowDate.getMonth() + 1 === Number(value.month)) {
+                            if (await nowDate.getMonth() + 1 === Number(value.month)) {
                                 message = remainingDays;
                                 postSubject = true;
+                                console.log("specificMonth:" + value.month);
                                 break;
                             }
                         }
@@ -215,8 +220,9 @@ const subPresetPost = async(presetDatePath, nowDate, retPostEv = undefined) => {
                     for (let value of condition.value) {
                         if(value.day.length > 0) {
                             const day = value.day;
-                            if (nowDate.getDate() === Number(value.day)) {
+                            if (await nowDate.getDate() === Number(value.day)) {
                                 postSubject = true;
+                                console.log("specificDay:" + value.day);
                                 break;
                             }
                         }
@@ -227,9 +233,10 @@ const subPresetPost = async(presetDatePath, nowDate, retPostEv = undefined) => {
                 } else if (condition.type === "everyNDays") {
                     for (let value of condition.value) {
                         if(value.number.length > 0) {
-                            if (remainingDays % value.number === 0) {
+                            if ((remainingDays % value.number) === 0) {
                                 message = remainingDays;
                                 postSubject = true;
+                                console.log("everyNDays:" + remainingDays);
                                 break;
                             }
                         }
@@ -245,6 +252,7 @@ const subPresetPost = async(presetDatePath, nowDate, retPostEv = undefined) => {
                             if(dayOfWeek === value.dayName) {
                                 message = dayOfWeek;
                                 postSubject = true;
+                                console.log("everyNDays:" + value.dayName);
                                 break;
                             }
                         }
@@ -260,10 +268,10 @@ const subPresetPost = async(presetDatePath, nowDate, retPostEv = undefined) => {
 
                 if(postSubject) {
                     // ポスト語句は複数設定されており、設定数の範囲でランダムに取得
-                    const postIdx = random(0,condition.value[idx].messages.length - 1);
+                    const postIdx = await random(0,condition.value[idx].messages.length - 1);
                     message = condition.value[idx].messages[postIdx] + message;
                     if(condition.value[idx].subMessages.length > 0){
-                        const subPostIdx = random(0,condition.value[idx].subMessages.length - 1);
+                        const subPostIdx = await random(0,condition.value[idx].subMessages.length - 1);
                         subMessage = condition.value[idx].subMessages[subPostIdx];
                     }
                     postEv = composePost(message + subMessage);
@@ -301,10 +309,10 @@ const subPresetPost = async(presetDatePath, nowDate, retPostEv = undefined) => {
 
                         if ( isToday && currentTime === value.minutes ) {
                             // ポスト語句は複数設定されており、設定数の範囲でランダムに取得
-                            const postIdx = random(0,value.messages.length - 1);
+                            const postIdx = await random(0,value.messages.length - 1);
                             let subMessage = "";
                             if(value.subMessages.length > 0){
-                                const subPostIdx = random(0,value.subMessages.length - 1);
+                                const subPostIdx = await random(0,value.subMessages.length - 1);
                                 subMessage = value.subMessages[subPostIdx];
                             }
                             postEv = composePost(value.messages[postIdx] + subMessage);
@@ -414,7 +422,7 @@ const subSunriseSunset = async (sunriseSunsetPath, nowDate, retPostEv = undefine
             const postChrConst = sunriseSunsetJson[sunriseorSunsetConst] + "(" +  sunriseSunsetJson.location + "／" + jpnNotation + ")\n";
 
             // 設定されている投稿語句の設定数の範囲でランダム数を取得する
-            const postIdx = random(0, sunriseorSunsetPostLength - 1);
+            const postIdx = await random(0, sunriseorSunsetPostLength - 1);
             // 投稿イベントを組み立て
             postEv = composePost(postChrConst + sunriseSunsetJson[sunriseorSunsetPost][postIdx]);
 

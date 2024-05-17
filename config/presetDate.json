@@ -7,7 +7,7 @@
     ]
     ,"midnightConditions": [
         {
-            "◇◇◇[description of specificDate]◇◇◇": "date になったら messages と subMessages を使用してポストします(date は MM/DD 形式で設定)"
+            "◇◇◇[description of specificDate]◇◇◇": "date になったら messages と subMessages を使用してポストします(date はゼロサプレス MM/DD 形式で設定)"
             ,"type": "specificDate"
             ,"value": [
                 {
@@ -39,11 +39,11 @@
         }
 
         ,{
-            "◇◇◇[description of anniversary]◇◇◇": "今日が date に設定された YYYY/MM/DD からn周年なら messages と subMessages を使用してポストします"
+            "◇◇◇[description of anniversary]◇◇◇": "今日が date に設定されたゼロ埋め YYYY/MM/DD からn周年なら messages と subMessages を使用してポストします"
             ,"type": "anniversary"
             ,"value": [
                 {
-                    "date": "2023/05/01"
+                    "date": "2023/5/1"
                     ,"messages": ["今日は俺の管理者が nostr を始めて"]
                     ,"subMessages": ["周年らしい…"]
                 }
@@ -63,7 +63,7 @@
 
 
         ,{
-            "◇◇◇[description of specificMonth]◇◇◇": "month になったら messages と subMessages を使用してポストします"            
+            "◇◇◇[description of specificMonth]◇◇◇": "month (ゼロサプレス設定)になったら messages と subMessages を使用してポストします"            
             ,"type": "specificMonth"
             ,"value": [
                 {
@@ -76,12 +76,12 @@
 
 
         ,{
-            "◇◇◇[description of specificDay]◇◇◇": "day になったら messages と subMessages を使用してポストします(day は「1」「31」などの日付を設定すること)" 
+            "◇◇◇[description of specificDay]◇◇◇": "day になったら messages と subMessages を使用してポストします(day は「1」「31」などのゼロサプレスした日付を設定すること)" 
             ,"type": "specificDay"
             ,"value": [
                 {
-                    "day": ""
-                    ,"messages": []
+                    "day": "29"
+                    ,"messages": ["今日は月に一度の肉の日だ…"]
                     ,"subMessages": []
                 }
             ]
@@ -112,7 +112,7 @@
         }
 
         ,{
-            "◇◇◇[description of everyMidnight]◇◇◇": "messages と subMessages を使用してポストします(minutes は HH:MM 形式で指定すること)"
+            "◇◇◇[description of everyMidnight]◇◇◇": "messages と subMessages を使用してポストします(minutes はゼロ埋め HH:MM 形式で指定すること)"
             ,"type": "everyMidnight"
             ,"value": [
                 {
@@ -142,7 +142,7 @@
     ]
     ,"minuteConditions": [
         {
-            "◇◇◇[description of everyMinutes]◇◇◇": "minutes だったら messages と subMessages を使用してポストします(minutes は HH:MM 形式で指定すること) また date に設定があれば、その日付でしか作動しません(設定は MM/DD 形式で)"
+            "◇◇◇[description of everyMinutes]◇◇◇": "minutes だったら messages と subMessages を使用してポストします(minutes はゼロ埋め HH:MM 形式で指定すること) また date に設定があれば、その日付でしか作動しません(設定はゼロサプレス MM/DD 形式で)"
             ,"type": "everyMinutes"
             ,"value": [
                 {
@@ -199,11 +199,11 @@
     ]
     ,"specifiedProcessatSpecifiedTime": [
         {
-            "◇◇◇[description of specifiedTime]◇◇◇": "minutes だったら messages と subMessages を使用してポストします(minutes は HH:MM 形式で指定すること)"
+            "◇◇◇[description of specifiedTime]◇◇◇": "minutes だったら messages と subMessages を使用してポストします(minutes はゼロ埋め HH:MM 形式で指定すること)"
             ,"type": "specifiedTime"
             ,"value": [
                 {
-                    "minutes": ["04:05", "07:05", "12:05", "16:05", "21:00", "0:05"]
+                    "minutes": ["04:05", "07:05", "12:05", "16:05", "21:00", "00:05"]
                     ,"messages": [
                                     "…現在のBTCのJPYチャートだ…"
                                     ,"…現在のビットコインの日本円チャートだ…"

@@ -82,7 +82,7 @@ const runProcess = async (config, stoporStart) => {
         if(exec) {
             try {
                 // 語句配列の数の範囲からランダム値を取得し、それを配列要素とする
-                const idx = random(0, config.comment.length - 1);
+                const idx = await random(0, config.comment.length - 1);
                 if(idx >= 0) {
                     // 語句未設定の場合はポストしない
                     if(config.comment[idx].length > 0) {
