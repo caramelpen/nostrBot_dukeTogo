@@ -157,6 +157,7 @@ const subPresetPost = async(presetDatePath, nowDate, retPostEv = undefined) => {
         
             // 各条件をチェック
             for (let condition of midnightConditions) {
+                console.log("condition.type:" + condition.type);
                 let message = "";
                 let subMessage = "";
                 let postSubject = false;
