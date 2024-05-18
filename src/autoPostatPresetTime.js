@@ -154,10 +154,11 @@ const subPresetPost = async(presetDatePath, nowDate, retPostEv = undefined) => {
             const remainingDays = Math.floor((endOfYear - nowDate) / (1000 * 60 * 60 * 24)) + 1;
             //console.log("endOfYear:" + endOfYear);
             console.log("remainingDays:" + remainingDays);
-        
+            let conditionCnt = 0;
             // 各条件をチェック
             for (let condition of midnightConditions) {
-                console.log("condition.type:" + condition.type);
+                conditionCnt ++;
+                console.log("condition.type:" + conditionCnt + ":" + condition.type);
                 let message = "";
                 let subMessage = "";
                 let postSubject = false;
