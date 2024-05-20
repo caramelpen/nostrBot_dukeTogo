@@ -3,11 +3,13 @@
  * emergency.js
  * botの緊急停止プログラム
  */
-
 const util = require("util");
 const exec = util.promisify(require("child_process").exec);
 const { currUnixtime, jsonSetandOpen } = require("./common/utils.js");
 const { publishToRelay } = require("./common/publishToRelay.js");
+const { BOT_PRIVATE_KEY_HEX } = require("./common/env.js");
+
+
 
 const conditions = {
     runStop: false
