@@ -65,11 +65,30 @@ const autoReply = async (relay) => {
             if(pubkey !== undefined && ev.pubkey !== pubkey && ev.tags.length <= 0) {
                 const jsonCommonPath = "../" + jsonPathDef;    // configの場所はここからみれば../config/だが、util関数の場所から見れば../../config/となる
                 // jsonの場所の割り出しと設定
-                const autoReactionJson = await jsonSetandOpen(jsonCommonPath + "autoReaction.json");    
-            
+                const autoReactionJson = await jsonSetandOpen(jsonCommonPath + "autoReaction.json");
+                
                 if(autoReactionJson === null) {
                     console.log("json file is not get");
                     return;
+                }
+
+                // 管理者の投稿
+                if(ev.pubkey === adminPubkey) {
+                    let emergencyemergencyStopWords = false;
+                    const surveillanceConfig = await jsonSetandOpen(jsonCommonPath + "surveillance.json");
+                    // フィードのポスト先頭がjsonの nativeWords プロパティを含んでいるなら真
+                    const includeNativeWords = autoReactionJson.nativeWords.some(word => ev.content.startsWith(word));
+                    if(includeNativeWords) {
+                        // 停止処理文言を見つけたら真
+                        if (surveillanceConfig.emergencyStopWords.some(word => ev.content.includes(word))) {    // この検索だと投稿のどこかに発見したということになるが、上位の判定で先頭が json の nativeWords かどうかを判定しているのでこれで問題ない
+                            emergencyemergencyStopWords = true;
+                        }
+                    }
+
+                    // 停止命令ポストならなにもしない（停止処理が処理する）
+                    if(emergencyemergencyStopWords) {
+                        return;
+                    }
                 }
 
                 for(let i = 0; i <= funcConfig.funcName.length - 1; i++) {

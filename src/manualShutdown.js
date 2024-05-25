@@ -52,7 +52,7 @@ const manualShutdown = async (relay) => {
                     // フィードのポスト先頭がjsonの nativeWords プロパティを含んでいるなら真
                     const includeNativeWords = autoReactionJson.nativeWords.some(word => ev.content.startsWith(word));
                     if(includeNativeWords) {
-                        if (config.emergencyStopWords.some(word => ev.content.includes(word))) {
+                        if (config.emergencyStopWords.some(word => ev.content.includes(word))) {    // この検索だと投稿のどこかに発見したということになるが、上位の判定で先頭が json の nativeWords かどうかを判定しているのでこれで問題ない
                             emergencyemergencyStopWords = true;
                         }
                     }
