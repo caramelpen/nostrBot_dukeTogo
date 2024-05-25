@@ -41,6 +41,7 @@
     │  autoReply.js
     │  emergency.js
     │  infoUpNotification.js
+    │  manualShutdown.js
     │  postUponReceiptofZap.js
     │  replyFunction.js
     │  replytoReply.js
@@ -100,6 +101,8 @@
   - リプライを受けると`autoReply.json`に設定された設定値でリプライ
 - 2-2-8.surveillance.js
   - `surveillance.json`に設定があると、本botの停止や起動を行う
+- 2-2-9.manualShutdown.js
+  - `surveillance.json`に設定がある語句を投稿すると、本botを停止する
 
 ### 2-3.src/common ディレクトリ
 - 2-3-1.env.js
@@ -135,7 +138,10 @@
   - `README_replytoReply.md`をご覧ください
 
 - 3-7.surveillance.js
-  - `README_surveillance.md`をご覧ください 
+  - `README_surveillance.md`をご覧ください
+    
+- 3-8.manualShutdown.js
+  - `README_manualShutdown.md`をご覧ください
 
 ### 4.その他
 - 4-1.秘密鍵
