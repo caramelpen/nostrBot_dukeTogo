@@ -1,3 +1,7 @@
+## ver.240525
+- botの手動停止プログラム `manualShutdown.js` の追加
+- 上記を実現させるため、`surveillance.json` 内に `emergencyStopWords` プロパティを追加し、この語句がbot本人または管理者が `autoReactionJson.nativeWords` に設定された語句の後ろに含まれればbotの緊急停止をおこなう
+
 ## ver.240517
 - `fetch` が使用できるため、`axios` をアンインストール
 - BTCチャートの画像取得がキャッシュされる問題を修正
