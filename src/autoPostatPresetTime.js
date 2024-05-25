@@ -233,7 +233,7 @@ const subPresetPost = async(presetDatePath, nowDate, retPostEv = undefined) => {
                 // 今年の残日数が value.number 日単位
                 } else if (condition.type === "everyNDays") {
                     for (let value of condition.value) {
-                        if(value.number.length > 0) {
+                        if(value.number > 0) {
                             if ((remainingDays % value.number) === 0) {
                                 message = remainingDays;
                                 postSubject = true;
