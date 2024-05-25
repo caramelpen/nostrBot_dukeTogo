@@ -5,6 +5,7 @@ pnpm-lock.yaml
 .env
 pm2config.json
 pm2configSurveillance.json
+pm2configManualShutdown.json
 package.json
 /.log
 /_tst
@@ -20,4 +21,3 @@ _dev_autoReply.js
 _old_autoReply.js
 _dev_replytoReply.js
 _old_replytoReply.js
-manualShutdown.js

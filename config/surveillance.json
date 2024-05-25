@@ -16,8 +16,6 @@
                     ]
 
 
-
-
     ,"startTime": [
                     "04:00"
 
@@ -30,6 +28,16 @@
 
                     
     ,"emergencyComment": "◆◆ 緊Q ◆◆ [監視ｼｽﾃﾑ] ﾖﾘ 発報 ◆◆ 緊Q ◆◆\n[ゴルゴ] ﾌﾟﾛｸﾞﾗﾑ ﾆ 異常 ｦ 検知\n[緊急停止] ｼﾏｽ\n繰ﾘ返ｼﾏｽ\n[ゴルゴ] ﾌﾟﾛｸﾞﾗﾑ ｦ [緊急停止] ｼﾏｼﾀ"
+
+
+
+    ,"◇◇◇[description of emergencyStopWords]◇◇◇": "emergencyStopWords 語句単体が自分から投稿されたら、緊急停止を行います"
+    ,"emergencyStopWords" :[
+                        "ストップ"
+                        ,"停止"
+                        ,"stop"
+                        ]
+
 
     ,"temporalies:": [
                         "[ゴルゴ] ﾌﾟﾛｸﾞﾗﾑ ｦ [停止] ｼﾖｳﾄｼﾃ ﾔﾒﾏｼﾀ"

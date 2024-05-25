@@ -5,6 +5,7 @@
  */
 const util = require("util");
 const exec = util.promisify(require("child_process").exec);
+const { finishEvent } = require("nostr-tools");
 const { currUnixtime, jsonSetandOpen } = require("./common/utils.js");
 const { publishToRelay } = require("./common/publishToRelay.js");
 const { BOT_PRIVATE_KEY_HEX } = require("./common/env.js");
@@ -36,7 +37,7 @@ const exeProcess = async (cmdExe, cmdConfig, stoporStart) => {
 
 
 // 投稿イベントを組み立てる
-const composePost = (postChar) => {
+const composePost = (postChar, pubKey) => {
     const ev = {
         pubkey: pubKey
         ,kind: 1
@@ -51,21 +52,21 @@ const composePost = (postChar) => {
 
 
 // 緊急措置
-const emergency = async (relay) => {
+const emergency = async (relay, pubKey) => {
     conditions.occurrenceEmergency = true;
     conditions.runStop = true;
     conditions.runStart = false;
     try {
         // jsonの場所の割り出しと設定
         const jsonCommonPath = "../../config/";    // configの場所はここからみれば../config/だが、util関数の場所から見れば../../config/となる
-        const jsonFineName = "surveillance.json";        
+        const jsonFineName = "surveillance.json";
         const config = await jsonSetandOpen(jsonCommonPath + jsonFineName); 
         // ストップ
         const exec = await exeProcess(config.stopExec, config.runConfig, "stopped");
         
         if(exec) {
             // イベント組み立て
-            const postEv = composePost(config.emergencyComment);
+            const postEv = composePost(config.emergencyComment, pubKey);
 
             // ポスト
             await publishToRelay(relay, postEv);

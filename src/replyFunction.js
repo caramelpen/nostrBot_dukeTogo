@@ -9,7 +9,7 @@ const sharp = require("sharp");
 const fs = require("fs");
 require("websocket-polyfill");
 const { finishEvent } = require("nostr-tools");
-const { currUnixtime, isSafeToReply, random, probabilityDetermination, retrievePostsInPeriod, isFolderExists, jsonSetandOpen, asyncIsFileExists, deleteFile } = require("./common/utils.js");
+const { currUnixtime, isSafeToReply, random, probabilityDetermination, retrievePostsInPeriod, isFolderExists, jsonSetandOpen, deleteFile } = require("./common/utils.js");
 const { publishToRelay } = require("./common/publishToRelay.js");
 const { emergency } = require("./emergency.js");
 
@@ -89,7 +89,7 @@ const functionalPosting = async (relay, ev, functionalPostingJson, autoReactionJ
                     // リプライやリアクションしても安全なら、リプライイベントやリアクションイベントを組み立てて送信する
                     // if (isSafeToReply(ev) && retrievePostsInPeriod(relay, pubKey)) {
                     if(!retrievePostsInPeriod(relay, pubKey)) {
-                        await emergency(relay);
+                        await emergency(relay, pubKey);
                         return;
                     }
                     if (isSafeToReply(ev)) {
@@ -227,7 +227,7 @@ const exchangeRate = async (relay, ev, exchangeRate, autoReactionJson, postInfoO
             // リプライしても安全なら、リプライイベントやリアクションイベントを組み立てて送信する
             // if (isSafeToReply(ev) && retrievePostsInPeriod(relay, pubKey)) {
             if(!retrievePostsInPeriod(relay, pubKey)) {
-                await emergency(relay);
+                await emergency(relay, pubKey);
                 return;
             }
             if (isSafeToReply(ev)) {
@@ -363,7 +363,7 @@ const normalAutoReply = async (relay, ev, autoReplyJson, autoReactionJson, postI
 
             // リプライやリアクションしても安全なら、リプライイベントやリアクションイベントを組み立てて送信する
             if(!retrievePostsInPeriod(relay, pubKey)) {
-                await emergency(relay);
+                await emergency(relay, pubKey);
                 return;
             }
             if (isSafeToReply(ev)) {

@@ -526,7 +526,7 @@ const main = async () => {
                     }
 
                     if(!retrievePostsInPeriod(relay, pubkey)) {
-                        await emergency(relay);
+                        await emergency(relay, pubkey);
                         return;
                     }
 
