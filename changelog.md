@@ -1,13 +1,13 @@
 ## ver.240525
-- botの手動停止プログラム `manualShutdown.js` の追加
-- 上記を実現させるため、`surveillance.json` 内に `emergencyStopWords` プロパティを追加し、この語句がbot本人または管理者が `autoReactionJson.nativeWords` に設定された語句の後ろに含まれればbotの緊急停止をおこなう
+- botの手動停止プログラム`manualShutdown.js`の追加
+- 上記を実現させるため、`surveillance.json`内に`emergencyStopWords`プロパティを追加し、この語句がbot本人または投稿するか、管理者が`autoReactionJson.nativeWords`に設定された語句の後ろにこの語句が含まれた語句の投稿をを行えばbotの緊急停止を行う
 
 ## ver.240517
-- `fetch` が使用できるため、`axios` をアンインストール
+- `fetch`が使用できるため、`axios`をアンインストール
 - BTCチャートの画像取得がキャッシュされる問題を修正
 
 ## ver.240427
-- `autoReactionJson.nativeWords` に完全一致しない場合でも、投稿の先頭文字がその文字なら、全反応語句からランダムでリプライするように変更
+- `autoReactionJson.nativeWords`に完全一致しない場合でも、投稿の先頭文字がその文字なら、全反応語句からランダムでリプライするように変更
 
 ## ver.240414
 - `postUponReceiptofZap.js`、`postUponReceiptofZap.json`を追加し、zap受領時投稿機能を追加
