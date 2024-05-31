@@ -371,6 +371,13 @@
         ,"probability": 2
     }
 
+    ,{
+        "orgPost": ["バルス"]
+        ,"replyPostChar": [
+                        "…本当にいいのか？何が起きても俺の範疇ではない…"
+                        ]
+        ,"probability": 10
+    }
 
 
 
