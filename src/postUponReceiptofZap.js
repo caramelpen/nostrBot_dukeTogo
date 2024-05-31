@@ -63,8 +63,8 @@ const zaptoReaction = async (relay, zapRelay) => {
     sub.on("event", async (ev) => {
         try {
 
-            // キャッシュのクリア
-            delete require.cache[require.resolve("./replyFunction.js")];
+            // // キャッシュのクリア
+            // delete require.cache[require.resolve("./replyFunction.js")];
 
             //有効とするのは(自分で自分にzapはないが一応)他者からのzapと、(一応明示)リプライなのでtagに値があるもののみ
             if(envKeys.pubKey !== undefined && ev.pubkey !== envKeys.pubKey && ev.tags.length > 0) {
