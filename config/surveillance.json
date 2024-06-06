@@ -8,7 +8,7 @@
 
     ,"stopTime": [
                     "00:10"
-                    ,"07:15"
+                    ,"07:10"
                 ]
     ,"stopExec": "pm2 stop"
     ,"stopComment": [
