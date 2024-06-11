@@ -844,6 +844,8 @@ const uploadImg = async (imgPath) => {
     const crypto = require("crypto");
     // void.cat APIのエンドポイントURL
     const uploadUrl = "https://void.cat/upload?cli=true";
+    const returnURL = "https://void.cat/";
+    const returnURLLength = returnURL.length;
     
     // 画像ファイルの読み込み
     const imageData = fs.readFileSync(imgPath);
@@ -871,12 +873,17 @@ const uploadImg = async (imgPath) => {
 
         if (response.ok) {
             const resURL = await response.text();
-            // JSON オブジェクトにパース
-            const jsonParse = JSON.parse(resURL);
-            if (jsonParse.errorMessage) {
-                return undefined;
+            // // JSON オブジェクトにパース
+            // const jsonParse = JSON.parse(resURL);
+            // if (jsonParse.errorMessage) {
+            //     return undefined;
+            // } else {
+            //     return resURL + ".png";
+            // }
+            if(resURL.substring(0,returnURLLength) === returnURL) {
+                return resURL + ".png";
             } else {
-                return resURL + ".png";                
+                return undefined;
             }
         }
 
