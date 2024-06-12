@@ -920,7 +920,7 @@ const uploadBTCtoJPYChartImg = async (presetJsonPath, nowDate, retPostEv, relay 
             if (condition.type === "specifiedTime") {
                 for (let value of condition.value) {
                     const hitMinutes = value.minutes.includes(currentTime);
-                    if (hitMinutes) {
+                    if (hitMinutes && value.name === "BTCChart") {
                         // BTCの日ごとと時間ごとのチャートデータを得る
                         const chartDataD = await getBTCtoJPYChart("D","https://min-api.cryptocompare.com/data/v2/histoday");
                         const chartDataH = await getBTCtoJPYChart("H","https://min-api.cryptocompare.com/data/v2/histominute");
