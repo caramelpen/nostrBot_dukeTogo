@@ -946,6 +946,7 @@ const uploadBTCtoJPYChartImg = async (presetJsonPath, nowDate, retPostEv, relay 
                                     // 投稿
                                     const postEv = composePost(value.messages[postIdx] + "\n" + imgURLH + " " + "\n" + imgURLD + (subMessage.length > 0 ? " \n" + subMessage:""));
                                     if(relay !== undefined) {
+                                        // ここにはこないはず
                                         await publishToRelay(relay, postEv);            
                                     } else {
                                         retPostEv.postEv = postEv;
@@ -971,25 +972,26 @@ const uploadBTCtoJPYChartImg = async (presetJsonPath, nowDate, retPostEv, relay 
                                     processingResult = true;
                                 } else {
                                     console.error("failed to upload chart images");
-                                    //return false;
+                                    return false;
 
-                                    // ポスト語句は複数設定されており、設定数の範囲でランダムに取得
-                                    const postIdx = await random(0,value.uploadErrMessages.length - 1);
-                                    let subMessage = "";
-                                    if(value.uploadErrSubMessages.length > 0){
-                                        const subPostIdx = await random(0,value.uploadErrSubMessages.length - 1);
-                                        subMessage = value.uploadErrSubMessages[subPostIdx];
-                                    }
+                                    // // ポスト語句は複数設定されており、設定数の範囲でランダムに取得
+                                    // const postIdx = await random(0,value.uploadErrMessages.length - 1);
+                                    // let subMessage = "";
+                                    // if(value.uploadErrSubMessages.length > 0){
+                                    //     const subPostIdx = await random(0,value.uploadErrSubMessages.length - 1);
+                                    //     subMessage = value.uploadErrSubMessages[subPostIdx];
+                                    // }
 
-                                    // 投稿
-                                    const postEv = composePost(value.uploadErrMessages[postIdx] + (subMessage.length > 0 ? " \n" + subMessage:""));
-                                    if(relay !== undefined) {
-                                        await publishToRelay(relay, postEv);            
-                                    } else {
-                                        retPostEv.postEv = postEv;
-                                    }
+                                    // // 投稿
+                                    // const postEv = composePost(value.uploadErrMessages[postIdx] + (subMessage.length > 0 ? " \n" + subMessage:""));
+                                    // if(relay !== undefined) {
+                                        // // ここにはこないはず
+                                        // await publishToRelay(relay, postEv);            
+                                    // } else {
+                                    //     retPostEv.postEv = postEv;
+                                    // }
 
-                                    processingResult = true;
+                                    // processingResult = true;
                                 }
                             } else {
                                 console.error("failed to create and save chart images");

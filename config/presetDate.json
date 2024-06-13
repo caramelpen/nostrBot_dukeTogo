@@ -207,7 +207,7 @@
             ,"type": "specifiedTime"
             ,"value": [
                 {
-                    "minutes": []
+                    "minutes": ["04:05", "07:05", "12:05", "16:05", "21:05", "00:05"]
                     ,"name":"BTCChart"
                     ,"messages": [
                                     "…現在のBTCのJPYチャートだ…"
