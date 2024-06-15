@@ -880,6 +880,7 @@ const uploadImg = async (imgPath) => {
             // } else {
             //     return resURL + ".png";
             // }
+            console.log(resURL);            
             if(resURL.substring(0,returnURLLength) === returnURL) {
                 return resURL + ".png";
             } else {
@@ -888,7 +889,7 @@ const uploadImg = async (imgPath) => {
         }
 
     } catch (error) {
-        console.error('Error uploading image:', error);
+        console.error("Error uploading image:", error);
         return "";
     }
 }
