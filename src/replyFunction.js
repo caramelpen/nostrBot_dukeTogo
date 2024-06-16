@@ -885,12 +885,46 @@ const uploadImg = async (imgPath) => {
                 return resURL + ".png";
             } else {
                 return undefined;
-            }
+
+                // // AnonFiles を使ってみる
+                // const FormData = require("form-data");
+                // const form = new FormData();
+                // form.append("image", fs.createReadStream(imgPath));
+                // //form.append('file', fs.createReadStream(imgPath)); 
+
+                // const response2 = await fetch("https://api.imgur.com/3/image", {
+                //     method: "POST",
+                //     body: form,
+                //     headers: {
+                //         "V-Content-Type": "image/png" // 画像のコンテンツタイプを指定
+                //         ,"V-Filename": imgPath 
+                //         ,"V-Full-Digest": fileHash
+                //         ,"Cache-Control": "no-store, no-cache, must-revalidate, post-check=0, pre-check=0"
+                //         , "Pragma": "no-cache"
+                //     }
+                // });
+
+                // if (response2.ok) {
+
+                //     const resURL2 = await response2.text();
+                //     // JSON オブジェクトにパース
+                //     const jsonParse = JSON.parse(resURL2);
+                //     if (jsonParse.errorMessage) {
+                //         return undefined;
+                //     } else {
+                //         return resURL2 + ".png";
+                //     }
+                // } else {
+                //     return undefined;
+                // }
+            } 
+        } else {
+            return undefined;
         }
 
     } catch (error) {
         console.error("Error uploading image:", error);
-        return "";
+        return undefined;
     }
 }
 
