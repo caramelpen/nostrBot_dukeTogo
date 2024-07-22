@@ -198,7 +198,10 @@
                                     ,"https://www.youtube.com/watch?v=PBRGLbrlUEk"
                                     ,"https://www.youtube.com/watch?v=hQjLgaKvat0"
                                 ]
-                    ,"subMessages": []
+                    ,"subMessages": ["\n体を動かせ…"
+                                    ,"\n黙って体を動かせ…"
+                                    ,"\nいいから黙って体を動かせ…"
+                                ]
                 }
 
 
@@ -209,8 +212,22 @@
                                     "https://www.youtube.com/watch?v=Pu5v3Ca5cQs"
                                     ,"https://www.youtube.com/watch?v=UkkplSH7zQ8"
                                 ]
-                    ,"subMessages": []
+                    ,"subMessages": ["\n集まれ…","\n…集まれ…","\n…時間だ… 集まれ…"]
                 }
+
+                ,{
+                    "minutes": "17:30"
+                    ,"date": ""
+                    ,"messages": [
+                                    "https://www.youtube.com/watch?v=QTQ_0RjHcVY"
+                                    ,"https://www.youtube.com/watch?v=1_FMta-NyvI"
+                                    ,"https://www.youtube.com/watch?v=EJMBDP3CWtE"
+                                    ,"https://www.youtube.com/watch?v=Tf_iCU6KotE"
+                                    ,"https://www.youtube.com/watch?v=ffo1fvvsfQM"
+                                    ,"https://www.youtube.com/watch?v=NBTKSeQD6to"
+                                ]
+                    ,"subMessages": []
+                }                
 
 
 
