@@ -189,6 +189,31 @@
                     ,"subMessages": []
                 }
 
+                ,{
+                    "minutes": "06:00"
+                    ,"date": "7/22-8/31"
+                    ,"messages": [
+                                    "https://www.youtube.com/watch?v=6YPEFSU1Qmk"
+                                    ,"https://www.youtube.com/watch?v=4nMBykQfpMg"
+                                    ,"https://www.youtube.com/watch?v=PBRGLbrlUEk"
+                                    ,"https://www.youtube.com/watch?v=hQjLgaKvat0"
+                                ]
+                    ,"subMessages": []
+                }
+
+
+                ,{
+                    "minutes": "05:55"
+                    ,"date": "7/22-8/31"
+                    ,"messages": [
+                                    "https://www.youtube.com/watch?v=Pu5v3Ca5cQs"
+                                    ,"https://www.youtube.com/watch?v=UkkplSH7zQ8"
+                                ]
+                    ,"subMessages": []
+                }
+
+
+
 
 
             ]

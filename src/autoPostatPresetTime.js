@@ -298,11 +298,28 @@ const subPresetPost = async(presetDatePath, nowDate, retPostEv = undefined) => {
                         let isToday = false;
                         // date プロパティに設定がある場合、その日でないと投稿はしない
                         if(targetDate.length > 0) {
-                            let [month, date] = targetDate.split("/");
-                            if (nowDate.getMonth() + 1 === Number(month) && 
-                                nowDate.getDate() === Number(date)
-                            ) {
-                                isToday = true;
+                            //「-」があった場合、今日の日付がその範囲内に入っているか判断する
+                            if (targetDate.includes("-")) {
+                                const [rengeStart, rangeEnd] = targetDate.split("-");
+                                const [rengeStartMonth, rengeStartDay] = rengeStart.split("/").map(Number);
+                                const [rengeEndMonth, rengeEndDay] = rangeEnd.split("/").map(Number);
+
+                                // 現在の日付が範囲内にあるかをチェック
+                                if (
+                                      (nowDate.getMonth() + 1 >= rengeStartMonth && nowDate.getDate() >= rengeStartDay) 
+                                    &&
+                                      (nowDate.getMonth() + 1 <= rengeEndMonth && nowDate.getDate() <= rengeEndDay) 
+                                ){
+                                    isToday = true;
+                                }
+
+                            } else {
+                                let [month, date] = targetDate.split("/");
+                                if (nowDate.getMonth() + 1 === Number(month) && 
+                                    nowDate.getDate() === Number(date)
+                                ) {
+                                    isToday = true;
+                                }
                             }
                         } else {
                             // 設定がないなら無条件で真として、時刻のみで有効と同じ状態にする
