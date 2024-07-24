@@ -198,7 +198,8 @@
                                     ,"https://www.youtube.com/watch?v=PBRGLbrlUEk"
                                     ,"https://www.youtube.com/watch?v=hQjLgaKvat0"
                                 ]
-                    ,"subMessages": ["\n体を動かせ…"
+                    ,"subMessages": [
+                                    "\n体を動かせ…"
                                     ,"\n黙って体を動かせ…"
                                     ,"\nいいから黙って体を動かせ…"
                                     ,"\n正確な姿勢を保て…"
@@ -213,7 +214,14 @@
                                     "https://www.youtube.com/watch?v=Pu5v3Ca5cQs"
                                     ,"https://www.youtube.com/watch?v=UkkplSH7zQ8"
                                 ]
-                    ,"subMessages": ["\n集まれ…","\n…集まれ…","\n…時間だ… 集まれ…","\n…時間だ… 集合しろ…","\n…時間だ","\n…集合だ…"]
+                    ,"subMessages": [
+                                    "\n集まれ…"
+                                    ,"\n…集まれ…"
+                                    ,"\n…時間だ… 集まれ…"
+                                    ,"\n…時間だ… 集合しろ…"
+                                    ,"\n…時間だ"
+                                    ,"\n…集合だ…"
+                                ]
                 }
 
                 ,{
@@ -226,7 +234,11 @@
                                     ,"https://www.youtube.com/watch?v=Tf_iCU6KotE"
                                     ,"https://www.youtube.com/watch?v=NBTKSeQD6to"
                                 ]
-                    ,"subMessages": []
+                    ,"subMessages": [
+                                    "\nもう帰ったほうがいいんじゃないのか…？"
+                                    ,"\n俺に照準を合わされたくなければ… もう帰ることだな…"
+                                    ,"\n…いつまで遊んでいる気だ？"
+                                ]
                 }                
 
 
