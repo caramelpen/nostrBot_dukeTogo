@@ -144,7 +144,7 @@
     ]
     ,"minuteConditions": [
         {
-            "◇◇◇[description of everyMinutes]◇◇◇": "minutes だったら messages と subMessages を使用してポストします(minutes はゼロ埋め HH:MM 形式で指定すること) また date に設定があれば、その日付でしか作動しません(設定はゼロサプレス MM/DD 形式で)"
+            "◇◇◇[description of everyMinutes]◇◇◇": "minutes だったら messages と subMessages を使用してポストします(minutes はゼロ埋め HH:MM 形式で指定すること) また date に設定があれば、その日付でしか作動しません(設定はゼロサプレス MM/DD 形式で、「-」を挟んで範囲指定も可)"
             ,"type": "everyMinutes"
             ,"value": [
                 {
