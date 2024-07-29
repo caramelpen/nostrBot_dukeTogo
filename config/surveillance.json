@@ -18,6 +18,7 @@
 
     ,"startTime": [
                     "04:00"
+                    ,"16:00"                    
                 ]
     ,"startExec": "pm2 restart"
     ,"startComment": [
@@ -36,6 +37,7 @@
                         ,"停止"
                         ,"stop"
                         ,"黙れ"
+                        ,"止まれ"
                         ]
 
 
