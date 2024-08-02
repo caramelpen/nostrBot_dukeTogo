@@ -303,13 +303,11 @@ const subPresetPost = async(presetDatePath, nowDate, retPostEv = undefined) => {
                                 const [rengeStart, rangeEnd] = targetDate.split("-");
                                 const [rengeStartMonth, rengeStartDay] = rengeStart.split("/").map(Number);
                                 const [rengeEndMonth, rengeEndDay] = rangeEnd.split("/").map(Number);
-
+                                //日付形式に    
+                                const rengeStartDate = new Date(nowDate.getFullYear(), rengeStartMonth - 1, rengeStartDay);
+                                const rengeEndDate = new Date(nowDate.getFullYear(), rengeEndMonth - 1, rengeEndDay);
                                 // 現在の日付が範囲内にあるかをチェック
-                                if (
-                                      (nowDate.getMonth() + 1 >= rengeStartMonth && nowDate.getDate() >= rengeStartDay) 
-                                    &&
-                                      (nowDate.getMonth() + 1 <= rengeEndMonth && nowDate.getDate() <= rengeEndDay) 
-                                ){
+                                if (nowDate >= rengeStartDate && nowDate <= rengeEndDate) {
                                     isToday = true;
                                 }
 
