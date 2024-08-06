@@ -259,28 +259,49 @@ const retrievePostsInPeriod = (relay, pubKey) => {
 
 //第2引数の公開鍵からユーザ名を取得する
 const userDisplayName = async (relay, pubKey) => {
-    return new Promise((resolve, reject) => {
-        let displayName = "";
-        const sub = relay.sub([
-            { 
-                kinds: [0]
-                , authors: [pubKey]
-            }
-        ]);
+    // return new Promise((resolve, reject) => {
+         let displayName = "";
+    //     const sub = relay.sub([
+    //         { 
+    //             kinds: [0]
+    //             , authors: [pubKey]
+    //         }
+    //     ]);
         
-        sub.on("event", (ev) => {
-            try {
-                // JSON文字列をJavaScriptオブジェクトに変換
-                const evObj = JSON.parse(ev.content);
+    //     sub.on("event", (ev) => {
+    //         try {
+    //             // JSON文字列をJavaScriptオブジェクトに変換
+    //             const evObj = JSON.parse(ev.content);
                 
-                // display_nameの値を取得
-                displayName = evObj.display_name;
+    //             // display_nameの値を取得
+    //             displayName = evObj.display_name;
 
-                resolve(displayName);
-            } catch (error) {
-                reject(undefined);
-            }
-        });
+    //             resolve(displayName);
+    //         } catch (error) {
+    //             reject(undefined);
+    //         }
+    //     });
+    // });
+
+    const sub = relay.sub([
+        { 
+            kinds: [0]
+            , authors: [pubKey]
+        }
+    ]);
+
+    sub.on("event", async (ev) => {
+        try {
+            // JSON文字列をJavaScriptオブジェクトに変換
+            const evObj = await JSON.parse(ev.content);
+            
+            // display_nameの値を取得
+            displayName = await evObj.display_name;
+
+            return displayName;
+        } catch (error) {
+            return undefined;
+        }
     });
 }
 
