@@ -22,7 +22,8 @@ const publishToRelay = async (relay, ev, isAutoReply = false, originallyPubKey =
         let findChar = "";
         let displayName = "";
         if(originallyPubKey.length > 0){
-            displayName = await userDisplayName(relay, originallyPubKey);
+            //displayName = await userDisplayName(relay, originallyPubKey);
+            displayName = userDisplayName(relay, originallyPubKey);
             findChar = findChar + "find:" + displayName + "( " + originallyPubKey + " )";
         }
         if(replyingtoaPost.length > 0 ) {
