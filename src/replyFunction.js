@@ -843,8 +843,10 @@ const createAndSaveChart = async (dorh, data, schema, nowUnixDate) => {
 const uploadImg = async (imgPath) => {
     const crypto = require("crypto");
     // void.cat APIのエンドポイントURL
-    const uploadUrl = "https://void.cat/upload?cli=true";
-    const returnURL = "https://void.cat/";
+    //const uploadUrl = "https://void.cat/upload?cli=true";
+    //const returnURL = "https://void.cat/";
+    const uploadUrl = "https://nostr.download/upload?cli=true";
+    const returnURL = "https://nostr.download/";
     const returnURLLength = returnURL.length;
     
     // 画像ファイルの読み込み
