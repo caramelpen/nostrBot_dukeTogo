@@ -841,84 +841,60 @@ const createAndSaveChart = async (dorh, data, schema, nowUnixDate) => {
 
 // 画像アップロードして、そのURLを得る
 const uploadImg = async (imgPath) => {
-    const crypto = require("crypto");
+    // const crypto = require("crypto");
     // void.cat APIのエンドポイントURL
-    //const uploadUrl = "https://void.cat/upload?cli=true";
-    //const returnURL = "https://void.cat/";
-    const uploadUrl = "https://nostr.download/upload?cli=true";
-    const returnURL = "https://nostr.download/";
+    // const uploadUrl = "https://void.cat/upload?cli=true";
+    // const returnURL = "https://void.cat/";
+    const uploadUrl = "https://catbox.moe/user/api.php";
+    const returnURL = "https://files.catbox.moe";
+
     const returnURLLength = returnURL.length;
+
+    const axios = require("axios");
+    const FormData = require("form-data");
+    const form = new FormData();
+    form.append("reqtype", "fileupload"); // リクエストタイプ
+    form.append("fileToUpload", fs.createReadStream(imgPath)); // 画像パス
+
     
     // 画像ファイルの読み込み
-    const imageData = fs.readFileSync(imgPath);
+    // const imageData = fs.readFileSync(imgPath);
     
     try {
 
         // ファイルのSHA256ハッシュを計算
-        const hash = crypto.createHash("sha256");
-        hash.update(imageData);
-        const fileHash = hash.digest("hex");
+        // const hash = crypto.createHash("sha256");
+        // hash.update(imageData);
+        // const fileHash = hash.digest("hex");
 
 
-        // void.cat へのHTTP POSTリクエストの設定
-        const response = await fetch(uploadUrl, {
-            method: "POST",
-            body: imageData,
-            headers: {
-                "V-Content-Type": "image/png" // 画像のコンテンツタイプを指定
-                ,"V-Filename": imgPath 
-                ,"V-Full-Digest": fileHash
-                ,"Cache-Control": "no-store, no-cache, must-revalidate, post-check=0, pre-check=0"
-                , "Pragma": "no-cache"
-            }
+        // // void.cat へのHTTP POSTリクエストの設定
+        // const response = await fetch(uploadUrl, {
+        //     method: "POST",
+        //     body: imageData,
+        //     headers: {
+        //         "V-Content-Type": "image/png" // 画像のコンテンツタイプを指定
+        //         ,"V-Filename": imgPath 
+        //         ,"V-Full-Digest": fileHash
+        //         ,"Cache-Control": "no-store, no-cache, must-revalidate, post-check=0, pre-check=0"
+        //         , "Pragma": "no-cache"
+        //     }
+        // });
+
+        const response = await axios.post(uploadUrl, form, {
+            headers: form.getHeaders(), // FormDataヘッダーを自動設定
         });
+        //console.log("Image URL:", response.data);
 
-        if (response.ok) {
-            const resURL = await response.text();
-            // // JSON オブジェクトにパース
-            // const jsonParse = JSON.parse(resURL);
-            // if (jsonParse.errorMessage) {
-            //     return undefined;
-            // } else {
-            //     return resURL + ".png";
-            // }
-            console.log(resURL);            
+        //if (response.ok) {
+        if (response.statusText === "OK") {
+            // const resURL = await response.text();
+            const resURL = await response.data;
             if(resURL.substring(0,returnURLLength) === returnURL) {
-                return resURL + ".png";
+                //return resURL + ".png";
+                return resURL;
             } else {
                 return undefined;
-
-                // // AnonFiles を使ってみる
-                // const FormData = require("form-data");
-                // const form = new FormData();
-                // form.append("image", fs.createReadStream(imgPath));
-                // //form.append('file', fs.createReadStream(imgPath)); 
-
-                // const response2 = await fetch("https://api.imgur.com/3/image", {
-                //     method: "POST",
-                //     body: form,
-                //     headers: {
-                //         "V-Content-Type": "image/png" // 画像のコンテンツタイプを指定
-                //         ,"V-Filename": imgPath 
-                //         ,"V-Full-Digest": fileHash
-                //         ,"Cache-Control": "no-store, no-cache, must-revalidate, post-check=0, pre-check=0"
-                //         , "Pragma": "no-cache"
-                //     }
-                // });
-
-                // if (response2.ok) {
-
-                //     const resURL2 = await response2.text();
-                //     // JSON オブジェクトにパース
-                //     const jsonParse = JSON.parse(resURL2);
-                //     if (jsonParse.errorMessage) {
-                //         return undefined;
-                //     } else {
-                //         return resURL2 + ".png";
-                //     }
-                // } else {
-                //     return undefined;
-                // }
             } 
         } else {
             return undefined;
