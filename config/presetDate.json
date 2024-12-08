@@ -148,7 +148,8 @@
             ,"type": "everyMinutes"
             ,"value": [
                 {
-                    "minutes": "07:00"
+                    "name:": "breakfast"
+                    ,"minutes": "07:00"
                     ,"date": ""
                     ,"messages": [
                                     "…朝食の時間だ…"
@@ -164,7 +165,8 @@
                 }
 
                 ,{
-                    "minutes": "19:15"
+                    "name:": "dinner"
+                    ,"minutes": "19:15"
                     ,"date": ""
                     ,"messages": [
                                     "…食事は仕事の後と決めている…"
@@ -183,7 +185,8 @@
                 }
 
                 ,{
-                    "minutes": "10:00"
+                    "name:": "starwarsday"
+                    ,"minutes": "10:00"
                     ,"date": "5/4"
                     ,"messages": [
                                     "May the Force be with you …"
@@ -192,7 +195,8 @@
                 }
 
                 ,{
-                    "minutes": "06:00"
+                    "name:": "summerwakeup"
+                    ,"minutes": "06:00"
                     ,"date": "7/22-8/31"
                     ,"messages": [
                                     "https://www.youtube.com/watch?v=6YPEFSU1Qmk"
@@ -210,7 +214,8 @@
 
 
                 ,{
-                    "minutes": "05:55"
+                    "name:": "summergymnastics"
+                    ,"minutes": "05:55"
                     ,"date": "7/22-8/31"
                     ,"messages": [
                                     "https://www.youtube.com/watch?v=Pu5v3Ca5cQs"
@@ -228,7 +233,8 @@
                 }
 
                 ,{
-                    "minutes": "17:30"
+                    "name": "evening"
+                    ,"minutes": "17:30"
                     ,"date": ""
                     ,"messages": [
                                     "https://www.youtube.com/watch?v=QTQ_0RjHcVY"
