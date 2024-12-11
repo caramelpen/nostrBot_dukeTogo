@@ -447,58 +447,59 @@ const subSunriseSunset = async (sunriseSunsetPath, nowDate, retPostEv = undefine
             writeJsonFile(sunriseSunsetJsonPath, sunriseorSunset, nextSunriseorSunset, -1);
             console.log("write json(" + sunriseorSunset + "):" + nextSunriseorSunset);
 
-            // 日の入りなら presetDate.json の minuteConditions.everyMinutes.evening の minutes を 日の入り時刻から10分前に設定する
-            // if(isPostSunset == true) {
-            //     const last4 = nextSunriseorSunset.slice(-4); // 末尾4桁を取得
+            // 日の入りなら presetDate.json の minuteConditions.everyMinutes.evening の minutes を日の入り時刻から10分前に設定する
+            if(isPostSunset == true) {
+                const last4 = nextSunriseorSunset.slice(-4); // 末尾4桁を取得
 
-            //     let hours = parseInt(last4.slice(0, 2), 10); // 時間部分を取得して整数に変換
-            //     let minutes = parseInt(last4.slice(2), 10); // 分部分を取得して整数に変換
+                let hours = parseInt(last4.slice(0, 2), 10); // 時間部分を取得して整数に変換
+                let minutes = parseInt(last4.slice(2), 10); // 分部分を取得して整数に変換
                 
-            //     // 10分引く処理
-            //     minutes -= 10;
+                // 10分引く処理
+                minutes -= 10;
                 
-            //     // 時刻調整（分が負の場合、1時間減らす）
-            //     if (minutes < 0) {
-            //       hours -= 1;        // 1時間引く
-            //       minutes += 60;     // 分を60足して正にする
-            //     }
-            //     const eveingTime = `${String(minutes).padStart(2, "0")}:${String(0).padStart(2, "0")}`;
+                // 時刻調整（分が負の場合、1時間減らす）
+                if (minutes < 0) {
+                  hours -= 1;        // 1時間引く
+                  minutes += 60;     // 分を60足して正にする
+                }
+                const eveingTime = `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`;
 
-            //     // json の更新
-            //     // json を取得
-            //     let presetDateJsonPath = null;
-            //     presetDateJsonPath = await jsonSetandOpen("../../config/presetDate.json");
+                // json の更新
+                // json を取得
+                const presetDateJsonPath = "../config/presetDate.json";
 
-            //     let jsonData;
-            //     const fs = require("fs");
-            //     try {
-            //         const data = fs.readFileSync(presetDateJsonPath, "utf8");
-            //         jsonData = JSON.parse(data);
+                try {
 
-            //         // "minuteConditions" 内の "value" 配列をループして対象を見つける
-            //         const conditions = jsonData.minuteConditions || [];
-            //         conditions.forEach(condition => {
-            //             if (condition.value) {
-            //                 condition.value.forEach(item => {
-            //                     if (item.name === "evening") {
-            //                         // "minutes"の値を変更
-            //                         item.minutes = eveingTime;
-            //                     }
-            //                 });
-            //             }
-            //         });
+                    const jsonPath = require("path");
+                    const fs = require("fs");
+                    const lastJsonPath = jsonPath.join(__dirname, presetDateJsonPath);
+                    const data = fs.readFileSync(lastJsonPath, "utf8");
+                    const jsonData = JSON.parse(data);
 
-            //         // JSONデータを文字列に変換
-            //         const jsonString = JSON.stringify(jsonData, null, 2);
+                    // "minuteConditions" 内の "value" 配列をループして対象を見つける
+                    const conditions = jsonData.minuteConditions || [];
+                    conditions.forEach(condition => {
+                        if (condition.value) {
+                            condition.value.forEach(item => {
+                                if (item.name === "evening") {
+                                    // "minutes"の値を変更
+                                    item.minutes = eveingTime;
+                                }
+                            });
+                        }
+                    });
+
+                    // JSONデータを文字列に変換
+                    const jsonString = JSON.stringify(jsonData, null, 2);
             
-            //         //jsonへ書き込み
-            //         fs.writeFileSync(presetDateJsonPath, jsonString, "utf8");
-            //         console.log("Property [eveing.minutes] has been updated successfully.");
-            //     } catch (err){
-            //         console.error("json Read or Write Err:" + err);
-            //         return false;
-            //     }
-            // }
+                    //jsonへ書き込み
+                    fs.writeFileSync(lastJsonPath, jsonString, "utf8");
+                    console.log("Property [eveing.minutes] has been updated successfully.");
+                } catch (err){
+                    console.error("json Read or Write Err:" + err);
+                    return false;
+                }
+            }
             return true;
         } else {
             return false;

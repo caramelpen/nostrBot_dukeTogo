@@ -1,312 +1,325 @@
 {
-    "◆◆◆[description of midnightConditions]◆◆◆": [
+  "◆◆◆[description of midnightConditions]◆◆◆": [
+    {
+      "description": "midnightConditions は毎日0:00に稼働します",
+      "description2": "specificDate anniversary jpnHoliday specificMonth specificDay everyNDays dayName everyMidnight の優先順に見ていき、どこかでポストしたら後のものは無視します"
+    }
+  ],
+  "midnightConditions": [
+    {
+      "◇◇◇[description of specificDate]◇◇◇": "date になったら messages と subMessages を使用してポストします(date はゼロサプレス MM/DD 形式で設定)",
+      "type": "specificDate",
+      "value": [
         {
-            "description": "midnightConditions は毎日0:00に稼働します"
-            ,"description2": "specificDate anniversary jpnHoliday specificMonth specificDay everyNDays dayName everyMidnight の優先順に見ていき、どこかでポストしたら後のものは無視します"
-        }
-    ]
-    ,"midnightConditions": [
+          "date": "12/31",
+          "messages": [
+            "大晦日だ… やり残したことはないか…？"
+          ],
+          "subMessages": []
+        },
         {
-            "◇◇◇[description of specificDate]◇◇◇": "date になったら messages と subMessages を使用してポストします(date はゼロサプレス MM/DD 形式で設定)"
-            ,"type": "specificDate"
-            ,"value": [
-                {
-                    "date": "12/31"
-                    ,"messages": ["大晦日だ… やり残したことはないか…？"]
-                    ,"subMessages": []
-                }
-                ,{
-                    "date": "1/1"
-                    ,"messages": ["…明けましておめでとう…"]
-                    ,"subMessages": []
-                }
-                ,{
-                    "date": "12/25"
-                    ,"messages": ["まだ言っていなかったが… メリークリスマス！"]
-                    ,"subMessages": []
-                }
-                ,{
-                    "date": "3/23"
-                    ,"messages": ["今日は俺の管理者の誕生日らしい…\n祝ってやってくれ…"]
-                    ,"subMessages": []
-                }
-                ,{
-                    "date": "4/8"
-                    ,"messages": ["今日はガウタマ・シッダールタの誕生日だ…\n灌仏会に行ってみることだな…"]
-                    ,"subMessages": []
-                }
-            ]
-        }
-
-        ,{
-            "◇◇◇[description of anniversary]◇◇◇": "今日が date に設定されたゼロ埋め YYYY/MM/DD からn周年なら messages と subMessages を使用してポストします"
-            ,"type": "anniversary"
-            ,"value": [
-                {
-                    "date": "2023/5/1"
-                    ,"messages": ["今日は俺の管理者が nostr を始めて"]
-                    ,"subMessages": ["周年らしい…"]
-                }
-            ]
-        }
-
-        ,{
-            "◇◇◇[description of jpnHoliday]◇◇◇": "今日が祝日なら messages と subMessages を使用してポストします"
-            ,"type": "jpnHoliday"
-            ,"value": [
-                {
-                    "messages": ["今日は「"]
-                    ,"subMessages": ["」だ…"]
-                }
-            ]
-        }
-
-
-        ,{
-            "◇◇◇[description of specificMonth]◇◇◇": "month (ゼロサプレス設定)になったら messages と subMessages を使用してポストします"            
-            ,"type": "specificMonth"
-            ,"value": [
-                {
-                    "month": "12"
-                    ,"messages": ["今年も残すところあと", "今年も残り"]
-                    ,"subMessages": ["日だ…", "日のようだ…"]
-                }
-            ]
-        }
-
-
-        ,{
-            "◇◇◇[description of specificDay]◇◇◇": "day になったら messages と subMessages を使用してポストします(day は「1」「31」などのゼロサプレスした日付を設定すること)" 
-            ,"type": "specificDay"
-            ,"value": [
-                {
-                    "day": "29"
-                    ,"messages": ["今日は月に一度の肉の日だ…"]
-                    ,"subMessages": []
-                }
-            ]
-        }
-
-        ,{
-            "◇◇◇[description of everyNDays]◇◇◇": "今年の残り日数が number で割り切れたら messages と subMessages を使用してポストします" 
-            ,"type": "everyNDays"
-            ,"value": [
-                {
-                    "number": 10
-                    ,"messages": ["今年も残すところあと", "今年も残り"]
-                    ,"subMessages": ["日だ…", "日のようだ…"]
-                }
-            ]
-        }
-
-        ,{
-            "◇◇◇[description of dayName]◇◇◇": "曜日が dayName だったら messages と subMessages を使用してポストします（dayName の指定は「月」や「火」など「曜日」は含めないで指定すること）"
-            ,"type": "dayName"
-            ,"value": [
-                {
-                    "dayName": ""
-                    ,"messages": ["今日は"]
-                    ,"subMessages": ["曜だ…", "曜のようだ…"]
-                }
-            ]
-        }
-
-        ,{
-            "◇◇◇[description of everyMidnight]◇◇◇": "messages と subMessages を使用してポストします(minutes はゼロ埋め HH:MM 形式で指定すること)"
-            ,"type": "everyMidnight"
-            ,"value": [
-                {
-                    "messages": [
-                                    "もういい… 眠れ…"
-                                    ,"そろそろ眠ったらどうだ…？"
-                                    ,"けっこうだ…… 俺はどこででも眠れる……"
-                                    ,"眠れなくても目を閉じていろ…"
-                                    ,"睡眠の質は翌日の仕事に影響する…"
-                                    ,"大人のアルパカと素手で戦って生き残れる自信があるやつだけ安心して眠れ…"
-                                    ,"そんな体たらくでまだ起きているつもりか…？"
-                                    ,"ただ意味もなく起きているなら眠ることだな…"
-                                ]
-                    ,"subMessages": []
-                }
-            ]
-        }
-    ]
-  
-
-
-
-
-
-    ,"◆◆◆[description of minuteConditions]◆◆◆": [
+          "date": "1/1",
+          "messages": [
+            "…明けましておめでとう…"
+          ],
+          "subMessages": []
+        },
         {
-            "description": "minuteConditions は毎分稼働します"
-        }
-    ]
-    ,"minuteConditions": [
+          "date": "12/25",
+          "messages": [
+            "まだ言っていなかったが… メリークリスマス！"
+          ],
+          "subMessages": []
+        },
         {
-            "◇◇◇[description of everyMinutes]◇◇◇": "minutes だったら messages と subMessages を使用してポストします(minutes はゼロ埋め HH:MM 形式で指定すること) また date に設定があれば、その日付でしか作動しません(設定はゼロサプレス MM/DD 形式で、「-」を挟んで範囲指定も可)"
-            ,"type": "everyMinutes"
-            ,"value": [
-                {
-                    "name:": "breakfast"
-                    ,"minutes": "07:00"
-                    ,"date": ""
-                    ,"messages": [
-                                    "…朝食の時間だ…"
-                                    ,"…朝食のメニューは…知らないほうがいい…"
-                                    ,"仕事の精度は朝食のメニューで決まるものだ…"
-                                    ,"…食事の時間だ…"
-                                    ,"朝食をとらずに仕事ができると思っているのか…？ ずいぶんとなめられたものだな…"
-                                    ,"俺は朝食のメニューをいちいち話すようなおしゃべりではない…"
-                                    ,"俺は朝食のメニューを誰かに漏らすようなお人よしではない…"
-                                    ,"朝食のメニュー？ さぁ…な…"
-                                ]
-                    ,"subMessages": []
-                }
-
-                ,{
-                    "name:": "dinner"
-                    ,"minutes": "19:15"
-                    ,"date": ""
-                    ,"messages": [
-                                    "…食事は仕事の後と決めている…"
-                                    ,"夕食に何を食べようが…それはお前の勝手だ…"
-                                    ,"…さっさと夕食を食べたらどうだ…？"
-                                    ,"…食事の時間だ…"
-                                    ,"…食事の量は 朝 > 昼 > 夕 がいいと聞くが…？"
-                                    ,"…贅沢なメニューもいいが、バランスも必要だ"
-                                    ,"俺は夕食のメニューをいちいち話すようなおしゃべりではない…"
-                                    ,"俺は夕食のメニューを誰かに漏らすようなお人よしではない…"
-                                    ,"…夕食のメニュー？ さぁ…な…"
-                                    ,"出された食事をひたむきに食べることが重要ではないのか…？"
-                                    ,"健康に良いからといってそればかりを食べるのは… 言いたいことはわかるな？"
-                                ]
-                    ,"subMessages": []
-                }
-
-                ,{
-                    "name:": "starwarsday"
-                    ,"minutes": "10:00"
-                    ,"date": "5/4"
-                    ,"messages": [
-                                    "May the Force be with you …"
-                                ]
-                    ,"subMessages": []
-                }
-
-                ,{
-                    "name:": "summerwakeup"
-                    ,"minutes": "06:00"
-                    ,"date": "7/22-8/31"
-                    ,"messages": [
-                                    "https://www.youtube.com/watch?v=6YPEFSU1Qmk"
-                                    ,"https://www.youtube.com/watch?v=4nMBykQfpMg"
-                                    ,"https://www.youtube.com/watch?v=PBRGLbrlUEk"
-                                    ,"https://www.youtube.com/watch?v=hQjLgaKvat0"
-                                ]
-                    ,"subMessages": [
-                                    "\n体を動かせ…"
-                                    ,"\n黙って体を動かせ…"
-                                    ,"\nいいから黙って体を動かせ…"
-                                    ,"\n正確な姿勢を保て…"
-                                ]
-                }
-
-
-                ,{
-                    "name:": "summergymnastics"
-                    ,"minutes": "05:55"
-                    ,"date": "7/22-8/31"
-                    ,"messages": [
-                                    "https://www.youtube.com/watch?v=Pu5v3Ca5cQs"
-                                    ,"https://www.youtube.com/watch?v=UkkplSH7zQ8"
-                                ]
-                    ,"subMessages": [
-                                    "\n集まれ…"
-                                    ,"\n…集まれ…"
-                                    ,"\n…時間だ… 集まれ…"
-                                    ,"\n…時間だ… 集合しろ…"
-                                    ,"\n…時間だ"
-                                    ,"\n…集合だ…"
-                                    ,"\n起床だ…"
-                                ]
-                }
-
-                ,{
-                    "name": "evening"
-                    ,"minutes": "17:30"
-                    ,"date": ""
-                    ,"messages": [
-                                    "https://www.youtube.com/watch?v=QTQ_0RjHcVY"
-                                    ,"https://www.youtube.com/watch?v=1_FMta-NyvI"
-                                    ,"https://www.youtube.com/watch?v=EJMBDP3CWtE"
-                                    ,"https://www.youtube.com/watch?v=Tf_iCU6KotE"
-                                    ,"https://www.youtube.com/watch?v=NBTKSeQD6to"
-                                ]
-                    ,"subMessages": [
-                                    "\nもう帰ったほうがいいんじゃないのか…？"
-                                    ,"\n俺に照準を合わされたくなければ… 帰ることだな…"
-                                    ,"\n…いつまで外で遊んでいるつもりだ？"
-                                ]
-                }                
-
-
-
-
-
-            ]
-        }
-  
-   ]
-
-
-
-
-   ,"◆◆◆[description of specifiedProcessatSpecifiedTime]◆◆◆": [
+          "date": "3/23",
+          "messages": [
+            "今日は俺の管理者の誕生日らしい…\n祝ってやってくれ…"
+          ],
+          "subMessages": []
+        },
         {
-            "description": "specifiedProcessatSpecifiedTime は指定の時刻に funcName プロパティを実行します"
+          "date": "4/8",
+          "messages": [
+            "今日はガウタマ・シッダールタの誕生日だ…\n灌仏会に行ってみることだな…"
+          ],
+          "subMessages": []
         }
-    ]
-    ,"specifiedProcessatSpecifiedTime": [
+      ]
+    },
+    {
+      "◇◇◇[description of anniversary]◇◇◇": "今日が date に設定されたゼロ埋め YYYY/MM/DD からn周年なら messages と subMessages を使用してポストします",
+      "type": "anniversary",
+      "value": [
         {
-            "◇◇◇[description of specifiedTime]◇◇◇": "minutes だったら messages と subMessages を使用してポストします(minutes はゼロ埋め HH:MM 形式で指定すること)"
-            ,"type": "specifiedTime"
-            ,"value": [
-                {
-                    "minutes": ["04:05", "07:05", "12:05", "16:05", "21:05", "00:05"]
-                    ,"name":"BTCChart"
-                    ,"messages": [
-                                    "…現在のBTCのJPYチャートだ…"
-                                    ,"…現在のビットコインの日本円チャートだ…"
-                                    ,"…現在のBTCのJPYチャートを教えてやろう…"
-                                    ,"…現在のビットコインの日本円チャートを教えてやろう…"
-                                ]
-                    ,"subMessages": [
-                                    "…売るか買うかは… 俺の知ったことではない…"
-                                    ,"よく見極めることだな…"
-                                    ,"お前が投資に向いているかどうか… さあ、な…"
-                                    ,"損をした？ ふふふ… さあ、な…"
-                                    ]
-
-                    ,"uploadErrMessages": [
-                                "BTCのJPYチャート画像のアップロードに失敗したようだ…"
-                                ,"BTCのJPYチャート画像のアップロードに失敗しているようだ…"
-                                ,"BTCのJPYチャート画像のアップロードに失敗したが、"
-                    ]
-                    ,"uploadErrSubMessages": [
-                                "原因を管理者にでも聞いてみるんだな…"
-                                ,"…原因は…知らないほうがいい…"
-                                ,"俺が原因ではない…"
-                    ]                    
-
-
-                }
-            ]
-
-        ,"tempOfBTCChartminutes":["04:05", "07:05", "12:05", "16:05", "21:05", "00:05"]    
+          "date": "2023/5/1",
+          "messages": [
+            "今日は俺の管理者が nostr を始めて"
+          ],
+          "subMessages": [
+            "周年らしい…"
+          ]
         }
-    ]
-
-  
+      ]
+    },
+    {
+      "◇◇◇[description of jpnHoliday]◇◇◇": "今日が祝日なら messages と subMessages を使用してポストします",
+      "type": "jpnHoliday",
+      "value": [
+        {
+          "messages": [
+            "今日は「"
+          ],
+          "subMessages": [
+            "」だ…"
+          ]
+        }
+      ]
+    },
+    {
+      "◇◇◇[description of specificMonth]◇◇◇": "month (ゼロサプレス設定)になったら messages と subMessages を使用してポストします",
+      "type": "specificMonth",
+      "value": [
+        {
+          "month": "12",
+          "messages": [
+            "今年も残すところあと",
+            "今年も残り"
+          ],
+          "subMessages": [
+            "日だ…",
+            "日のようだ…"
+          ]
+        }
+      ]
+    },
+    {
+      "◇◇◇[description of specificDay]◇◇◇": "day になったら messages と subMessages を使用してポストします(day は「1」「31」などのゼロサプレスした日付を設定すること)",
+      "type": "specificDay",
+      "value": [
+        {
+          "day": "29",
+          "messages": [
+            "今日は月に一度の肉の日だ…"
+          ],
+          "subMessages": []
+        }
+      ]
+    },
+    {
+      "◇◇◇[description of everyNDays]◇◇◇": "今年の残り日数が number で割り切れたら messages と subMessages を使用してポストします",
+      "type": "everyNDays",
+      "value": [
+        {
+          "number": 10,
+          "messages": [
+            "今年も残すところあと",
+            "今年も残り"
+          ],
+          "subMessages": [
+            "日だ…",
+            "日のようだ…"
+          ]
+        }
+      ]
+    },
+    {
+      "◇◇◇[description of dayName]◇◇◇": "曜日が dayName だったら messages と subMessages を使用してポストします（dayName の指定は「月」や「火」など「曜日」は含めないで指定すること）",
+      "type": "dayName",
+      "value": [
+        {
+          "dayName": "",
+          "messages": [
+            "今日は"
+          ],
+          "subMessages": [
+            "曜だ…",
+            "曜のようだ…"
+          ]
+        }
+      ]
+    },
+    {
+      "◇◇◇[description of everyMidnight]◇◇◇": "messages と subMessages を使用してポストします(minutes はゼロ埋め HH:MM 形式で指定すること)",
+      "type": "everyMidnight",
+      "value": [
+        {
+          "messages": [
+            "もういい… 眠れ…",
+            "そろそろ眠ったらどうだ…？",
+            "けっこうだ…… 俺はどこででも眠れる……",
+            "眠れなくても目を閉じていろ…",
+            "睡眠の質は翌日の仕事に影響する…",
+            "大人のアルパカと素手で戦って生き残れる自信があるやつだけ安心して眠れ…",
+            "そんな体たらくでまだ起きているつもりか…？",
+            "ただ意味もなく起きているなら眠ることだな…"
+          ],
+          "subMessages": []
+        }
+      ]
+    }
+  ],
+  "◆◆◆[description of minuteConditions]◆◆◆": [
+    {
+      "description": "minuteConditions は毎分稼働します"
+    }
+  ],
+  "minuteConditions": [
+    {
+      "◇◇◇[description of everyMinutes]◇◇◇": "minutes だったら messages と subMessages を使用してポストします(minutes はゼロ埋め HH:MM 形式で指定すること) また date に設定があれば、その日付でしか作動しません(設定はゼロサプレス MM/DD 形式で、「-」を挟んで範囲指定も可)",
+      "type": "everyMinutes",
+      "value": [
+        {
+          "name:": "breakfast",
+          "minutes": "07:00",
+          "date": "",
+          "messages": [
+            "…朝食の時間だ…",
+            "…朝食のメニューは…知らないほうがいい…",
+            "仕事の精度は朝食のメニューで決まるものだ…",
+            "…食事の時間だ…",
+            "朝食をとらずに仕事ができると思っているのか…？ ずいぶんとなめられたものだな…",
+            "俺は朝食のメニューをいちいち話すようなおしゃべりではない…",
+            "俺は朝食のメニューを誰かに漏らすようなお人よしではない…",
+            "朝食のメニュー？ さぁ…な…"
+          ],
+          "subMessages": []
+        },
+        {
+          "name:": "dinner",
+          "minutes": "19:15",
+          "date": "",
+          "messages": [
+            "…食事は仕事の後と決めている…",
+            "夕食に何を食べようが…それはお前の勝手だ…",
+            "…さっさと夕食を食べたらどうだ…？",
+            "…食事の時間だ…",
+            "…食事の量は 朝 > 昼 > 夕 がいいと聞くが…？",
+            "…贅沢なメニューもいいが、バランスも必要だ",
+            "俺は夕食のメニューをいちいち話すようなおしゃべりではない…",
+            "俺は夕食のメニューを誰かに漏らすようなお人よしではない…",
+            "…夕食のメニュー？ さぁ…な…",
+            "出された食事をひたむきに食べることが重要ではないのか…？",
+            "健康に良いからといってそればかりを食べるのは… 言いたいことはわかるな？"
+          ],
+          "subMessages": []
+        },
+        {
+          "name:": "starwarsday",
+          "minutes": "10:00",
+          "date": "5/4",
+          "messages": [
+            "May the Force be with you …"
+          ],
+          "subMessages": []
+        },
+        {
+          "name:": "summerwakeup",
+          "minutes": "06:00",
+          "date": "7/22-8/31",
+          "messages": [
+            "https://www.youtube.com/watch?v=6YPEFSU1Qmk",
+            "https://www.youtube.com/watch?v=4nMBykQfpMg",
+            "https://www.youtube.com/watch?v=PBRGLbrlUEk",
+            "https://www.youtube.com/watch?v=hQjLgaKvat0"
+          ],
+          "subMessages": [
+            "\n体を動かせ…",
+            "\n黙って体を動かせ…",
+            "\nいいから黙って体を動かせ…",
+            "\n正確な姿勢を保て…"
+          ]
+        },
+        {
+          "name:": "summergymnastics",
+          "minutes": "05:55",
+          "date": "7/22-8/31",
+          "messages": [
+            "https://www.youtube.com/watch?v=Pu5v3Ca5cQs",
+            "https://www.youtube.com/watch?v=UkkplSH7zQ8"
+          ],
+          "subMessages": [
+            "\n集まれ…",
+            "\n…集まれ…",
+            "\n…時間だ… 集まれ…",
+            "\n…時間だ… 集合しろ…",
+            "\n…時間だ",
+            "\n…集合だ…",
+            "\n起床だ…"
+          ]
+        },
+        {
+          "name": "evening",
+          "minutes": "16:19",
+          "date": "",
+          "messages": [
+            "https://www.youtube.com/watch?v=QTQ_0RjHcVY",
+            "https://www.youtube.com/watch?v=1_FMta-NyvI",
+            "https://www.youtube.com/watch?v=EJMBDP3CWtE",
+            "https://www.youtube.com/watch?v=Tf_iCU6KotE",
+            "https://www.youtube.com/watch?v=NBTKSeQD6to"
+          ],
+          "subMessages": [
+            "\nもう帰ったほうがいいんじゃないのか…？",
+            "\n俺に照準を合わされたくなければ… 帰ることだな…",
+            "\n…いつまで外で遊んでいるつもりだ？"
+          ]
+        }
+      ]
+    }
+  ],
+  "◆◆◆[description of specifiedProcessatSpecifiedTime]◆◆◆": [
+    {
+      "description": "specifiedProcessatSpecifiedTime は指定の時刻に funcName プロパティを実行します"
+    }
+  ],
+  "specifiedProcessatSpecifiedTime": [
+    {
+      "◇◇◇[description of specifiedTime]◇◇◇": "minutes だったら messages と subMessages を使用してポストします(minutes はゼロ埋め HH:MM 形式で指定すること)",
+      "type": "specifiedTime",
+      "value": [
+        {
+          "minutes": [
+            "04:05",
+            "07:05",
+            "12:05",
+            "16:05",
+            "21:05",
+            "00:05"
+          ],
+          "name": "BTCChart",
+          "messages": [
+            "…現在のBTCのJPYチャートだ…",
+            "…現在のビットコインの日本円チャートだ…",
+            "…現在のBTCのJPYチャートを教えてやろう…",
+            "…現在のビットコインの日本円チャートを教えてやろう…"
+          ],
+          "subMessages": [
+            "…売るか買うかは… 俺の知ったことではない…",
+            "よく見極めることだな…",
+            "お前が投資に向いているかどうか… さあ、な…",
+            "損をした？ ふふふ… さあ、な…"
+          ],
+          "uploadErrMessages": [
+            "BTCのJPYチャート画像のアップロードに失敗したようだ…",
+            "BTCのJPYチャート画像のアップロードに失敗しているようだ…",
+            "BTCのJPYチャート画像のアップロードに失敗したが、"
+          ],
+          "uploadErrSubMessages": [
+            "原因を管理者にでも聞いてみるんだな…",
+            "…原因は…知らないほうがいい…",
+            "俺が原因ではない…"
+          ]
+        }
+      ],
+      "tempOfBTCChartminutes": [
+        "04:05",
+        "07:05",
+        "12:05",
+        "16:05",
+        "21:05",
+        "00:05"
+      ]
+    }
+  ]
 }
-  
