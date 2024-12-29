@@ -28,6 +28,7 @@
       - `minutes`の時刻になったら`messages`と`subMessages`を使用してポストします(※1)
       - `date`に設定があった場合、その日の`minutes`の時刻になったらポストします
       - `date`に`mm/dd-mm/dd`というように設定があった場合、その日が設定値の範囲内の場合`minutes`の時刻になったらポストします
+      - 少し変わった挙動として`sunriseSunset.json`の`sunset`が翌日の値に更新されると、`evening`の`minutes`をその時刻の10分前の値で更新します
 
   - 3-1-1-3.親プロパティ`specifiedProcessatSpecifiedTime`
     - `specifiedProcessatSpecifiedTime`は`minutes`プロパティに設定された時刻`mm:ss`になるとBTCのチャートをダウンロードし画像にしたものを、`messages`と`subMessages`の文言も併せてポストします
