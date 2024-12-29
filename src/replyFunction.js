@@ -881,6 +881,26 @@ const uploadImg = async (imgPath) => {
         //     }
         // });
 
+        // const res = await fetch("https://nostrcheck.me/api/v2/media", {
+        //     "method": "POST",
+        //     "url": "https://nostrcheck.me/api/v2/media",
+        //     "headers": {
+        //         "Content-Type":"multipart/form-data",
+        //         "content_type": "image/jpeg",
+        //         "Authorization": "Bearer Auth37f3352fe10584d7396f010eb501482930dd712f"
+        //     },
+        //     "body": {
+        //         "uploadtype": "media",
+        //         "file": imgPath
+        //     }
+        // });
+
+
+
+
+
+
+
         const response = await axios.post(uploadUrl, form, {
             headers: form.getHeaders(), // FormDataヘッダーを自動設定
         });
@@ -888,8 +908,10 @@ const uploadImg = async (imgPath) => {
 
         //if (response.ok) {
         if (response.statusText === "OK") {
+        //if (res.ok) {
             // const resURL = await response.text();
             const resURL = await response.data;
+            //const resURL = await res.data;
             if(resURL.substring(0,returnURLLength) === returnURL) {
                 //return resURL + ".png";
                 return resURL;
