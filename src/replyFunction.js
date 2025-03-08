@@ -693,7 +693,7 @@ const createAndSaveChart = async (dorh, data, schema, nowUnixDate) => {
                     ,scale: "x"
                     ,format: "%m/%d"
                     ,tickCount: {interval: "date", step: 1}
-                    ,title: "date"              // タイトル
+                    ,title: "date(JST)"         // タイトル
                     ,grid: true                 // 罫線
                     ,labelAngle: -90            // ラベルを垂直にする
                     ,labelAlign: "right"        // ラベルを右寄せにする
@@ -762,7 +762,7 @@ const createAndSaveChart = async (dorh, data, schema, nowUnixDate) => {
                     ,scale: "x"
                     ,format: "%H:%M"
                     ,tickCount: {interval: "minutes", step: 10}
-                    ,title: "time"              // タイトル
+                    ,title: "time(JST)"         // タイトル
                     ,grid: true                 // 罫線
                     ,labelAngle: -90            // ラベルを垂直にする
                     ,labelAlign: "right"        // ラベルを右寄せにする
