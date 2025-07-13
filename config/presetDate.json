@@ -218,7 +218,7 @@
         {
           "name:": "summerwakeup",
           "minutes": "06:00",
-          "date": "7/22-8/31",
+          "date": "7/19-8/31",
           "messages": [
             "https://www.youtube.com/watch?v=6YPEFSU1Qmk",
             "https://www.youtube.com/watch?v=4nMBykQfpMg",
@@ -252,7 +252,7 @@
         },
         {
           "name": "evening",
-          "minutes": "18:51",
+          "minutes": "18:49",
           "date": "",
           "messages": [
             "https://www.youtube.com/watch?v=QTQ_0RjHcVY",
