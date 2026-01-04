@@ -406,11 +406,20 @@
         ,"probability": 5
     }
 
+    ,{
+        "orgPost": ["伯方の","はかたの","は！か！た！の！","はっかったっのっ"]
+        ,"replyPostChar": [
+                        "…塩…",
+                        "塩",
+                        "…しお…"
+                        ]
+        ,"probability": 10
+    }    
 
 
 
     ,{
-        "orgPost": ["nostrチュートリアル"]
+        "orgPost": ["nostrチュートリアル","nostr チュートリアル"]
         ,"replyPostChar": [
                         "…まずはここを見ろ… \nhttps://welcome.nostr-jp.org/ \nhttps://scrapbox.io/nostr/ \n有識者が随時更新をしてくれている… \nそして俺が言えることは「秘密鍵を他人に漏らすな」…ということだ…"
                         ]
