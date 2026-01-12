@@ -253,14 +253,13 @@
         },
         {
           "name": "evening",
-          "minutes": "16:32",
+          "minutes": "16:38",
           "date": "",
           "messages": [
             "https://www.youtube.com/watch?v=QTQ_0RjHcVY",
             "https://www.youtube.com/watch?v=1_FMta-NyvI",
             "https://www.youtube.com/watch?v=EJMBDP3CWtE",
-            "https://www.youtube.com/watch?v=Tf_iCU6KotE",
-            "https://www.youtube.com/watch?v=NBTKSeQD6to"
+            "https://www.youtube.com/watch?v=Tf_iCU6KotE"
           ],
           "subMessages": [
             "\nもう帰ったほうがいいんじゃないのか…？",
