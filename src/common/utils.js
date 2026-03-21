@@ -370,7 +370,46 @@ const probabilityDetermination = (probability) => {
 }
 
 
+/**
+ * pubkey から kind:0 を取得して bot か判定
+ */
+const isBotFromPubkey = (relay, pubkey) => {
+    return new Promise((resolve) => {
+        try {
+            const sub = relay.sub([
+                {
+                    kinds: [0],
+                    authors: [pubkey],
+                    limit: 1
+                }
+            ]);
 
+            let resolved = false;
+
+            sub.on("event", (ev) => {
+                if (resolved) return;
+
+                try {
+                    const profile = JSON.parse(ev.content);
+                    resolved = true;
+                    resolve(profile.bot === true);
+                } catch (e) {
+                    resolved = true;
+                    resolve(false);
+                }
+            });
+
+            sub.on("eose", () => {
+                if (!resolved) {
+                    resolve(false);
+                }
+            });
+
+        } catch (e) {
+            resolve(false);
+        }
+    });
+};
 
 
 
@@ -390,5 +429,7 @@ module.exports = {
     ,random
     ,formattedDateTime
     ,probabilityDetermination
+    ,isBotFromPubkey
+
 };
 

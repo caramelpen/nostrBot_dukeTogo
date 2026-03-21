@@ -9,7 +9,7 @@ const sharp = require("sharp");
 const fs = require("fs");
 require("websocket-polyfill");
 const { finishEvent } = require("nostr-tools");
-const { currUnixtime, isSafeToReply, random, probabilityDetermination, retrievePostsInPeriod, isFolderExists, jsonSetandOpen, deleteFile } = require("./common/utils.js");
+const { currUnixtime, isSafeToReply, random, probabilityDetermination, retrievePostsInPeriod, isFolderExists, jsonSetandOpen, deleteFile, isBotFromPubkey } = require("./common/utils.js");
 const { publishToRelay } = require("./common/publishToRelay.js");
 const { emergency } = require("./emergency.js");
 
@@ -268,7 +268,7 @@ const normalAutoReply = async (relay, ev, autoReplyJson, autoReactionJson, postI
                 postInfoObj.postCategory = 1;     // リプライ
             // 投稿者が管理者以外
             } else {
-                // 公開キー ev.Pubkey のフォローの中に自分の公開キー pubkey がいるなら真（自分のフォロアだ）
+                // 公開キー ev.Pubkey のフォローの中に自分の公開キー pubkey がいるなら真（自分のフォロアだ）※フォロアでも相手が bot なら偽
                 isChkMyFollower = isFromReplytoReply ? true : await chkMyFollower(relay, ev.pubkey);
 
                 if(isChkMyFollower) {
@@ -474,7 +474,13 @@ const chkMyFollower = (relay, evPubkey) => {
             sub.on("event",  (ev) => {
                 const hasMatch = ev.tags.some(tag => tag[1] === pubKey);    // "p","公開キー" という構成なので[1]
                 if (hasMatch) {
-                    resolve(true);
+                    // resolve(true);
+                    if (isBotFromPubkey(relay, evPubkey)) {
+                        console.log("this account is bot:" + pubKey);
+                        resolve(false); //相手が bot なら反応しない
+                    } else {
+                        resolve(true);
+                    }
                 } else {
                     resolve(false);
                 }
