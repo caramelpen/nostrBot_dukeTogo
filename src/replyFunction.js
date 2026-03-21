@@ -475,12 +475,23 @@ const chkMyFollower = (relay, evPubkey) => {
                 const hasMatch = ev.tags.some(tag => tag[1] === pubKey);    // "p","公開キー" という構成なので[1]
                 if (hasMatch) {
                     // resolve(true);
-                    if (isBotFromPubkey(relay, evPubkey)) {
-                        console.log("this account is bot:" + pubKey);
-                        resolve(false); //相手が bot なら反応しない
-                    } else {
-                        resolve(true);
-                    }
+                    let resolved = false;
+                    // isBotFromPubkey は Promise を返すので then() で処理
+                    isBotFromPubkey(relay, evPubkey).then(isBot => {
+                        if (resolved) return;
+                        resolved = true;
+
+                        if (isBot) {
+                            console.log("this account is bot:" + evPubkey);
+                            resolve(false); // 相手が BOT
+                        } else {
+                            resolve(true);  // 自分のフォロワーかつ BOT でない
+                        }
+                    }).catch(() => {
+                        if (resolved) return;
+                        resolved = true;
+                        resolve(false);
+                    });
                 } else {
                     resolve(false);
                 }
