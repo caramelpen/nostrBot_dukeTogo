@@ -14,31 +14,6 @@ const currDateTime = () => new Date();
 const currUnixtime = () => Math.floor(currDateTime().getTime() / 1000);
 
 
-// // UNIX時間から日本時間に変換し、月と日のみを取得する関数
-// const convertUnixTimeToJapanMonthAndDay = (unixTimeInSeconds) => {
-//     // UNIX時間をミリ秒に変換してDateオブジェクトを作成
-//     const date = new Date(unixTimeInSeconds * 1000);
-
-//     // 日本時間に変換し、月と日のみを取得 mm/dd
-//     const japanMonthAndDay = date.toLocaleDateString("ja-JP", { timeZone: "Asia/Tokyo", month: "2-digit", day: "2-digit" });
-//     return japanMonthAndDay;
-// };
-
-
-
-
-
-/*
-// 1番目のコマンドライン引数を取得
-const getCliArg = (errMsg) => {
-  if (process.argv.length <= 2) {
-    console.error(errMsg);
-    process.exit(1);
-  }
-  return process.argv[2];
-};
-*/
-
 
 /**
  * jsonを取得
@@ -49,27 +24,12 @@ const jsonOpen = (jsonPath) => {
         const data = fs.readFileSync(jsonPath, "utf8");
         const jsonData = JSON.parse(data);
         return jsonData;
-    } catch (err)  {
+    } catch (err) {
         console.error("json Read Err:" + err);
         return null;
     }
 }
-/*
-const jsonSetandOpen = (filePath) => {
-    try {
-        // jsonの場所を割り出すために
-        const jsonPath = require("path");
-        const lastJsonPath = jsonPath.join(__dirname, filePath);
-        const fs = require("fs");
-        const data = fs.readFileSync(lastJsonPath, "utf8");
-        const jsonData = JSON.parse(data);
-        return jsonData;
-    } catch (err)  {
-        console.error("json Read Err:" + err);
-        return null;
-    }
-}
-*/
+
 const jsonSetandOpen = async (filePath) => {
     try {
         const jsonPath = require("path");
@@ -78,7 +38,7 @@ const jsonSetandOpen = async (filePath) => {
         const data = await fs.readFile(lastJsonPath, "utf8");
         const jsonData = JSON.parse(data);
         return jsonData;
-    } catch (err)  {
+    } catch (err) {
         console.error("json Read Err:" + err);
         return null;
     }
@@ -96,7 +56,7 @@ const writeJsonFile = (jsonPath, propertyName, writeValue, idx) => {
     try {
         const data = fs.readFileSync(jsonPath, "utf8");
         jsonData = JSON.parse(data);
-        if(idx < 0) {
+        if (idx < 0) {
             jsonData[propertyName] = writeValue;
         } else {
             jsonData[idx][propertyName] = writeValue;
@@ -109,7 +69,7 @@ const writeJsonFile = (jsonPath, propertyName, writeValue, idx) => {
         fs.writeFileSync(jsonPath, jsonString, "utf8");
         console.log(`Property "${propertyName}" has been updated successfully.`);
         return true;
-    } catch (err){
+    } catch (err) {
         console.error("json Read or Write Err:" + err);
         return false;
     }
@@ -130,7 +90,7 @@ const asyncIsFileExists = async (targetFilePath, notExistsErrlog = false) => {
         return stats.isFile();
     } catch (error) {
         if (error.code === "ENOENT") {
-            if(notExistsErrlog) {
+            if (notExistsErrlog) {
                 console.error("asyncIsFileExists:file is not exists");
             }
             return false;
@@ -142,7 +102,7 @@ const isFileExists = (targetFilePath, notExistsErrlog = false) => {
     if (fs.existsSync(targetFilePath)) {
         return true;
     } else {
-        if(notExistsErrlog) {
+        if (notExistsErrlog) {
             console.error("isFileExists:file is not exists");
         }
         return false;
@@ -170,7 +130,7 @@ const isFolderExists = (targetFolder, createFolder = false) => {
         if (fs.existsSync(targetFolder)) {
             return true;
         } else {
-            if(createFolder) {
+            if (createFolder) {
                 fs.mkdirSync(targetFolder, { recursive: true });
                 return true;
             } else {
@@ -212,20 +172,20 @@ const isSafeToReply = ({ pubkey, created_at }) => {
     return true;
 }
 
-const updateLastReplyTime = (pubkey, time) =>{
+const updateLastReplyTime = (pubkey, time) => {
     // 公開鍵に対する最後の返信時間を現在時間で更新
     lastReplyTimePerPubkey.set(pubkey, time);
 }
 
 // 第2引数の公開鍵が現在から60秒前以内に10個以上投稿があったら偽を返す
 const retrievePostsInPeriod = (relay, pubKey) => {
-    const baseSeconds = 60; 
+    const baseSeconds = 60;
     const currUnixtime_60 = currUnixtime - baseSeconds;
 
     return new Promise((resolve, reject) => {
         try {
             const sub = relay.sub([
-                { 
+                {
                     "kinds": [1]
                     , "authors": [pubKey]
                     , "since": currUnixtime_60
@@ -235,7 +195,7 @@ const retrievePostsInPeriod = (relay, pubKey) => {
             let resolved = false; // resolveが呼び出されたかどうかを追跡する変数
 
             const eventListener = (ev) => {
-                cnt ++;
+                cnt++;
                 if (cnt >= 10) {
                     sub.off("event", eventListener); // リスナーを削除
                     resolved = true; // resolveが呼び出されたことを記録
@@ -259,32 +219,9 @@ const retrievePostsInPeriod = (relay, pubKey) => {
 
 //第2引数の公開鍵からユーザ名を取得する
 const userDisplayName = async (relay, pubKey) => {
-    // return new Promise((resolve, reject) => {
-         let displayName = "";
-    //     const sub = relay.sub([
-    //         { 
-    //             kinds: [0]
-    //             , authors: [pubKey]
-    //         }
-    //     ]);
-        
-    //     sub.on("event", (ev) => {
-    //         try {
-    //             // JSON文字列をJavaScriptオブジェクトに変換
-    //             const evObj = JSON.parse(ev.content);
-                
-    //             // display_nameの値を取得
-    //             displayName = evObj.display_name;
-
-    //             resolve(displayName);
-    //         } catch (error) {
-    //             reject(undefined);
-    //         }
-    //     });
-    // });
-
+    let displayName = "";
     const sub = relay.sub([
-        { 
+        {
             kinds: [0]
             , authors: [pubKey]
         }
@@ -294,7 +231,7 @@ const userDisplayName = async (relay, pubKey) => {
         try {
             // JSON文字列をJavaScriptオブジェクトに変換
             const evObj = await JSON.parse(ev.content);
-            
+
             // display_nameの値を取得
             displayName = await evObj.display_name;
 
@@ -312,7 +249,7 @@ const userDisplayName = async (relay, pubKey) => {
  * 第1引数から第2引数の間でランダムな整数を得る
  */
 const random = (min, max) => {
-    return Math.floor( Math.random() * (max + 1 - min) ) + min;
+    return Math.floor(Math.random() * (max + 1 - min)) + min;
 }
 
 
@@ -338,33 +275,28 @@ const formattedDateTime = (date) => {
 /*
 * 確率判定
 */
-// const probabilityDetermination = (probability) => {
-//     // 100なら無条件でOK
-//     if(probability >= 100) {
-//         return true;
-//     } else {
-//         // 0ならダメ
-//         if(probability <= 0) {
-//             return false;
-//         } else {
-//             // 1-100までの整数をランダムで取得し、基準を満たせばOK
-//             return Math.floor(Math.random() * 100) + 1 <= probability;
-//         }
-//     }
-// }
 const probabilityDetermination = (probability) => {
     // 100なら無条件でOK
-    if(probability >= 100) {
+    if (probability >= 100) {
         return true;
     } else {
         // 0ならダメ
-        if(probability <= 0) {
+        if (probability <= 0) {
             return false;
         } else {
+            /*
             const randomInt = crypto.randomBytes(2).readUInt16BE(0) + 1;  // 1 から 65536 の範囲
             const maxRange = 65536;
             const probabilityThreshold = Math.floor((probability / 100) * maxRange);
             return randomInt <= probabilityThreshold;
+            */
+            const maxRange = 10000;
+            // 0 から 9999 までの整数を生成 (全10,000通り)
+            const randomInt = crypto.randomInt(0, maxRange);
+            // しきい値の計算
+            const probabilityThreshold = probability * (maxRange / 100);
+            // 「未満」で判定することで、個数を正確に合わせる
+            return randomInt < probabilityThreshold;
         }
     }
 }
@@ -418,18 +350,18 @@ const isBotFromPubkey = (relay, pubkey) => {
  */
 module.exports = {
     currDateTime
-    ,currUnixtime //, convertUnixTimeToJapanMonthAndDay
+    , currUnixtime //, convertUnixTimeToJapanMonthAndDay
     // ,getCliArg
-    ,jsonOpen, jsonSetandOpen
-    ,writeJsonFile
-    ,asyncIsFileExists, isFileExists
-    ,deleteFile
-    ,isFolderExists
-    ,isSafeToReply, updateLastReplyTime, retrievePostsInPeriod, userDisplayName
-    ,random
-    ,formattedDateTime
-    ,probabilityDetermination
-    ,isBotFromPubkey
+    , jsonOpen, jsonSetandOpen
+    , writeJsonFile
+    , asyncIsFileExists, isFileExists
+    , deleteFile
+    , isFolderExists
+    , isSafeToReply, updateLastReplyTime, retrievePostsInPeriod, userDisplayName
+    , random
+    , formattedDateTime
+    , probabilityDetermination
+    , isBotFromPubkey
 
 };
 
