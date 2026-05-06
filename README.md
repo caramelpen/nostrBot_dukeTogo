@@ -22,6 +22,7 @@
     - sharp (0.33.2) ...svgファイルをpngに変換するために使用しています
     - suncalc (1.9.0) ...日の出日の入り時刻を取得できます
     - vega (5.17.0) ...チャートの描画で使用しています
+    - kaomoji ...形態素解析で使用しています
   - ほかに環境によってはPM2などの永続化に対応したモジュールを必要に応じて使用してください
 
 
@@ -33,6 +34,7 @@
 │      exchangeRate.json
 │      functionalPosting.json
 │      infoUpNotification.json
+│      morphologischeAnalyse.json
 │      postUponReceiptofZap.json
 │      presetDate.json
 │      sunriseSunset.json
@@ -53,6 +55,7 @@
            │ env.js 
            │ gitHubCooperation.js 
            │ lastReplyTimePerPubkey.js
+           │ morphologischeAnalyse.js
            │ publishToRelay.js
            │ utils.js
 </pre>
@@ -84,6 +87,9 @@
   - 内容は随時更新していきます
 - 2-1-9.surveillance.json
   - `src\surveillance.js`、`emergency.js`で使用（後述）
+  - 内容は随時更新していきます
+- 2-1-10.morphologischeAnalyse.json
+  - `src\common\morphologischeAnalyse.js`で使用（後述）
   - 内容は随時更新していきます
 
 ### 2-2.src ディレクトリ
@@ -117,6 +123,8 @@
   - リレーにイベントを送信する
 - 2-3-5.utils.js
   - 共通関数
+- 2-3-6.morphologischeAnalyse.js
+  - 形態素解析を行う
 
 
 ### 3.各機能詳細（長いので各mdファイルに分割しました）
