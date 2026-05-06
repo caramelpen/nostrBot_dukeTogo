@@ -11,6 +11,7 @@ require("websocket-polyfill");
 const { finishEvent } = require("nostr-tools");
 const { currUnixtime, isSafeToReply, random, probabilityDetermination, retrievePostsInPeriod, isFolderExists, jsonSetandOpen, deleteFile, isBotFromPubkey } = require("./common/utils.js");
 const { publishToRelay } = require("./common/publishToRelay.js");
+const { isNounWoEnd } = require("./common/morphologischeAnalyse.js");
 const { emergency } = require("./emergency.js");
 
 const chartFile = "chart";
@@ -460,6 +461,60 @@ const postUponReceiptofZap = async (relay, ev, autoReplyJson, postInfoObj) => {
         throw err;
     }
 }
+
+
+// 形態素解析反応ポスト
+const nounWoEnd = async (relay, ev, morphologischeAnalyseJson, postInfoObj, isFromReplytoReply = false) => {
+    try {
+        // フィードのポストが 名詞 +「を」なら真
+        const target = await isNounWoEnd(ev.content);
+
+        // 投稿者が管理者なら真
+        const isAdminPubkey = ev.pubkey === adminPubkey ? true : false;
+        // 公開キー ev.Pubkey のフォローの中に自分の公開キー pubkey がいるなら真
+        let isChkMyFollower = false;
+        // 作動区分
+        postInfoObj.postCategory = 0;
+            
+        // 名詞 +「を」だ
+        if(target) {
+
+            // 投稿者が管理者
+            if(isAdminPubkey) {
+                postInfoObj.postCategory = 1;     // ポスト
+            // 投稿者が管理者以外
+            } else {
+                // 公開キー ev.Pubkey のフォローの中に自分の公開キー pubkey がいるなら真（自分のフォロアだ）※フォロアでも相手が bot なら偽
+                isChkMyFollower = await chkMyFollower(relay, ev.pubkey);
+                if(isChkMyFollower) {
+                    postInfoObj.postCategory = 1;     // ポスト
+                }
+            }
+
+            // 作動対象だ
+            if(postInfoObj.postCategory > 0) {
+                replyChr = "";
+                // ポストしても安全なら、ポストイベントを組み立てて送信する
+                if(!retrievePostsInPeriod(relay, pubKey)) {
+                    await emergency(relay, pubKey);
+                    return;
+                }            
+                // 投稿しても大丈夫だ
+                if (isSafeToReply(ev)) {
+                    // jsonに設定されている対応するポスト語句の数を利用してランダムでポスト語句を決める
+                    const randomIdx = await random(0, morphologischeAnalyseJson.postChar.length - 1);
+                    // ポスト
+                    const replyPostEv = composePost(morphologischeAnalyseJson.postChar[randomIdx], ev);
+                    await publishToRelay(relay, replyPostEv);                    
+                }
+
+            }
+        }
+    } catch(err) {
+        throw err;
+    }
+}
+
 
 // 投稿者の公開キー evPubkey のフォローの中に自分の公開キー pubkey がいるなら真
 const chkMyFollower = (relay, evPubkey) => {
@@ -1192,5 +1247,6 @@ module.exports = {
     ,normalAutoReply        // 通常リプライ
     ,uploadBTCtoJPYChartImg // BTCチャート画像ポスト
     ,postUponReceiptofZap   // zap反応ポスト
+    ,nounWoEnd              // 形態素解析反応ポスト
 };
   

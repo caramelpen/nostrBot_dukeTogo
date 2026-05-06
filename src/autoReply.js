@@ -8,7 +8,7 @@ require("websocket-polyfill");
 const { relayInit } = require("nostr-tools");
 const { jsonSetandOpen } = require("./common/utils.js");
 const { BOT_PRIVATE_KEY_HEX, pubkey, adminPubkey, RELAY_URL } = require("./common/env.js");
-const { initial, functionalPosting, exchangeRate, normalAutoReply } = require("./replyFunction.js");
+const { initial, functionalPosting, exchangeRate, normalAutoReply, nounWoEnd } = require("./replyFunction.js");
 
 let relay;
 let connect = false;
@@ -36,15 +36,16 @@ const funcObj = {
     functionalPosting   // 機能ポスト
     ,exchangeRate       // 為替ポスト
     ,normalAutoReply    // 通常リプライ
+    ,nounWoEnd          // 形態素解析リプライ
 }
 
 const jsonPathDef = "../config/";
 
 // ディスパッチの設定値
 const funcConfig = {
-    funcName: ["functionalPosting", "exchangeRate", "normalAutoReply"]                  // useJsonFile の記述順と対応させる
-    ,useJsonFile: ["functionalPosting.json", "exchangeRate.json", "autoReply.json"]     // funcName の記述順と対応させる
-    ,operationCategory: [1, 1, 1]                                                       // 1ならポストできたら次へ進めない（useJsonFileやuncName の記述順と対応させる）
+    funcName: ["functionalPosting", "exchangeRate", "normalAutoReply", "nounWoEnd"]                                   // useJsonFile の記述順と対応させる
+    ,useJsonFile: ["functionalPosting.json", "exchangeRate.json", "autoReply.json", "morphologischeAnalyse.json"]     // funcName の記述順と対応させる
+    ,operationCategory: [1, 1, 1, 1]                                                                                  // 1ならポストできたら次へ進めない（useJsonFileやuncName の記述順と対応させる）
 }
 
 const autoReply = async (relay) => {
