@@ -14,8 +14,6 @@ const getTokenizer = () => {
   if (!tokenizerPromise) {
     tokenizerPromise = new Promise((resolve, reject) => {
       kuromoji.builder({ dicPath: "node_modules/kuromoji/dict" })
-//      const path = require("path");
-//      kuromoji.builder({ dicPath: path.join(__dirname, "node_modules/kuromoji/dict") })
         .build((err, tokenizer) => {
           if (err) reject(err);
           else resolve(tokenizer);
