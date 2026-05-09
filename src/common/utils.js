@@ -320,21 +320,31 @@ const isBotFromPubkey = (relay, pubkey) => {
 
             sub.on("event", (ev) => {
                 if (resolved) return;
-
+                
                 try {
                     const profile = JSON.parse(ev.content);
                     resolved = true;
-                    resolve(profile.bot === true);
+                    //resolve(profile.bot === true);
+                    resolve(profile?.bot === true);
                 } catch (e) {
                     resolved = true;
                     resolve(false);
                 }
             });
 
+/*            
             sub.on("eose", () => {
                 if (!resolved) {
                     resolve(false);
                 }
+            });
+*/
+
+            sub.on("eose", () => {
+                if (resolved) return;
+
+                resolved = true;
+                resolve(false);
             });
 
         } catch (e) {

@@ -2,6 +2,7 @@
  * 狙撃屋13bot(@dukeTogo)
  * autoReply.js
  * フィードを購読し、リプライ対象となるポストがないか調べ、存在するならリプライ等の動作をする
+ * （デバックする場合はこのファイルをデバック実行します）
  */
 const cron = require("node-cron");
 require("websocket-polyfill");
