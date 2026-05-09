@@ -159,7 +159,7 @@
 - 4-2.各機能詳細内の※1について
   - ランダムで語句を得る方法として、配列で設定した設定語句の要素数の範囲を用いてランダム値を取得し、それをそのまま配列の要素番号として使用し、語句を得ます
 - 4-3.リレーについて
-  - `wss://relay-jp.nostr.wirednet.jp`で運用させていただいています
+  - `wss://relay-jp.nostr.wirednet.jp`または`wss://yabu.me`で運用させていただいています
     (`.env`ファイルの`RELAY_URL`からリレーURLは取得しています)
 
 ### 5.ライセンス
@@ -168,6 +168,7 @@
 ### 6.謝辞
 - Nostr Japan ( https://github.com/nostr-jp )各位
 - Don ( https://github.com/nikolat )様
+- いくらどん ( αυγοτάραχο σολωμου ／ https://ikuradon.id/ ) 様
 - ひゅうが霄 ( https://showhyuga.blogspot.com/ )様
 - 名言まとめドットコム ( https://www.underwater-festival.com/00096-2/ )様
 - 劇画 Bombs away！( https://onihei-fan.com/?p=10214 )様
