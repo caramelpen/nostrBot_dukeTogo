@@ -17,12 +17,18 @@ if (dr.type !== "nsec") {
     console.error("NOSTR PRIVATE KEY is not nsec");
     return;
 }
-
+/*
+const relayUrls = (process.env.RELAY_URLS)
+  .split(",")
+  .map(v => v.trim())
+  .filter(Boolean);
+*/
 const env = {
     BOT_PRIVATE_KEY_HEX: dr.data                                // 秘密鍵
     ,pubkey: getPublicKey(dr.data)                              // 秘密鍵から公開鍵の取得
     ,adminPubkey: process.env.admin_HEX_PUBKEY                  // bot管理者の公開鍵の取得
     ,RELAY_URL: process.env.RELAY_URL                           // リレーURL
+    //,RELAY_URLS: relayUrls                                       // リレーURL
     ,GIT_USER_NAME: process.env.GIT_USER_NAME                   // GitHubのユーザ名
     ,GIT_REPO: process.env.GIT_REPO                             // GitHubのリポジトリ
     ,GIT_TOKEN: process.env.GIT_TOKEN                           // GitHubのAPIトークン

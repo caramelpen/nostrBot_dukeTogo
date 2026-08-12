@@ -119,7 +119,6 @@ const main = async (sw = 0) => {
     connect = false;
     
     // リレー
-    //const relay = relayInit(RELAY_URL);
     relay = relayInit(RELAY_URL);
     relay.on("error", () => {
         relay.close();
