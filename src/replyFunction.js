@@ -9,7 +9,7 @@ const sharp = require("sharp");
 const fs = require("fs");
 require("websocket-polyfill");
 const { finishEvent } = require("nostr-tools");
-const { currUnixtime, isSafeToReply, random, probabilityDetermination, retrievePostsInPeriod, isFolderExists, jsonSetandOpen, deleteFile, isBotFromPubkey } = require("./common/utils.js");
+const { currUnixtime, isSafeToReply, random, probabilityDetermination, retrievePostsInPeriod, isFolderExists, jsonSetandOpen, deleteFile, isBotFromPubkey, setMyLastReplyEventId } = require("./common/utils.js");
 const { publishToRelay } = require("./common/publishToRelay.js");
 const { isNounWoEnd } = require("./common/morphologischeAnalyse.js");
 const { emergency } = require("./emergency.js");
@@ -98,6 +98,7 @@ const functionalPosting = async (relay, ev, functionalPostingJson, autoReactionJ
                         const replyPostEv = !isFromReplytoReply ? composeReply(replyChr, ev) : composeReplytoReply(replyChr, ev);
 
                         await publishToRelay(relay, replyPostEv, (isFromReplytoReply ? false : true), ev.pubkey, ev.content);
+                        setMyLastReplyEventId(replyPostEv.id);
                     }
                 }
             }
@@ -237,6 +238,7 @@ const exchangeRate = async (relay, ev, exchangeRate, autoReactionJson, postInfoO
                 const replyPostorreactionPostEv = !isFromReplytoReply ? composeReply(replyChr, ev) : composeReplytoReply(replyChr, ev);
 
                 await publishToRelay(relay, replyPostorreactionPostEv, (isFromReplytoReply ? false : true), ev.pubkey, ev.content);
+                setMyLastReplyEventId(replyPostorreactionPostEv.id);
             }
         }
 
@@ -423,6 +425,7 @@ const normalAutoReply = async (relay, ev, autoReplyJson, autoReactionJson, postI
                     replyPostorreactionPostEv = composeReplyEmoji(ev, autoReactionJson, randomReactionIdx);
                     await publishToRelay(relay, replyPostorreactionPostEv, (isFromReplytoReply ? false : true), ev.pubkey, ev.content);
                 }
+                setMyLastReplyEventId(replyPostorreactionPostEv.id);
             }
         }
 
@@ -454,6 +457,7 @@ const postUponReceiptofZap = async (relay, ev, autoReplyJson, postInfoObj) => {
                 // 投稿
                 const replyPostorreactionPostEv = composePost(autoReplyJson.postedWord[randomIdx] + " \n" + autoReplyJson.postedSubWord[randomSubIdx]);
                 await publishToRelay(relay, replyPostorreactionPostEv);
+                setMyLastReplyEventId(replyPostorreactionPostEv.id);
             }
         }
 
@@ -505,7 +509,8 @@ const nounWoEnd = async (relay, ev, morphologischeAnalyseJson, postInfoObj, isFr
                     const randomIdx = await random(0, morphologischeAnalyseJson.postChar.length - 1);
                     // ポスト
                     const replyPostEv = composePost(morphologischeAnalyseJson.postChar[randomIdx], ev);
-                    await publishToRelay(relay, replyPostEv);                    
+                    await publishToRelay(relay, replyPostEv);
+                    setMyLastReplyEventId(replyPostEv.id);                  
                 }
 
             }
@@ -516,6 +521,10 @@ const nounWoEnd = async (relay, ev, morphologischeAnalyseJson, postInfoObj, isFr
 }
 
 
+
+
+
+/*
 // 投稿者の公開キー evPubkey のフォローの中に自分の公開キー pubkey がいるなら真
 const chkMyFollower = (relay, evPubkey) => {
     return new Promise((resolve, reject) => {
@@ -551,6 +560,131 @@ const chkMyFollower = (relay, evPubkey) => {
                     resolve(false);
                 }
             });
+        } catch {
+            reject(false);
+        }
+    });
+}
+*/
+
+
+
+
+
+
+
+// 投稿者の公開キー evPubkey のフォローの中に自分の公開キー pubkey がいるなら真
+// 重要: kind:3 は複数残るため、古い follow 記録を「最新の状態」として誤って扱ってはいけない
+// そのため、イベントごとに最新の created_at を追跡し、eose の最後に一度だけ最終判定する
+// これにより、古い follow 履歴が残っていても、誤って「自分をフォローしている」と判定しない
+const chkMyFollower = (relay, evPubkey) => {
+    return new Promise((resolve, reject) => {
+        // フィードを購読
+        // 最新の kind:3 だけを見て判定するように修正
+        // 古い follow 記録が残っていても、誤って「自分をフォローしている」と判定しないように
+        const sub = relay.sub(
+            [
+                { "kinds": [3], "authors": [evPubkey] }
+            ]
+        );
+
+        let latestCreatedAt = 0;        // 最新の kind:3 イベントの created_at を記録する（古いフォロー情報が残っていても、最新の状態を優先して判定する）
+        let latestHasMatch = false;     // 最新の kind:3 で自分の pubkey が含まれていたかどうか
+        let resolved = false;           // finish() が既に呼ばれていないかの確認
+
+        // 1回だけ結果を返すための共通関数
+        // これにより、イベントが複数回来ても最初の結果だけが採用される
+        // なお、ここで即座に resolve すると、古いイベントの誤判定が先に返ってしまう
+        const finish = (result) => {
+            if (resolved) return;
+            resolved = true;
+            if (typeof sub.unsub === "function") {
+                sub.unsub();
+            }
+            resolve(result);
+        };
+
+        try {
+            /*
+            sub.on("event",  (ev) => {
+                // ここでは "p" タグの中に自分の pubkey があるかを確認する
+                // ただし、即座に true を返さず、最新のイベントを更新するだけに留める
+                const hasMatch = ev.tags.some(tag => tag[1] === pubKey);    // "p","公開キー" という構成なので[1]
+
+                // もし、このイベントが最新なら、その結果を採用する
+                if (ev.created_at !== undefined && ev.created_at >= latestCreatedAt) {
+                    latestCreatedAt = ev.created_at;
+                    latestHasMatch = hasMatch;
+                }
+            });
+            */
+            sub.on("event", (ev) => {
+                // ここでは "p" タグの中に自分の pubkey があるかを確認する
+                // ただし、即座に true を返さず、最新イベントの結果だけを保持する
+                // tag[0] === "p" のみを対象にしないと、余計な tag が混ざって誤判定する可能性がある
+                if (!Array.isArray(ev.tags) || !Number.isFinite(Number(ev.created_at))) {
+                    return;
+                }
+
+                const createdAt = Number(ev.created_at);
+                if (createdAt <= 0) {
+                    return;
+                }
+
+                // "p" タグの中に自分の pubkey があるかを厳密に確認
+                const hasMatch = ev.tags.some(tag =>
+                    Array.isArray(tag) && tag[0] === "p" && tag[1] === pubKey
+                );
+
+                // 古い follow 記録が残っていても、最新の created_at を優先する
+                // これがないと、過去の follow だけが残っている場合に誤って true になる
+                if (createdAt >= latestCreatedAt) {
+                    latestCreatedAt = createdAt;
+                    latestHasMatch = hasMatch;
+                }
+            });
+
+            /*
+            sub.on("eose", async () => {
+                try {
+                    // フィードの終端まで確認した後に、最新のフォロー状態で判定する
+                    if (latestHasMatch) {
+                        const isBot = await isBotFromPubkey(relay, evPubkey);
+                        finish(!isBot); // 自分のフォロワーかつ BOT でない
+                    } else {
+                        finish(false);  // 相手が BOT
+                    }
+                } catch {
+                    finish(false);
+                }
+            });
+            */
+            sub.on("eose", async () => {
+                try {
+                    // フィードの終端まで確認した後に、最新のフォロー状態で最終判定
+                    // これが重要: 「どれか1つのイベントが true だった」ではなく
+                    // 「最新の kind:3 の状態が true かどうか」を見る
+                    if (!latestHasMatch) {
+                        finish(false);
+                        return;
+                    }
+
+                    // 自分をフォローしている相手が BOT かどうかを確認
+                    // BOT なら誤反応しないように、BOT には false を返す
+                    const isBot = await isBotFromPubkey(relay, evPubkey);
+                    finish(!isBot); // フォローあり かつ BOT でない
+                } catch {
+                    finish(false);  // 相手が BOT
+                }
+            });
+
+
+            // 何も返ってこない場合の保険
+            // これにより、relay 側で応答が止まった時も安全側に倒す
+            setTimeout(() => {
+                finish(false);
+            }, 5000);
+
         } catch {
             reject(false);
         }

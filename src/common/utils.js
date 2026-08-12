@@ -14,6 +14,14 @@ const currDateTime = () => new Date();
 const currUnixtime = () => Math.floor(currDateTime().getTime() / 1000);
 
 
+// 自分が最後に送信したイベントIDを保持する
+// 自分の直前の返信に対する返信を再度返さないようにする
+let myLastReplyEventId = "";
+const setMyLastReplyEventId = (id) => {
+    myLastReplyEventId = id;
+};
+const getMyLastReplyEventId = () => myLastReplyEventId;
+
 
 /**
  * jsonを取得
@@ -372,6 +380,7 @@ module.exports = {
     , formattedDateTime
     , probabilityDetermination
     , isBotFromPubkey
-
+    , setMyLastReplyEventId
+    ,getMyLastReplyEventId
 };
 
