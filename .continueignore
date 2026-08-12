@@ -24,3 +24,13 @@ _old_autoReply.js
 _dev_replytoReply.js
 _old_replytoReply.js
 .vscode/settings.json
+node_modules/
+.git/
+dist/
+build/
+coverage/
+*.pem
+*.key
+*.crt
+id_rsa
+id_rsa.*
