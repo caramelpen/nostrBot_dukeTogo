@@ -11,7 +11,7 @@ const { jsonSetandOpen } = require("./common/utils.js");
 const { BOT_PRIVATE_KEY_HEX, pubkey, adminPubkey, RELAY_URL } = require("./common/env.js");
 const { initial, functionalPosting, exchangeRate, normalAutoReply, nounWoEnd } = require("./replyFunction.js");
 
-let relay;
+let relay = null;
 let connect = false;
 
 // envファイルのかたまり
