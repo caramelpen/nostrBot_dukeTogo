@@ -10,7 +10,7 @@ const { jsonSetandOpen, isSafeToReply } = require("./common/utils.js");
 const { BOT_PRIVATE_KEY_HEX, pubkey, adminPubkey, RELAY_URL } = require("./common/env.js");
 const { emergency } = require("./emergency.js");
 
-let relay;
+let relay = null;
 let connect = false;
 let stopped = false;
 
