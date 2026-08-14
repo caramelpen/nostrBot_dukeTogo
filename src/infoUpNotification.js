@@ -55,9 +55,7 @@ const infoUpNotification = async (rssJsonPath, rssJson, i) => {
             if(rssJson[i].gitHubPush === 1) {
                 const fileNamewk = rssJsonPath.split("/").pop();
                 const rssJsonPathSingle = `config/${fileNamewk}`;   // "../config/infoUpNotification.json" を "config/infoUpNotification.json" の形にする
-                //await toGitHubPush(GIT_REPO, rssJsonPath, rssJsonPathSingle, GIT_USER_NAME, GIT_TOKEN, "[auto]"+ rssJson[i].nickName + " RSS info update", GIT_BRANCH);
-                const projectRoot = path.join(__dirname, "../..");  // プロジェクトルートへのパス
-                await toGitHubPush(GIT_REPO, rssJsonPath, rssJsonPathSingle, GIT_USER_NAME, GIT_TOKEN, "[auto]"+ rssJson[i].nickName + " RSS info update", GIT_BRANCH, projectRoot);
+                await toGitHubPush(GIT_REPO, rssJsonPath, rssJsonPathSingle, GIT_USER_NAME, GIT_TOKEN, "[auto]"+ rssJson[i].nickName + " RSS info update", GIT_BRANCH);
                 console.log("infoUpNotification.json is commit/push");
             }
         }
