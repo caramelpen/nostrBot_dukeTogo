@@ -1,5 +1,6 @@
 const { Octokit } = require("octokit");
 const fs = require("fs");
+const { execSync } = require("child_process");
 
 /**
  * GitHubへプッシュする
@@ -11,7 +12,7 @@ const fs = require("fs");
  *  GitHub側に表示されるコミットのコメント
  *  ブランチ名（main とか）
  */
-const toGitHubPush = async (repoName, filePath, relativePath, gitUserName, gitToken, comment, branch) => {
+const toGitHubPush = async (repoName, filePath, relativePath, gitUserName, gitToken, comment, branch, projectRoot = null) => {
     try {
         const octokit = new Octokit({
             auth: gitToken
@@ -51,6 +52,18 @@ const toGitHubPush = async (repoName, filePath, relativePath, gitUserName, gitTo
             branch: branch, // プッシュ先のブランチ名
             sha: fileSha    // ファイルの SHA ハッシュ
         });
+
+        // GitHub API 経由での push 後、ローカル git 参照を同期させる
+        // これにより VSCode の git 差分表示が正しく更新される
+        if (projectRoot) {
+            try {
+                execSync(`git -C "${projectRoot}" fetch origin ${branch}:${branch}`, { stdio: "pipe" });
+                console.log(`Local git reference updated for branch: ${branch}`);
+            } catch (fetchErr) {
+                console.warn("Git fetch failed after push, but push was successful:", fetchErr.message);
+            }
+        }
+
 
     } catch (err) {
         console.error("GitHubPush is Err:"+ err);
