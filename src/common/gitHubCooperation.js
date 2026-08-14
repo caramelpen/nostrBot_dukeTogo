@@ -18,7 +18,11 @@ const toGitHubPush = async (repoName, filePath, relativePath, gitUserName, gitTo
         });
 
         // ファイルのコンテンツを取得
-        const fileContent = fs.readFileSync(filePath, "utf-8");
+        let fileContent = fs.readFileSync(filePath, "utf-8");
+
+        // core.autocrlf = true 環境下で GitHub API 経由のプッシュ時に
+        // CRLF/LF の差異が生じないよう、LF に正規化する
+        fileContent = fileContent.replace(/\r\n/g, "\n");
 
         // ファイルがすでに存在するかどうかを確認し、存在する場合は GitHubにある街頭ファイルのSHAハッシュを取得する
         let fileSha = "";
