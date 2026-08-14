@@ -58,7 +58,8 @@ const toGitHubPush = async (repoName, filePath, relativePath, gitUserName, gitTo
         if (projectRoot) {
             try {
                 //execSync(`git -C "${projectRoot}" fetch origin ${branch}:${branch}`, { stdio: "pipe" });
-                execSync(`git -C "${projectRoot}" pull --ff-only origin ${branch}`, { stdio: "pipe" });
+                //execSync(`git -C "${projectRoot}" pull --ff-only origin ${branch}`, { stdio: "pipe" });
+                execSync(`git -C "${projectRoot}" fetch origin`, { stdio: "pipe" });
                 console.log(`Local git reference updated for branch: ${branch}`);
             } catch (fetchErr) {
                 console.warn("Git fetch failed after push, but push was successful:", fetchErr.message);
