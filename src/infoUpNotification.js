@@ -11,6 +11,8 @@ const { publishToRelay } = require("./common/publishToRelay.js");
 const { toGitHubPush } = require("./common/gitHubCooperation.js");
 const cron = require("node-cron");
 const parser = require("rss-parser");
+const path = require("path");
+const projectRoot = path.resolve(__dirname, "..");
 
 let postEv;
 
@@ -55,7 +57,8 @@ const infoUpNotification = async (rssJsonPath, rssJson, i) => {
             if(rssJson[i].gitHubPush === 1) {
                 const fileNamewk = rssJsonPath.split("/").pop();
                 const rssJsonPathSingle = `config/${fileNamewk}`;   // "../config/infoUpNotification.json" を "config/infoUpNotification.json" の形にする
-                await toGitHubPush(GIT_REPO, rssJsonPath, rssJsonPathSingle, GIT_USER_NAME, GIT_TOKEN, "[auto]"+ rssJson[i].nickName + " RSS info update", GIT_BRANCH);
+                //await toGitHubPush(GIT_REPO, rssJsonPath, rssJsonPathSingle, GIT_USER_NAME, GIT_TOKEN, "[auto]"+ rssJson[i].nickName + " RSS info update", GIT_BRANCH);
+                await toGitHubPush(GIT_REPO, rssJsonPath, rssJsonPathSingle, GIT_USER_NAME, GIT_TOKEN, "[auto]"+ rssJson[i].nickName + " RSS info update", GIT_BRANCH,projectRoot);
                 console.log("infoUpNotification.json is commit/push");
             }
         }

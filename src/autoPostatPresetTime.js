@@ -14,7 +14,8 @@ const { publishToRelay } = require("./common/publishToRelay.js");
 const { toGitHubPush } = require("./common/gitHubCooperation.js");
 const { initial, uploadBTCtoJPYChartImg } = require("./replyFunction.js");
 const { emergency } = require("./emergency.js");
-
+const path = require("path");
+const projectRoot = path.resolve(__dirname, "..");
 
 // envファイルのかたまり
 const keys = {
@@ -104,7 +105,8 @@ const sunCalcDatagetandJsonUpdate = async () => {
         if(runUpdate) {
             const fileNamewk = sunriseSunsetJsonPathGitHub.split("/").pop();
             const sunriseSunsetPathSingle = `config/${fileNamewk}`; // "../config/sunriseSunset.json" を "config/sunriseSunset.json" の形にする
-            await toGitHubPush(GIT_REPO, sunriseSunsetJsonPathGitHub, sunriseSunsetPathSingle, GIT_USER_NAME, GIT_TOKEN, "[auto/initial set] update", GIT_BRANCH);
+            //await toGitHubPush(GIT_REPO, sunriseSunsetJsonPathGitHub, sunriseSunsetPathSingle, GIT_USER_NAME, GIT_TOKEN, "[auto/initial set] update", GIT_BRANCH);
+            await toGitHubPush(GIT_REPO, sunriseSunsetJsonPathGitHub, sunriseSunsetPathSingle, GIT_USER_NAME, GIT_TOKEN, "[auto/initial set] update", GIT_BRANCH,projectRoot);
             console.log("initial set sunriseSunset.json is commit/push");
         }
     } catch (err) {
@@ -608,7 +610,8 @@ const main = async () => {
                         if(sunriseSunsetJson.gitHubPush === 1) {
                             const fileNamewk = sunriseSunsetJsonPath.split("/").pop();
                             const sunriseSunsetPathSingle = `config/${fileNamewk}`; // "../config/sunriseSunset.json" を "config/sunriseSunset.json" の形にする
-                            await toGitHubPush(GIT_REPO, sunriseSunsetJsonPath, sunriseSunsetPathSingle, GIT_USER_NAME, GIT_TOKEN, "[auto/" + sunriseorSunset + "] daily update", GIT_BRANCH);
+                            //await toGitHubPush(GIT_REPO, sunriseSunsetJsonPath, sunriseSunsetPathSingle, GIT_USER_NAME, GIT_TOKEN, "[auto/" + sunriseorSunset + "] daily update", GIT_BRANCH);
+                            await toGitHubPush(GIT_REPO, sunriseSunsetJsonPath, sunriseSunsetPathSingle, GIT_USER_NAME, GIT_TOKEN, "[auto/" + sunriseorSunset + "] daily update", GIT_BRANCH,projectRoot);
                             console.log("sunriseSunset.json is commit/push");
                         }
                     }
