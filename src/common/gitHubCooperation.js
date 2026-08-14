@@ -57,7 +57,8 @@ const toGitHubPush = async (repoName, filePath, relativePath, gitUserName, gitTo
         // これにより VSCode の git 差分表示が正しく更新される
         if (projectRoot) {
             try {
-                execSync(`git -C "${projectRoot}" fetch origin ${branch}:${branch}`, { stdio: "pipe" });
+                //execSync(`git -C "${projectRoot}" fetch origin ${branch}:${branch}`, { stdio: "pipe" });
+                execSync(`git -C "${projectRoot}" pull --ff-only origin ${branch}`, { stdio: "pipe" });
                 console.log(`Local git reference updated for branch: ${branch}`);
             } catch (fetchErr) {
                 console.warn("Git fetch failed after push, but push was successful:", fetchErr.message);
