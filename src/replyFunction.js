@@ -325,8 +325,7 @@ const normalAutoReply = async (relay, ev, autoReplyJson, autoReactionJson, postI
             // フィードのポストがjsonの nativeWords プロパティそのものなら真
             const isNativeWords = autoReactionJson.nativeWords.length > 0 && autoReactionJson.nativeWords.some(name => name === ev.content) ? true : false;
             // フィードのポスト先頭がjsonの nativeWords プロパティを含んでいるなら真
-            //const includeNativeWords = autoReactionJson.nativeWords.some(word => ev.content.startsWith(word));
-            const includeNativeWords = autoReactionJson.nativeWords.some(word => startsWithKeywordAtWordBoundary(ev.content, word));
+            const includeNativeWords = autoReactionJson.nativeWords.some(word => ev.content.startsWith(word));
 
             // 投稿者が管理者か replytoReply から来た
             if(isAdminPubkey || isFromReplytoReply) {
