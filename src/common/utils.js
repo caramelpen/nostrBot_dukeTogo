@@ -363,6 +363,60 @@ const isBotFromPubkey = (relay, pubkey) => {
 
 
 
+
+/**
+ * 文字が語句の境界かどうかを判定する
+ *
+ * 例:
+ *  - "プロ" in "プロ"       => true
+ *  - "プロ" in "プログラム" => false
+ *  - "デューク" in "デューク東郷" => false
+ *  - "デューク" in "デューク！" => true
+ *
+ * 文字種の連続している中に埋もれていないかを確認するための補助関数。
+ */
+const isBoundaryChar = (char) => {
+    if (!char) return true;
+    return !/[A-Za-z0-9ぁ-んァ-ン一-龠々ー]/.test(char);
+};
+
+/**
+ * content 内に keyword が存在し、語句の境界であるかどうかを判定する
+ *
+ * 例:
+ *  containsKeywordAtWordBoundary("プログラム", "プロ") === false
+ *  containsKeywordAtWordBoundary("プロ！", "プロ") === true
+ *  containsKeywordAtWordBoundary("ゴルゴ13", "ゴルゴ") === false
+ */
+const containsKeywordAtWordBoundary = (content, keyword) => {
+    if (!keyword) return false;
+
+    const idx = content.indexOf(keyword);
+    if (idx === -1) return false;
+
+    const prev = idx > 0 ? content[idx - 1] : "";
+    const next = idx + keyword.length < content.length ? content[idx + keyword.length] : "";
+
+    return isBoundaryChar(prev) && isBoundaryChar(next);
+};
+
+/**
+ * content が keyword で始まり、語句の境界であるかどうかを判定する
+ *
+ * 例:
+ *  startsWithKeywordAtWordBoundary("デューク東郷", "デューク") === false
+ *  startsWithKeywordAtWordBoundary("デューク", "デューク") === true
+ *  startsWithKeywordAtWordBoundary("プロ！", "プロ") === true
+ */
+const startsWithKeywordAtWordBoundary = (content, keyword) => {
+    if (!keyword || !content.startsWith(keyword)) return false;
+
+    const next = content[keyword.length] ?? "";
+    return isBoundaryChar(next);
+};
+
+
+
 /**
  * module.exports
  */
@@ -381,6 +435,9 @@ module.exports = {
     , probabilityDetermination
     , isBotFromPubkey
     , setMyLastReplyEventId
-    ,getMyLastReplyEventId
+    , getMyLastReplyEventId
+    , isBoundaryChar
+    , containsKeywordAtWordBoundary
+    , startsWithKeywordAtWordBoundary
 };
 

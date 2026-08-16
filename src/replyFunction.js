@@ -9,7 +9,7 @@ const sharp = require("sharp");
 const fs = require("fs");
 require("websocket-polyfill");
 const { finishEvent } = require("nostr-tools");
-const { currUnixtime, isSafeToReply, random, probabilityDetermination, retrievePostsInPeriod, isFolderExists, jsonSetandOpen, deleteFile, isBotFromPubkey, setMyLastReplyEventId } = require("./common/utils.js");
+const { currUnixtime, isSafeToReply, random, probabilityDetermination, retrievePostsInPeriod, isFolderExists, jsonSetandOpen, deleteFile, isBotFromPubkey, setMyLastReplyEventId, containsKeywordAtWordBoundary, startsWithKeywordAtWordBoundary } = require("./common/utils.js");
 const { publishToRelay } = require("./common/publishToRelay.js");
 const { isNounWoEnd } = require("./common/morphologischeAnalyse.js");
 const { emergency } = require("./emergency.js");
@@ -254,7 +254,9 @@ const exchangeRate = async (relay, ev, exchangeRate, autoReactionJson, postInfoO
 const normalAutoReply = async (relay, ev, autoReplyJson, autoReactionJson, postInfoObj, isFromReplytoReply = false) => {
     try {
         // フィードのポストの中にjsonで設定した値が存在するなら真
-        const target = autoReplyJson.find(item => item.orgPost.some(post => ev.content.includes(post)));
+        //const target = autoReplyJson.find(item => item.orgPost.some(post => ev.content.includes(post)));
+        // 反応語句を境界付きで判定する
+        const target = autoReplyJson.find(item => item.orgPost.some(post => containsKeywordAtWordBoundary(ev.content, post)));
 
         // 投稿者が管理者なら真
         const isAdminPubkey = ev.pubkey === adminPubkey ? true : false;
@@ -276,7 +278,9 @@ const normalAutoReply = async (relay, ev, autoReplyJson, autoReactionJson, postI
 
                 if(isChkMyFollower) {
                     // 反応語句はjsonの何番目にいるか取得
-                    const orgPostIdx = target.orgPost.findIndex(element => ev.content.includes(element));
+                    //const orgPostIdx = target.orgPost.findIndex(element => ev.content.includes(element));
+                    const orgPostIdx = target.orgPost.findIndex(element => containsKeywordAtWordBoundary(ev.content, element));
+
                     // 反応語句は存在するはずだが、もし何らかの理由で見つからなかったらなにもしない
                     if(orgPostIdx === -1) {
                         return;
@@ -286,7 +290,8 @@ const normalAutoReply = async (relay, ev, autoReplyJson, autoReactionJson, postI
                     // 反応語句の前方を収める
                     const fowardSubstr = ev.content.substring(0, chridx);
                     // 反応語句の前方に配列で設定した nativeWords が含まれる
-                    if(autoReactionJson.nativeWords.length > 0 && autoReactionJson.nativeWords.some(word => fowardSubstr.includes(word))) {
+                    //if(autoReactionJson.nativeWords.length > 0 && autoReactionJson.nativeWords.some(word => fowardSubstr.includes(word))) {
+                    if(autoReactionJson.nativeWords.length > 0 && autoReactionJson.nativeWords.some(word => containsKeywordAtWordBoundary(fowardSubstr, word))) {
                         postInfoObj.postCategory = 1;     // リプライ
                     } else {
                         // replytoReply から来た
@@ -320,7 +325,8 @@ const normalAutoReply = async (relay, ev, autoReplyJson, autoReactionJson, postI
             // フィードのポストがjsonの nativeWords プロパティそのものなら真
             const isNativeWords = autoReactionJson.nativeWords.length > 0 && autoReactionJson.nativeWords.some(name => name === ev.content) ? true : false;
             // フィードのポスト先頭がjsonの nativeWords プロパティを含んでいるなら真
-            const includeNativeWords = autoReactionJson.nativeWords.some(word => ev.content.startsWith(word));
+            //const includeNativeWords = autoReactionJson.nativeWords.some(word => ev.content.startsWith(word));
+            const includeNativeWords = autoReactionJson.nativeWords.some(word => startsWithKeywordAtWordBoundary(ev.content, word));
 
             // 投稿者が管理者か replytoReply から来た
             if(isAdminPubkey || isFromReplytoReply) {
