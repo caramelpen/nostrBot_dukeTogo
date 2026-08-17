@@ -5,7 +5,7 @@
  */
 require("websocket-polyfill");
 const { relayInit } = require("nostr-tools");
-const { jsonSetandOpen, getMyLastReplyEventId } = require("./common/utils.js");
+const { jsonSetandOpen, getMyLastReplyEventId, currUnixtime } = require("./common/utils.js");
 const { BOT_PRIVATE_KEY_HEX, pubkey, RELAY_URL, adminPubkey } = require("./common/env.js");
 const { initial, functionalPosting, exchangeRate, normalAutoReply } = require("./replyFunction.js");
 
@@ -162,8 +162,11 @@ const replytoReply = async (relay)=>{
                     }
                     // 処理の実行はディスパッチで行い、最適化をはかる
                     await funcObj[funcConfig.funcName[i]](relay, ev, funcJson, autoReactionJson, postInfo, true);
+
                     // ポストできていて、次へ進めない区分なら
                     if(postInfo.postCategory >= 1 && funcConfig.operationCategory[i] === 1) {
+                        // クールダウン Map の更新
+                        lastReplyAtByPubkey.set(ev.pubkey, currUnixtime());
                         break;
                     }
                 }
