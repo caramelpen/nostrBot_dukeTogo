@@ -6,7 +6,7 @@
 const { currUnixtime, updateLastReplyTime, userDisplayName } = require("./utils.js");
 
 // リレーにイベントを送信
-const publishToRelay = async (relay, ev, isAutoReply = false, originallyPubKey = "", replyingtoaPost = "") => {
+const publishToRelay = async (relay, ev, isAutoReply = false, originallyPubKey = "", replyingtoaPost = "", matchedKeyword = "") => {
     /* nostr-toolsのバージョンが1.17.0だとpub.onが対応しておらずエラーになる
     const pub = relay.publish(ev);
 
@@ -18,17 +18,25 @@ const publishToRelay = async (relay, ev, isAutoReply = false, originallyPubKey =
     });
     */
     try {
-        
+        let responsePhrases = "";
         let findChar = "";
         let displayName = "";
+
+        if(matchedKeyword.length > 0){
+            responsePhrases = "／response phrases:" + matchedKeyword;
+        }
+
         if(originallyPubKey.length > 0){
             //displayName = await userDisplayName(relay, originallyPubKey);
             displayName = userDisplayName(relay, originallyPubKey);
             findChar = findChar + "find:" + displayName + "( " + originallyPubKey + " )";
         }
+
         if(replyingtoaPost.length > 0 ) {
             findChar = findChar + " original messege:" + replyingtoaPost;
         }
+        
+        findChar = findChar + responsePhrases;
         findChar = findChar + (findChar.length > 0 ? "\n=> ":"");
 
         await relay.publish(ev).then(() => {

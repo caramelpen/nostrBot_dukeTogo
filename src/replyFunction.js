@@ -265,6 +265,8 @@ const normalAutoReply = async (relay, ev, autoReplyJson, autoReactionJson, postI
         // 作動区分
         postInfoObj.postCategory = 0;
         
+        let matchedKeyword = "";
+
         // 反応語句を発見
         if(target) {
 
@@ -280,6 +282,8 @@ const normalAutoReply = async (relay, ev, autoReplyJson, autoReactionJson, postI
                     // 反応語句はjsonの何番目にいるか取得
                     //const orgPostIdx = target.orgPost.findIndex(element => ev.content.includes(element));
                     const orgPostIdx = target.orgPost.findIndex(element => containsKeywordAtWordBoundary(ev.content, element));
+
+                    matchedKeyword = target.orgPost[orgPostIdx];
 
                     // 反応語句は存在するはずだが、もし何らかの理由で見つからなかったらなにもしない
                     if(orgPostIdx === -1) {
@@ -424,7 +428,7 @@ const normalAutoReply = async (relay, ev, autoReplyJson, autoReactionJson, postI
                     return;
                 }
 
-                await publishToRelay(relay, replyPostorreactionPostEv, (isFromReplytoReply ? false : true), ev.pubkey, ev.content);
+                await publishToRelay(relay, replyPostorreactionPostEv, (isFromReplytoReply ? false : true), ev.pubkey, ev.content, matchedKeyword);
                 // リアクションとリアクション絵文字でのリプライを行う動作区分で、かつカスタム絵文字URLが設定されているならリアクション絵文字でリプライも行う
                 if(postInfoObj.postCategory === 4) {
                     // リプライ
