@@ -13,6 +13,8 @@ const currDateTime = () => new Date();
 // 現在の日本時間のUnixtime(秒単位)を取得
 const currUnixtime = () => Math.floor(currDateTime().getTime() / 1000);
 
+// 取得した現在の日本時間のUnixtimeを保管
+const APP_START_TIME = currUnixtime();
 
 // 自分が最後に送信したイベントIDを保持する
 // 自分の直前の返信に対する返信を再度返さないようにする
@@ -152,7 +154,11 @@ const isFolderExists = (targetFolder, createFolder = false) => {
     }
 }
 
-
+// 再起動時即時反応
+const isStartupGracePeriod = () => {
+    const now = currUnixtime();
+    return (now - APP_START_TIME) <= 30; // 30秒だけ再起動直後は即時反応
+};
 
 // 引数のイベントにリプライしても安全か?
 // 対象の発行時刻が古すぎる場合・最後にリプライを返した時点からクールタイム分の時間が経過していない場合、安全でない
@@ -164,6 +170,11 @@ const isSafeToReply = ({ pubkey, created_at }) => {
 
     // 現在のUNIX時間を取得
     const now = currUnixtime();
+
+    // 再起動直後はクールタイムなし
+    if (isStartupGracePeriod()) {
+        return true;
+    }
 
     // 作成日時が現在時間からクールタイムを引いたものより過去（古すぎる）なら、返信は安全ではないと判断し、偽を返す
     if (created_at < now - COOL_TIME_DUR_SEC) {
@@ -187,8 +198,14 @@ const updateLastReplyTime = (pubkey, time) => {
 
 // 第2引数の公開鍵が現在から60秒前以内に10個以上投稿があったら偽を返す
 const retrievePostsInPeriod = (relay, pubKey) => {
+
+    // 再起動時は解除
+    if (isStartupGracePeriod()) {
+        return Promise.resolve(true);
+    }
+
     const baseSeconds = 60;
-    const currUnixtime_60 = currUnixtime - baseSeconds;
+    const currUnixtime_60 = currUnixtime() - baseSeconds;
 
     return new Promise((resolve, reject) => {
         try {
