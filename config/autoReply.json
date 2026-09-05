@@ -14,6 +14,21 @@
 
 
     ,{
+        "orgPost": ["nostrでnsecをあげろ","nostr で nsec をあげろ"
+                    ,"Nostrでnsecをあげろ","Nostr で nsec をあげろ"
+                    ,"レターパックでnsecを送れ","レターパックで nsec を送れ"]
+        ,"replyPostChar": [
+                        "詐欺だな…"
+                        ,"…詐欺だな…"
+                        ,"…断る…"
+                        ,"…それは…詐欺だな…"
+                        ,"…それは…詐欺だな…ふふふ…"
+                        ]
+        ,"probability": 100
+    }
+
+
+    ,{
         "orgPost": ["nostrチュートリアル","nostr チュートリアル"]
         ,"replyPostChar": [
                         "…まずはここを見ろ… \nhttps://welcome.nostr-jp.org/ \nhttps://scrapbox.io/nostr/ \n有識者が随時更新をしてくれている… \nそして俺が言えることは「秘密鍵を他人に漏らすな」…ということだ…"
