@@ -1097,17 +1097,27 @@ const uploadImg = async (imgPath) => {
     // void.cat APIのエンドポイントURL
     // const uploadUrl = "https://void.cat/upload?cli=true";
     // const returnURL = "https://void.cat/";
-    const uploadUrl = "https://catbox.moe/user/api.php";
-    const returnURL = "https://files.catbox.moe";
+    // const uploadUrl = "https://catbox.moe/user/api.php";
+    // const returnURL = "https://files.catbox.moe";
+    const uploadUrl = "https://nostr.build/api/v2/upload/files";
+    const token = createNip98Token(uploadUrl);
 
-    const returnURLLength = returnURL.length;
+    //const returnURLLength = returnURL.length;
 
     const axios = require("axios");
     const FormData = require("form-data");
     const form = new FormData();
+    const path = require("path");
+
+    /*
     form.append("reqtype", "fileupload"); // リクエストタイプ
     form.append("fileToUpload", fs.createReadStream(imgPath)); // 画像パス
-
+    form.append("file[]", fs.createReadStream(imgPath), {
+        filename: path.basename(imgPath),
+        contentType: "image/png"
+    });
+    */    
+    form.append("file[]", fs.createReadStream(imgPath));
     
     // 画像ファイルの読み込み
     // const imageData = fs.readFileSync(imgPath);
@@ -1147,17 +1157,20 @@ const uploadImg = async (imgPath) => {
         //     }
         // });
 
-
-
-
-
-
-
         const response = await axios.post(uploadUrl, form, {
-            headers: form.getHeaders(), // FormDataヘッダーを自動設定
+            //headers: form.getHeaders(), // FormDataヘッダーを自動設定
+            headers: {
+                ...form.getHeaders(),
+                Authorization: token,
+                "Accept": "application/json"
+            },
+            maxContentLength: Infinity,
+            maxBodyLength: Infinity,
+            timeout: 60000            
         });
         //console.log("Image URL:", response.data);
 
+        /*
         //if (response.ok) {
         if (response.statusText === "OK") {
         //if (res.ok) {
@@ -1173,9 +1186,24 @@ const uploadImg = async (imgPath) => {
         } else {
             return undefined;
         }
+        */
+
+        const uploadedFile = response.data?.data?.[0];
+        const imageUrl = uploadedFile?.url;
+
+        if (!imageUrl) {
+            throw new Error(`Invalid nostr.build response: ${JSON.stringify(response.data)}`);
+        }
+
+        return imageUrl;
 
     } catch (error) {
-        console.error("Error uploading image:", error);
+        console.error("Error uploading image:", {
+            status: error.response?.status,
+            statusText: error.response?.statusText,
+            data: error.response?.data,
+            message: error.message
+        });
         return undefined;
     }
 }
@@ -1300,6 +1328,23 @@ const uploadBTCtoJPYChartImg = async (presetJsonPath, nowDate, retPostEv, relay 
     }
     return processingResult;
 }
+
+
+const createNip98Token = (url) => {
+    const authEvent = finishEvent({
+        kind: 27235,
+        content: "",
+        tags: [
+            ["u", url],
+            ["method", "POST"]
+        ],
+        created_at: currUnixtime()
+    }, BOT_PRIVATE_KEY_HEX);
+
+    return "Nostr " + Buffer
+        .from(JSON.stringify(authEvent))
+        .toString("base64");
+};
 
 
 
