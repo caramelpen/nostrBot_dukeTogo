@@ -49,6 +49,11 @@ const funcConfig = {
     ,operationCategory: [1, 1, 1, 1]                                                                                  // 1ならポストできたら次へ進めない（useJsonFileやuncName の記述順と対応させる）
 }
 
+
+const seenEventIds = new Set();
+const processingEventIds = new Set();    
+
+
 const autoReply = async (relay) => {
     // フィードを購読
     const sub = relay.sub(
@@ -58,6 +63,13 @@ const autoReply = async (relay) => {
     );
 
     sub.on("event", async (ev) => {
+
+        if (!ev.id) return;
+        if (seenEventIds.has(ev.id) || processingEventIds.has(ev.id)) return;
+
+        seenEventIds.add(ev.id);
+        processingEventIds.add(ev.id);
+        
         try {
 
             // 有効とするのは自分の投稿以外でかつtagが空のもの
@@ -106,7 +118,10 @@ const autoReply = async (relay) => {
                 }
             }
         } catch (err) {
-            throw err;
+            //throw err;
+            console.error("autoReply event error:", err);
+        } finally {
+            processingEventIds.delete(ev.id);
         }
     });
 }
