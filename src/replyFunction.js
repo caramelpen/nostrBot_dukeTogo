@@ -784,12 +784,13 @@ const convertUnixTimeToJapanISOUTC = (unixTimeInSeconds) => {
 
 
 // BTCの日本円チャートを得る（第1引数がDなら日ごと、Hなら時間ごと）
-const getBTCtoJPYChart = async (dorh, APIEndPoint) => {
-    const timeStamp = new Date().getTime();
+//const getBTCtoJPYChart = async (dorh, APIEndPoint) => {
+const getBTCtoJPYChart = async (dorh) => {
+    //const timeStamp = new Date().getTime();
     try {
         // パラメーターを設定
+        /*
         let params;
-        //params = "";
         if(dorh === "D") {
             params = {
                 fsym: "BTC",
@@ -817,16 +818,25 @@ const getBTCtoJPYChart = async (dorh, APIEndPoint) => {
             // params = params + "&limit=179";
             // params = params + "&aggregatePredictableTimePeriods=false";
         }
+        */
+        const params = new URLSearchParams({
+            symbol: "BTCJPY",
+            interval: dorh === "D" ? "1d" : "1m",
+            limit: dorh === "D" ? "30" : "180"
+        });
 
+        const url = `https://api.binance.com/api/v3/klines?${params}`;
+        console.log("Binance URL:", url);
         
         // APIにリクエストを送信してデータを取得
-        const endPoint = APIEndPoint + "?timestamp=" + timeStamp;
-        //const endPoint = APIEndPoint + params + "&timestamp=" + timeStamp;
+        //const endPoint = APIEndPoint + "?timestamp=" + timeStamp;
         
         try {
-             const url = new URL(endPoint);
-             Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
+            /*
+            const url = new URL(endPoint);
+            Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
             //const url = endPoint;
+            console.log("CryptoCompare URL:", url.toString());
             const response = await fetch(url, 
                 {
                     method: "GET",
@@ -841,12 +851,38 @@ const getBTCtoJPYChart = async (dorh, APIEndPoint) => {
             // console.log("↑---------- chartData(" + dorh + ") --------");
 
             return chartData; // データは価格の配列として返されます
+
+            */
+
+            const response = await fetch(url);
+            const resJson = await response.json();
+
+            if (!response.ok) {
+                throw new Error(
+                    `Binance API error ${response.status}: ${JSON.stringify(resJson)}`
+                );
+            }
+
+            if (!Array.isArray(resJson) || resJson.length === 0) {
+                throw new Error(`Invalid Binance response: ${JSON.stringify(resJson)}`);
+            }
+
+            // BinanceのKline:
+            // [openTime, open, high, low, close, volume, ...]
+            return resJson.map(kline => ({
+                // convertUnixTimeToJapanISOUTC() が秒を要求するためミリ秒を秒へ変換
+                time: Number(kline[0]) / 1000,
+                close: Number(kline[4])
+            }));
+
         } catch (error) {
-            console.error("エラーが発生しました:", error);
+            console.error("getBTCtoJPYChart でエラーが発生しました:", error);
+            throw error;
         }
         
     } catch (err) {
-        console.error(err);
+        console.error("getBTCtoJPYChart でエラーが発生しました:", err);
+        throw err;
     }
 }
 
@@ -1173,8 +1209,10 @@ const uploadBTCtoJPYChartImg = async (presetJsonPath, nowDate, retPostEv, relay 
                     const hitMinutes = value.minutes.includes(currentTime);
                     if (hitMinutes && value.name === "BTCChart") {
                         // BTCの日ごとと時間ごとのチャートデータを得る
-                        const chartDataD = await getBTCtoJPYChart("D","https://min-api.cryptocompare.com/data/v2/histoday");
-                        const chartDataH = await getBTCtoJPYChart("H","https://min-api.cryptocompare.com/data/v2/histominute");
+                        // const chartDataD = await getBTCtoJPYChart("D","https://min-api.cryptocompare.com/data/v2/histoday");
+                        // const chartDataH = await getBTCtoJPYChart("H","https://min-api.cryptocompare.com/data/v2/histominute");
+                        const chartDataD = await getBTCtoJPYChart("D");
+                        const chartDataH = await getBTCtoJPYChart("H");
                         if(chartDataD !== undefined && chartDataH !== undefined) {
                             // チャートを図にする
                             nowUnixDate = currUnixtime();
