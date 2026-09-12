@@ -331,6 +331,8 @@ const normalAutoReply = async (relay, ev, autoReplyJson, autoReactionJson, postI
             // フィードのポスト先頭がjsonの nativeWords プロパティを含んでいるなら真
             //const includeNativeWords = autoReactionJson.nativeWords.some(word => ev.content.startsWith(word));
             const includeNativeWords = autoReactionJson.nativeWords.some(word => startsWithKeywordAtWordBoundary(ev.content, word));
+            // フィードのポストに nativeWords がどこかに含まれていれば真
+            const includeNativeWordsAdmin = autoReactionJson.nativeWords.some(word => ev.content.includes(word));
 
             // 投稿者が管理者か replytoReply から来た
             if(isAdminPubkey || isFromReplytoReply) {
@@ -342,8 +344,9 @@ const normalAutoReply = async (relay, ev, autoReplyJson, autoReactionJson, postI
                     } else {
                         // 管理者だ
                         if(isAdminPubkey) {
-                            // フィードのポスト先頭がjsonの nativeWords プロパティを含んでいる
-                            if(includeNativeWords) {
+                            
+                            // フィードのポスト先頭がjsonの nativeWords プロパティを含んでいるかあるいは nativeWords がどこかに含まれている
+                            if(includeNativeWords || includeNativeWordsAdmin) {
                                 postInfoObj.postCategory = 2;     // リプライ(全リプライ語句からのランダムリプライ)
                             }
                         }
@@ -361,8 +364,8 @@ const normalAutoReply = async (relay, ev, autoReplyJson, autoReactionJson, postI
                 } else {
                     // 自分をフォローしている人なら
                     if(isChkMyFollower) {
-                        // フィードのポスト先頭がjsonの nativeWords プロパティを含んでいる
-                        if(includeNativeWords) {
+                        // フィードのポスト先頭がjsonの nativeWords プロパティを含んでいるかあるいは nativeWords がどこかに含まれている
+                        if(includeNativeWords || includeNativeWordsAdmin) {
                             postInfoObj.postCategory = 2;     // リプライ(全リプライ語句からのランダムリプライ)
                         }
                     }
