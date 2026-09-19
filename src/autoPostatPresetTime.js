@@ -545,12 +545,56 @@ const funcConfig = {
 }
 
 
+// 起動時ポスト
+const startUpPost = async () => {
+    let relay;
+    try {
+        // surveillance.json から起動時投稿の設定を読み込む
+        const config = await jsonSetandOpen("../../config/surveillance.json");
+        // startComment が未設定または空の場合は投稿しない
+        if (!config || !Array.isArray(config.startComment) || config.startComment.length === 0) {
+            console.error("startUuPost: startComment is not configured");
+            return false;
+        }
+
+        // 起動時投稿のヘッダーと本文を設定から取得する
+        const postChar = config.surveillanceCommonHeader + config.startComment[0];
+
+        // 空の投稿文はリレーへ送信しない
+        if (typeof postChar !== "string" || postChar.length === 0) {
+            console.log("startUpPost: no post was made because postChar is empty");
+            return false;
+        }
+
+        // リレーへ接続する
+        relay = relayInit(RELAY_URL);
+        // リレー接続時のエラーを監視する
+        relay.on("error", () => {
+            console.error("startUpPost: failed to connect");
+        });
+        await relay.connect();
+        // 投稿文から署名済みイベントを作成して投稿する
+        await publishToRelay(relay, composePost(postChar));
+        return true;
+    } catch (err) {
+        console.error("startUpPost is error:" + err);
+        return false;
+    } finally {
+        // 投稿処理の終了後にリレー接続を閉じる
+        if (relay) {
+            relay.close();
+        }
+    }
+}
+
+
 
 
 /****************
  * メイン
  ***************/
 const main = async () => {
+    await startUpPost();
     await sunCalcDatagetandJsonUpdate();
     cron.schedule("* * * * *", async () => {  // 分単位
 
