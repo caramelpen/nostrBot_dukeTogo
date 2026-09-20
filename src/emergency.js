@@ -14,7 +14,8 @@ const { BOT_PRIVATE_KEY_HEX } = require("./common/env.js");
 
 const conditions = {
     runStop: false
-    ,runStart: false
+    //,runStart: false
+    ,runStart: true
     ,occurrenceEmergency: false
 }
 

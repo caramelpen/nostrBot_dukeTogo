@@ -147,14 +147,27 @@ const main = async () => {
         if (config.stopTime) {
             config.stopTime.forEach(time => {
                 const cronTime = convertToCronFormat(time);
-                job = cron.schedule(cronTime, () => {
+                job = cron.schedule(cronTime, async () => {
                     if(!conditions.occurrenceEmergency && !conditions.runStop) {
+                        /*
                         if(runProcess( {exec: config.stopExec
                                         , runConfig: config.runConfig
                                         , surveillanceCommonHeader: config.surveillanceCommonHeader
                                         , comment: config.stopComment
                                         }
                                     ,"stopped" )) {
+                            conditions.runStop = true;
+                            conditions.runStart = false;
+                        }
+                        */
+                        const stopped = await runProcess({
+                            exec: config.stopExec,
+                            runConfig: config.runConfig,
+                            surveillanceCommonHeader: config.surveillanceCommonHeader,
+                            comment: config.stopComment
+                        }, "stopped");
+
+                        if (stopped) {
                             conditions.runStop = true;
                             conditions.runStart = false;
                         }
@@ -169,14 +182,27 @@ const main = async () => {
         if (config.startTime) {
             config.startTime.forEach(time => {
                 const cronTime = convertToCronFormat(time);
-                job = cron.schedule(cronTime, () => {
+                job = cron.schedule(cronTime, async () => {
                     if(!conditions.occurrenceEmergency && !conditions.runStart) {
+                        /*
                         if(runProcess( {exec: config.startExec 
                                         , runConfig: config.runConfig
                                         , surveillanceCommonHeader: config.surveillanceCommonHeader
                                         , comment: config.startComment
                                         }
                                     ,"started" )) {                            
+                            conditions.runStart = true;
+                            conditions.runStop = false;
+                        }
+                        */
+                        const started = await runProcess({
+                            exec: config.startExec,
+                            runConfig: config.runConfig,
+                            surveillanceCommonHeader: config.surveillanceCommonHeader,
+                            comment: config.startComment
+                        }, "started");
+
+                        if (started) {
                             conditions.runStart = true;
                             conditions.runStop = false;
                         }
