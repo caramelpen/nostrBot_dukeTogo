@@ -16,6 +16,8 @@ const { initial, uploadBTCtoJPYChartImg } = require("./replyFunction.js");
 const { emergency } = require("./emergency.js");
 const path = require("path");
 const projectRoot = path.resolve(__dirname, "..");
+const fs = require("fs");
+
 
 // envファイルのかたまり
 const keys = {
@@ -512,8 +514,28 @@ const subSunriseSunset = async (sunriseSunsetPath, nowDate, retPostEv = undefine
     }
 }
 
+// サーバ起動なら真
+const isServerBoot = () => {
+    const bootIdPath = "/proc/sys/kernel/random/boot_id";
+    const savedBootIdPath = path.join(projectRoot, ".lastBootId");
 
+    try {
+        const currentBootId = fs.readFileSync(bootIdPath, "utf8").trim();
 
+        let previousBootId = "";
+        if (fs.existsSync(savedBootIdPath)) {
+            previousBootId = fs.readFileSync(savedBootIdPath, "utf8").trim();
+        }
+
+        fs.writeFileSync(savedBootIdPath, currentBootId, "utf8");
+
+        // 初回起動、またはサーバー再起動後だけ true
+        return currentBootId !== previousBootId;
+    } catch (err) {
+        console.error("isServerBoot is error:" + err);
+        return false;
+    }
+}
 
 // 投稿イベントを組み立てる
 const composePost = (postChar) => {
@@ -594,7 +616,10 @@ const startUpPost = async () => {
  * メイン
  ***************/
 const main = async () => {
-    await startUpPost();
+    // サーバー再起動時だけ固定ポストを行う
+    if (isServerBoot()) {
+        await startUpPost();
+    }
     await sunCalcDatagetandJsonUpdate();
     cron.schedule("* * * * *", async () => {  // 分単位
 
